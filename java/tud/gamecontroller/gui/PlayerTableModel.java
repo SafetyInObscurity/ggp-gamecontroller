@@ -23,7 +23,9 @@ import javax.swing.table.AbstractTableModel;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.impl.Game;
+import tud.gamecontroller.players.HyperPlayer.HyperPlayerInfo;
 import tud.gamecontroller.players.LegalPlayerInfo;
+import tud.gamecontroller.players.MCSPlayer.MCSPlayerInfo;
 import tud.gamecontroller.players.XXXXPlayer.XXXXPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
@@ -191,8 +193,11 @@ public class PlayerTableModel extends AbstractTableModel {
 			else if(type.equals(PlayerType.XXXX)){ // ADDED
 				return new XXXXPlayerInfo(row,GDLVersion.v1);
 			}
-			else if(type.equals(PlayerType.MCS)){
-				return new XXXXPlayerInfo(row,GDLVersion.v1);
+			else if(type.equals(PlayerType.MCS)) {
+				return new MCSPlayerInfo(row, GDLVersion.v1);
+			}
+			else if(type.equals(PlayerType.HYPERPLAY)){
+				return new HyperPlayerInfo(row,GDLVersion.v2);
 			}else{
 				return new LegalPlayerInfo(row,GDLVersion.v1);
 			}

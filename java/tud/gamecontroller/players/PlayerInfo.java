@@ -29,6 +29,7 @@ public abstract class PlayerInfo {
 	public static final String TYPE_RANDOM = "random";
 	public static final String TYPE_XXXX = "xxxx"; // ADDED
 	public static final String TYPE_MCS = "mcs";
+	public static final String TYPE_HYPERPLAY = "hyper";
 
 	private int roleindex;
 	private String name;

@@ -17,11 +17,20 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * 
- */
-package tud.gamecontroller.gui;
+package tud.gamecontroller.players.HyperPlayer;
 
-public enum PlayerType {
-	REMOTE, LEGAL, RANDOM, XXXX, MCS, HYPERPLAY // ADDED
+import tud.gamecontroller.GDLVersion;
+import tud.gamecontroller.players.LocalPlayerInfo;
+
+public class HyperPlayerInfo extends LocalPlayerInfo {
+
+	public HyperPlayerInfo(int roleindex, GDLVersion gdlVersion) {
+		super(roleindex, "hyper", gdlVersion);
+	}
+
+	@Override
+	public String getType() {
+		return TYPE_HYPERPLAY;
+	}
+
 }

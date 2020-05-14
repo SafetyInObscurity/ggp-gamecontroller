@@ -54,7 +54,7 @@ public class JPlayerTable extends JTable {
 		private static final long serialVersionUID = 7990970130621681632L;
 
 		public PlayerTypeCellEditor() {
-			super(new JComboBox(new PlayerType[]{PlayerType.REMOTE, PlayerType.RANDOM, PlayerType.LEGAL, PlayerType.XXXX, PlayerType.MCS})); // ADDED
+			super(new JComboBox(new PlayerType[]{PlayerType.REMOTE, PlayerType.RANDOM, PlayerType.LEGAL, PlayerType.XXXX, PlayerType.MCS, PlayerType.HYPERPLAY})); // ADDED
 		}
 	}
 	

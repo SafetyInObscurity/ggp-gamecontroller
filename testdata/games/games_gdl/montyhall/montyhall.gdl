@@ -34,6 +34,12 @@
    (does candidate ?m))
 (<= (sees candidate (open_door ?d))
    (does random (open_door ?d)))
+(<= (sees random (does candidate ?m))
+   (does candidate ?m))
+(<= (sees random (open_door ?d))
+   (does random (open_door ?d)))
+(<= (sees random (hide_car ?d))
+   (does random (hide_car ?d)))
 
 (<= (next (car ?d))
    (does random (hide_car ?d)))

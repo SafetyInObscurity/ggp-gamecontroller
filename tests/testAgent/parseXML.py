@@ -50,6 +50,8 @@ def parse_file_csv(filename, csv):
             num_steps = len(child)
 
     writer.writerow({'match_id': match_id,
+                     'game_name': game_name,
+                     'gdl_version': gdl_version,
                      'timestamp': timestamp,
                      'startclock': startclock,
                      'sight_of': sight_of,
@@ -66,9 +68,13 @@ def parse_file_csv(filename, csv):
 output_dir = sys.argv[1]
 file_prefex = sys.argv[2]
 num_tests = int(sys.argv[3])
+game_name = sys.argv[4]
+gdl_version = sys.argv[5]
 
 with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w') as csv_file:
     fieldnames = ['match_id',
+                  'game_name',
+                  'gdl_version',
                   'timestamp',
                   'startclock',
                   'sight_of',

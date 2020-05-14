@@ -1,0 +1,13 @@
+MATCH_ID="randomhyper"
+GAMEFILE="testdata/games/games_gdl/montyhall/montyhall.gdl"
+GAMENAME="montyhall"
+START_CLOCK=10
+PLAY_CLOCK=60
+GDL_VERSION=2
+PLAYER_NAME_1="legal"
+ROLE_ID_1=1
+PLAYER_NAME_2="random"
+ROLE_ID_2=2
+OUTPUT_DIR="matches/"
+STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
+NUMTESTS=1
