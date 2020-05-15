@@ -20,9 +20,11 @@
 package tud.gamecontroller.players.HyperPlayer;
 
 import tud.gamecontroller.game.MoveInterface;
+import tud.gamecontroller.game.RoleInterface;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.JointMove;
@@ -44,18 +46,48 @@ public class Model<TermType extends TermInterface> {
             State at step
         And is hashed according to stepNum
      */
-    private HashMap<Integer, Triple<Collection<MoveInterface<TermType>>, JointMove<TermType>, StateInterface<TermType, ?>>> gameplayTracker;
+    private HashMap<Integer, StateTrackerTriple<TermType>> gameplayTracker;
     private LikelihoodTracker likelihoodTracker; // Tracks the likelihood of the model representing the true state
 
     public Model() {
-        this.gameplayTracker = new HashMap<Integer, Triple<Collection<MoveInterface<TermType>>, JointMove<TermType>, StateInterface<TermType, ?>>>();
+        this.gameplayTracker = new HashMap<Integer, StateTrackerTriple<TermType>>();
         this.likelihoodTracker = new LikelihoodTracker();
     }
 
-    public HashMap<Integer, Triple<Collection<MoveInterface<TermType>>, JointMove<TermType>, StateInterface<TermType, ?>>> getGameplayTracker() {
-        return gameplayTracker;
-    }
+    public HashMap<Integer, StateTrackerTriple<TermType>> getGameplayTracker() { return gameplayTracker; }
     public LikelihoodTracker getLikelihoodTracker() {
         return likelihoodTracker;
+    }
+
+
+
+    public void updateGameplayTracker(int stepNum, Collection<TermType> percepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> state) {
+        if(this.gameplayTracker.containsKey(stepNum)) System.err.println("Key already contained");
+        else {
+            StateTrackerTriple<TermType> gameplay = new StateTrackerTriple<TermType>(percepts, jointAction, state);
+            this.gameplayTracker.put(stepNum, gameplay);
+        }
+    }
+
+    public StateInterface<TermType, ?> getCurrentState() {
+        return this.gameplayTracker.get(gameplayTracker.size()-1).getState();
+    }
+
+    /**
+     * @return moves that are legal in all of the current possible states
+     */
+    public Collection<? extends MoveInterface<TermType>> computeLegalMoves(RoleInterface<TermType> role) {
+        // Get current state
+        StateInterface<TermType, ?> state = getCurrentState();
+
+        // Compute legal moves
+        Collection<? extends MoveInterface<TermType>> stateLegalMoves = state.getLegalMoves(role);
+
+        Collection<? extends MoveInterface<TermType>> legalMoves = null;
+        legalMoves = new HashSet<MoveInterface<TermType>>(stateLegalMoves);
+        legalMoves.retainAll(stateLegalMoves);
+
+        // Return legal moves
+        return legalMoves;
     }
 }

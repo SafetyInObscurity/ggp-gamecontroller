@@ -21,9 +21,11 @@
 
 package tud.gamecontroller.players.HyperPlayer;
 
+import tud.auxiliary.CrossProductMap;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.*;
+import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
@@ -47,12 +49,13 @@ public class HyperPlayer<
 
 	private Random random;
 	private int numHyperGames = 10;
+	private HyperStatesTracker<TermType, StateType> hStateTracker;
 
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
 	private HashMap<String, Collection<MoveInterface<TermType>>> badMovesTracker; // Tracks the invalid moves from each perfect-information state
-	private Collection<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
+	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 
 	public HyperPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
@@ -71,6 +74,7 @@ public class HyperPlayer<
 		perceptTracker = new HashMap<Integer, Collection<TermType>>();
 		badMovesTracker = new HashMap<String, Collection<MoveInterface<TermType>>>();
 		hypergames = new ArrayList<Model<TermType>>();
+		hStateTracker = new HyperStatesTracker<TermType, StateType>(match.getGame(), match.getGame().getInitialState(), role, numHyperGames);
 		stepNum = 0;
 	}
 
@@ -84,15 +88,18 @@ public class HyperPlayer<
 	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
 		notifier.connectionEstablished();
-		if(seesTerms != null) {
-			// calculate the successor(s) of current state(s)
-			statesTracker.statesUpdate((Collection<TermType>) seesTerms);
-		}
+//		if(seesTerms != null) {
+//			// calculate the successor(s) of current state(s)
+//			hStateTracker.statesUpdate((Collection<TermType>) seesTerms);
+//		}
 		perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
 		MoveInterface<TermType> move = getNextMove();
-		actionTracker.put(stepNum, move); // Puts the action taken in the map at the current step
+		actionTracker.put(stepNum, move); // Puts the action taken in the map at the current step @todo: Update to ensure this works even if an illegal move is made
 
+		System.out.println("PERCEPT TRACKER");
 		System.out.println(perceptTracker.toString());
+		System.out.println();
+		System.out.println("ACTION TRACKER");
 		System.out.println(actionTracker.toString());
 
 		notifyStopRunning();
@@ -106,11 +113,90 @@ public class HyperPlayer<
 	 * @return A legal move
 	 */
 	public MoveInterface<TermType> getNextMove() {
-		ArrayList<MoveInterface<TermType>> legalMoves = new ArrayList<MoveInterface<TermType>>(getLegalMoves());
+		ArrayList<MoveInterface<TermType>> legalMoves = null;
+		if(stepNum == 0) {
+			// Create first model to represent the empty state
+			Model<TermType> model = new Model<TermType>();
 
+			Collection<TermType> initialPercepts = perceptTracker.get(stepNum);
+			JointMove<TermType> initialJointAction = null;
+			StateInterface<TermType, ?> initialState = match.getGame().getInitialState();
+			model.updateGameplayTracker(stepNum, initialPercepts, initialJointAction, initialState);
 
+			hypergames.add(model);
+
+			// Get legal moves from this model
+			legalMoves = new ArrayList<MoveInterface<TermType>>(model.computeLegalMoves(role));
+		} else {
+			// Update first model with percepts gained
+			Model<TermType> model = hypergames.get(0);
+
+			Collection<TermType> percepts = perceptTracker.get(stepNum);
+			JointMove<TermType> jointAction = (JointMove<TermType>) getRandomJointMove(model.getCurrentState());
+			StateInterface<TermType, ?> state = model.getCurrentState();
+			model.updateGameplayTracker(stepNum, percepts, jointAction, state);
+
+			// Get legal moves from model
+			legalMoves = new ArrayList<MoveInterface<TermType>>(model.computeLegalMoves(role));
+		}
 
 		int i = random.nextInt(legalMoves.size());
 		return legalMoves.get(i);
+	}
+
+	/**
+	 * Gets a random joint move given the action matches the action taken in the last step
+	 *
+	 * @param state
+	 * @return
+	 */
+	public JointMoveInterface<TermType> getRandomJointMove(StateInterface<TermType, ?> state) {
+		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state));
+
+		System.out.println("Valid Joint moves:");
+		for (JointMoveInterface<TermType> move : possibleJointMoves) {
+			System.out.println(move.toString());
+		}
+
+		int i = random.nextInt(possibleJointMoves.size());
+		return possibleJointMoves.get(i);
+	}
+
+	public Collection<JointMoveInterface<TermType>> computeJointMoves(StateType state) {
+		// compute legal moves for all roles
+		HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>> legalMovesMap = new HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>>();
+		for(RoleInterface<TermType> role: match.getGame().getOrderedRoles()) {
+			if(role == this.role) {
+				Collection<MoveInterface<TermType>> lastMoveMap = new ArrayList<MoveInterface<TermType>>();
+				lastMoveMap.add(actionTracker.get(stepNum - 1));
+				legalMovesMap.put(role, lastMoveMap);
+			} else {
+				legalMovesMap.put(role, state.getLegalMoves(role));
+			}
+		}
+		// build the cross product
+		final CrossProductMap<RoleInterface<TermType>, MoveInterface<TermType>> jointMovesMap = new CrossProductMap<RoleInterface<TermType>, MoveInterface<TermType>>(legalMovesMap);
+		// wrap the elements of the cross product in JointMove<TermType>
+		// the following is an on-the-fly collection that just refers to "jointMoves" above
+		Collection<JointMoveInterface<TermType>> jointMoves = new AbstractCollection<JointMoveInterface<TermType>>(){
+			@Override
+			public Iterator<JointMoveInterface<TermType>> iterator() {
+				final Iterator<Map<RoleInterface<TermType>, MoveInterface<TermType>>> iterator = jointMovesMap.iterator();
+				return new Iterator<JointMoveInterface<TermType>>(){
+					@Override public boolean hasNext() { return iterator.hasNext(); }
+
+					@Override public JointMoveInterface<TermType> next() { return new JointMove<TermType>(match.getGame().getOrderedRoles(), iterator.next()); }
+
+					@Override public void remove() { iterator.remove();	}
+				};
+			}
+
+			@Override
+			public int size() {
+				return jointMovesMap.size();
+			}
+		};
+		// System.out.println("legal joint moves: " + jointMoves);
+		return jointMoves;
 	}
 }

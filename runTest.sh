@@ -1,7 +1,7 @@
 #!/bin/bash
 
-source tests/testConfig/gdl1_connect4.txt
-PARSERESULTS=true
+source tests/testConfig/gdl2_kriegTTT_5x5.txt
+PARSERESULTS=false
 
 for ((i=0 ; i < NUMTESTS ; i++));
 do
