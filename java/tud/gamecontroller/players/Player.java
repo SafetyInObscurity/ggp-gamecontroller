@@ -39,9 +39,9 @@ public interface Player<TermType, StateType extends StateInterface<TermType, ? e
 	 * 			- sees(player1, move(player2, moveX)) <- does(player2, moveX)
 	 * 			- and likewise for every other pair of players
 	 */
-	public MoveInterface<TermType> gamePlay(Object seesFluents, ConnectionEstablishedNotifier notifier);
+	public MoveInterface<TermType> gamePlay(Object seesFluents, Object priorMove, ConnectionEstablishedNotifier notifier);
 	
-	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier);
+	public void gameStop(Object seesTerms,  Object priorMove, ConnectionEstablishedNotifier notifier);
 	/**
 	 * 
 	 * @return the total runtime of the player in milliseconds

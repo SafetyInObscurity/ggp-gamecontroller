@@ -75,6 +75,9 @@
 (<= (sees ?p (yougotit ?m ?n))
    (validmove ?p ?m ?n))
 
+(<= (sees ?p (tried ?p ?m ?n))
+   (does ?p (mark ?m ?n)))
+
 (<= (sees ?p (mark ?m ?n))
    (does ?p (mark ?m ?n))
    (not (validmove ?p ?m ?n)))

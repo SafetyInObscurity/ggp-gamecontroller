@@ -69,7 +69,8 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 	 * - or with GDL-II, a "Collection<? extends FluentInterface<TermType>>" object that really are SeesTerms
 	 */
 	@SuppressWarnings("unchecked")
-	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+	@Override
+	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
 		notifier.connectionEstablished();
 		if(seesTerms != null) {

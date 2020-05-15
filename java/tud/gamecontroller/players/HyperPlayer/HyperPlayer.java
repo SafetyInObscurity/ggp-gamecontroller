@@ -85,7 +85,7 @@ public class HyperPlayer<
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
 		notifier.connectionEstablished();
 //		if(seesTerms != null) {
@@ -93,14 +93,10 @@ public class HyperPlayer<
 //			hStateTracker.statesUpdate((Collection<TermType>) seesTerms);
 //		}
 		perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
+		if(stepNum >= 0) {
+			actionTracker.put(stepNum - 1, (MoveInterface<TermType>) priorMove); // Note: This won't get the final move made
+		}
 		MoveInterface<TermType> move = getNextMove();
-		actionTracker.put(stepNum, move); // Puts the action taken in the map at the current step @todo: Update to ensure this works even if an illegal move is made
-
-		System.out.println("PERCEPT TRACKER");
-		System.out.println(perceptTracker.toString());
-		System.out.println();
-		System.out.println("ACTION TRACKER");
-		System.out.println(actionTracker.toString());
 
 		notifyStopRunning();
 		stepNum++;
@@ -138,6 +134,12 @@ public class HyperPlayer<
 
 			// Get legal moves from model
 			legalMoves = new ArrayList<MoveInterface<TermType>>(model.computeLegalMoves(role));
+
+			System.out.println("LEGAL MOVES:");
+			for (MoveInterface<TermType> move : legalMoves) {
+				System.out.println(move.toString());
+			}
+			System.out.println();
 		}
 
 		int i = random.nextInt(legalMoves.size());
@@ -152,12 +154,6 @@ public class HyperPlayer<
 	 */
 	public JointMoveInterface<TermType> getRandomJointMove(StateInterface<TermType, ?> state) {
 		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state));
-
-		System.out.println("Valid Joint moves:");
-		for (JointMoveInterface<TermType> move : possibleJointMoves) {
-			System.out.println(move.toString());
-		}
-
 		int i = random.nextInt(possibleJointMoves.size());
 		return possibleJointMoves.get(i);
 	}

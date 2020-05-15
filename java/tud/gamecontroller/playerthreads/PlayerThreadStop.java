@@ -31,13 +31,15 @@ public class PlayerThreadStop<
 		> extends AbstractPlayerThread<TermType, StateType> {
 
 	private Object seesTerms;
-	
-	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, Object seesTerms, long deadline){
+	protected Object priorMove;
+
+	public PlayerThreadStop(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, Object seesTerms, Object priorMove, long deadline){
 		super("StopMessageThread("+player.getName()+","+match.getMatchID()+")",role, player, match, deadline);
 		this.seesTerms=seesTerms;
+		this.priorMove = priorMove;
 	}
 	public void doRun(){
-		player.gameStop(seesTerms, this);
+		player.gameStop(seesTerms, priorMove, this);
 	}
 	
 	@Override

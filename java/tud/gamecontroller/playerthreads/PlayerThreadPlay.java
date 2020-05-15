@@ -36,17 +36,19 @@ public class PlayerThreadPlay<
 
 	protected MoveInterface<TermType> move;
 	protected Object seesTerms;
+	protected Object priorMove;
 	
-	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, Object seesTerms, long deadline){
+	public PlayerThreadPlay(RoleInterface<TermType> role, Player<TermType, StateType> player, RunnableMatchInterface<TermType, StateType> match, Object seesTerms, Object priorMove, long deadline){
 		super("PlayMessageThread("+player.getName()+","+match.getMatchID()+")", role, player, match, deadline);
 		this.move=null;
 		this.seesTerms = seesTerms;
+		this.priorMove = priorMove;
 	}
 	public MoveInterface<TermType> getMove() {
 		return move;
 	}
 	public void doRun(){
-		move = player.gamePlay(seesTerms, this);
+		move = player.gamePlay(seesTerms, priorMove, this);
 	}
 	
 	@Override

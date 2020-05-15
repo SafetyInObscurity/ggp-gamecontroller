@@ -58,7 +58,7 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 		this.lastMessageRuntime=0;
 	}
 
-	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+	public void gameStop(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
 		notifier.connectionEstablished();
 	}
 	

@@ -20,11 +20,7 @@
 
 package tud.gamecontroller;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -192,7 +188,8 @@ public class GameController<
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
 			Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
 			Object seesTerms = getSeesTermsForRole(role, player, priorState, priorJointMove);
-			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, playclock*1000+EXTRA_DEADLINE_TIME));
+			Object priorMove = getPriorMoveForRole(role, priorJointMove);
+			playerthreads.add(new PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, priorMove, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		
 		logger.info("Sending play messages ...");
@@ -245,12 +242,28 @@ public class GameController<
 		return seesTerms;
 	}
 
+	private Object getPriorMoveForRole(RoleInterface<TermType> role,
+									   JointMoveInterface<TermType> priormoves) {
+		/*
+		 * Here is the only point at which the difference between regular GDL and GDL-II is made:
+		 * - if we play a regular GDL game, we will send the moves as seesTerms;
+		 * - and if on the contrary we play a GDL-II game, we will derive the seesTerms from the game description, and send them.
+		 */
+		Object priorMove = null;
+		if (priormoves != null) { // not the first play message
+			priorMove = priormoves.get(role);
+			logger.info("priorMove("+role+") = " + priorMove.toString());
+		}
+		return priorMove;
+	}
+
 	private void gameStop(JointMoveInterface<TermType> priorJointMove, State<TermType, ReasonerStateInfoType> priorState) throws InterruptedException {
 		Collection<PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>> playerthreads=new LinkedList<PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>>();
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
 			Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
 			Object seesTerms = getSeesTermsForRole(role, player, priorState, priorJointMove);
-			playerthreads.add(new PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, playclock*1000+EXTRA_DEADLINE_TIME));
+			Object priorMove = getPriorMoveForRole(role, priorJointMove);
+			playerthreads.add(new PlayerThreadStop<TermType, State<TermType, ReasonerStateInfoType>>(role, player, match, seesTerms, priorMove, playclock*1000+EXTRA_DEADLINE_TIME));
 		}
 		logger.info("Sending stop messages ...");
 		runThreads(playerthreads, Level.WARNING);
