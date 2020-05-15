@@ -19,9 +19,11 @@
 
 package tud.gamecontroller.players.HyperPlayer;
 
+import tud.gamecontroller.game.JointMoveInterface;
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +39,7 @@ import tud.gamecontroller.term.TermInterface;
  * @version 1.0
  * @since 1.0
  */
-public class Model<TermType extends TermInterface> {
+public class Model<TermType extends TermInterface> implements Cloneable{
 
     /*
         gameplayTracker tracks the state of the game as it progresses by maintaining a collection of:
@@ -48,29 +50,39 @@ public class Model<TermType extends TermInterface> {
      */
     private HashMap<Integer, StateTrackerTriple<TermType>> gameplayTracker;
     private LikelihoodTracker likelihoodTracker; // Tracks the likelihood of the model representing the true state
+    private ArrayList<JointMove<TermType>> actionPath;
+    private int actionPathHash = -1;
 
     public Model() {
         this.gameplayTracker = new HashMap<Integer, StateTrackerTriple<TermType>>();
         this.likelihoodTracker = new LikelihoodTracker();
+        this.actionPath = new ArrayList<JointMove<TermType>>();
+    }
+    public Model(Model<TermType> model) {
+        this.gameplayTracker = model.getGameplayTracker();
+        this.likelihoodTracker = model.getLikelihoodTracker();
+        this.actionPath = new ArrayList<JointMove<TermType>>(model.getActionPath());
+        this.actionPathHash = model.getActionPathHash();
     }
 
-    public HashMap<Integer, StateTrackerTriple<TermType>> getGameplayTracker() { return gameplayTracker; }
-    public LikelihoodTracker getLikelihoodTracker() {
-        return likelihoodTracker;
-    }
-
+    public HashMap<Integer, StateTrackerTriple<TermType>> getGameplayTracker() { return this.gameplayTracker; }
+    public LikelihoodTracker getLikelihoodTracker() { return this.likelihoodTracker; }
+    public ArrayList<JointMove<TermType>> getActionPath() { return this.actionPath; }
+    public int getActionPathHash() { return this.actionPathHash; }
 
 
     public void updateGameplayTracker(int stepNum, Collection<TermType> percepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> state) {
-        if(this.gameplayTracker.containsKey(stepNum)) System.err.println("Key already contained");
-        else {
+        if(this.actionPath.size() > stepNum) System.err.println("Key already contained");
+//        else {
             StateTrackerTriple<TermType> gameplay = new StateTrackerTriple<TermType>(percepts, jointAction, state);
             this.gameplayTracker.put(stepNum, gameplay);
-        }
+            this.actionPath.add(jointAction);
+            this.actionPathHash = this.actionPath.hashCode();
+//        }
     }
 
     public StateInterface<TermType, ?> getCurrentState() {
-        return this.gameplayTracker.get(gameplayTracker.size()-1).getState();
+        return this.gameplayTracker.get(this.gameplayTracker.size() - 1).getState();
     }
 
     /**
