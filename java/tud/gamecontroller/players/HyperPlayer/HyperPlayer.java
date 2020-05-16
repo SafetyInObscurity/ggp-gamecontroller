@@ -31,6 +31,43 @@ import tud.gamecontroller.term.TermInterface;
 
 import java.util.*;
 
+/*
+	How it works:
+
+	At game start:
+		Prepares the data structures
+
+	On first move:
+		Makes an inital model with:
+			null joint action
+			initial percepts
+			initial state
+		Uses this model to generate all legal moves and select one
+
+	On all subsequent moves:
+		Update percepts
+		Add last move to action tracker
+		For each model:
+			Update model by choosing a random move such that:
+				The player's move matches the last move actually performed
+				@todo: Ensure it doesn't draw from moves in the bad move set at this point
+			Ensure the percepts of this update match the actual percepts received after the last move. If they do not:
+				Add move to 'bad moves' tracker for state
+				Remove model from hypergame set @todo: Implement back tracking since it is likely that all models will eventually stop fittiing
+			Branch the model by:
+				Cloning the original model and update such that:
+					Player's move matches the last move actually performed
+					The move chosen isn't the same move as was chosen for a previoud update/branch from this state
+					@todo: Ensure it doesn't draw from moves in the bad move set at this point
+				Ensure percepts match, then add to hypergame set up to limit
+			For all updates and branches, add the legal moves to a set
+		Select a move from the legal moves set
+
+	Move Selection:
+		Random
+		@todo: add a MCS player to this for each hypergame
+ */
+
 /**
  * HyperPlayer is an agent that can play imperfect information and non-deterministic two player extensive-form games
  * with perfect recall by holding many 'hypergames' as models that may represent the true state of the game in perfect
@@ -38,6 +75,7 @@ import java.util.*;
  * it representing the true state of the game and returns the moves with the greatest weighted expected payoff.
  * Implements the algorithm descrived in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
  * @see "https://staff.cdms.westernsydney.edu.au/~dongmo/GTLW/Michael_Tim.pdf"
+ *
  *
  * @author Michael Dorrell
  * @version 1.0
@@ -48,14 +86,14 @@ public class HyperPlayer<
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
 	private Random random;
-	private int numHyperGames = 10;
-	private int numHyperBranches = 20;
+	private int numHyperGames = 50;
+	private int numHyperBranches = 10;
 	private HashSet<Integer> hypergameHashSet;
 
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
-	private HashMap<String, Collection<MoveInterface<TermType>>> badMovesTracker; // Tracks the invalid moves from each perfect-information state
+	private HashMap<Integer, Collection<JointMove<TermType>>> badMovesTracker; // Tracks the invalid moves from each perfect-information state
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 
 	public HyperPlayer(String name, GDLVersion gdlVersion) {
@@ -73,7 +111,7 @@ public class HyperPlayer<
 		// Instantiate globals
 		actionTracker = new HashMap<Integer, MoveInterface<TermType>>();
 		perceptTracker = new HashMap<Integer, Collection<TermType>>();
-		badMovesTracker = new HashMap<String, Collection<MoveInterface<TermType>>>();
+		badMovesTracker = new HashMap<Integer, Collection<JointMove<TermType>>>();
 		hypergames = new ArrayList<Model<TermType>>();
 		hypergameHashSet = new HashSet<Integer>();
 		stepNum = 0;
@@ -106,7 +144,8 @@ public class HyperPlayer<
 	 * @return A legal move
 	 */
 	public MoveInterface<TermType> getNextMove() {
-		ArrayList<MoveInterface<TermType>> legalMoves = null;
+		ArrayList<MoveInterface<TermType>> legalMoves = new ArrayList<MoveInterface<TermType>>();
+		HashSet<MoveInterface<TermType>> legalMovesInState = null;
 		if(stepNum == 0) {
 			// Create first model to represent the empty state
 			Model<TermType> model = new Model<TermType>();
@@ -114,7 +153,7 @@ public class HyperPlayer<
 			Collection<TermType> initialPercepts = perceptTracker.get(stepNum);
 			JointMove<TermType> initialJointAction = null;
 			StateInterface<TermType, ?> initialState = match.getGame().getInitialState();
-			model.updateGameplayTracker(stepNum, initialPercepts, initialJointAction, initialState);
+			model.updateGameplayTracker(stepNum, initialPercepts, initialJointAction, initialState, role);
 
 			hypergames.add(model);
 			hypergameHashSet.add(model.getActionPathHash());
@@ -122,40 +161,83 @@ public class HyperPlayer<
 			// Get legal moves from this model
 			legalMoves = new ArrayList<MoveInterface<TermType>>(model.computeLegalMoves(role));
 		} else {
-			// Get first model and update it with a random joint action that matches player's last action
-			// @todo: Do this for all hypergames at each turn
-			Model<TermType> model = hypergames.get(0);
-			Model<TermType> cloneModel = new Model<TermType>(model);
+			// For each model in the the current hypergames set, update it with a random joint action that matches player's last action and branch by the branching factor
+			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
+			for (Model<TermType> model : currentHypergames) {
+//			Model<TermType> model = hypergames.get(0);
+				Model<TermType> cloneModel = new Model<TermType>(model);
 
-			Collection<TermType> percepts = perceptTracker.get(stepNum);
-			StateInterface<TermType, ?> state = model.getCurrentState();
-			JointMove<TermType> jointAction = (JointMove<TermType>) getRandomJointMove(state);
+				// Update the model
+				StateInterface<TermType, ?> state = model.getCurrentState();
+				JointMove<TermType> jointAction = (JointMove<TermType>) getRandomJointMove(state);
 
-			hypergameHashSet.remove(model.getActionPathHash());
-			model.updateGameplayTracker(stepNum, percepts, jointAction, state);
-			hypergameHashSet.add(model.getActionPathHash());
+				hypergameHashSet.remove(model.getActionPathHash());
+				model.updateGameplayTracker(stepNum, null, jointAction, state, role);
+				hypergameHashSet.add(model.getActionPathHash());
 
-			// Branch numHyperBranches times
-			for(int i = 0 ; i < numHyperBranches - 1; i++) {
-				if(hypergames.size() < numHyperGames) {
-					Model<TermType> newModel = new Model<TermType>(cloneModel);
-					StateInterface<TermType, ?> currState = newModel.getCurrentState();
-					JointMove<TermType> nextJointAction = (JointMove<TermType>) getRandomJointMove(state);
-
-					newModel.updateGameplayTracker(stepNum, percepts, nextJointAction, currState);
-
-					int newModelHash = newModel.getActionPathHash();
-					if(hypergameHashSet.contains(newModelHash)) {
-						i--; // @todo: This may cause an infinite loop
-						System.out.println("DUPLICATE MOVE HANDLED");
+				// Check if new model matches expected percepts, else discard
+				int newModelHash = model.getActionPathHash();
+				if(!model.getLatestExpectedPercepts().equals(perceptTracker.get(stepNum))) {
+					System.out.println("NOT A MATCH");
+					// Add move to bad move set
+					if(badMovesTracker.containsKey(newModelHash)) {
+						Collection<JointMove<TermType>> badJointActions = badMovesTracker.get(newModelHash);
+						badJointActions.add(jointAction);
 					} else {
-						hypergames.add(newModel);
-						hypergameHashSet.add(newModelHash);
+						Collection<JointMove<TermType>> badJointActions = new ArrayList<JointMove<TermType>>();
+						badJointActions.add(jointAction);
+						badMovesTracker.put(newModelHash, badJointActions);
 					}
-				} else break;
+					hypergameHashSet.remove(model.getActionPathHash());
+					hypergames.remove(model);
+				}
+
+				// Branch the model so a total of numHyperBranches branch from the base model
+				for(int i = 0 ; i < numHyperBranches - 1; i++) {
+					if(hypergames.size() < numHyperGames) {
+						// Clone the original model and branch randomly
+						Model<TermType> newModel = new Model<TermType>(cloneModel);
+						StateInterface<TermType, ?> currState = newModel.getCurrentState();
+						JointMove<TermType> nextJointAction = (JointMove<TermType>) getRandomJointMove(state);
+
+						newModel.updateGameplayTracker(stepNum, null, nextJointAction, currState, role);
+
+						// @todo: Ensure the percepts of this step match the expected percepts, else discard
+						// @todo: Check if there are other valid moves to try
+						// Check if expected percepts match actual percepts of last turn
+						newModelHash = newModel.getActionPathHash();
+						if(!newModel.getLatestExpectedPercepts().equals(perceptTracker.get(stepNum))) {
+							System.out.println("NOT A MATCH");
+							// Add move to bad move set
+							if(badMovesTracker.containsKey(newModelHash)) {
+								Collection<JointMove<TermType>> badJointActions = badMovesTracker.get(newModelHash);
+								badJointActions.add(nextJointAction);
+							} else {
+								Collection<JointMove<TermType>> badJointActions = new ArrayList<JointMove<TermType>>();
+								badJointActions.add(nextJointAction);
+								badMovesTracker.put(newModelHash, badJointActions);
+							}
+						} else {
+							if(hypergameHashSet.contains(newModelHash)) {
+								System.out.println("DUPLICATE MOVE HANDLED");
+							} else {
+								hypergames.add(newModel);
+								hypergameHashSet.add(newModelHash);
+								legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role));
+								legalMoves.addAll(legalMovesInState);
+							}
+						}
+
+
+					} else break;
+				}
+				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+				legalMoves.addAll(legalMovesInState);
 			}
 
 			// Print model info
+			System.out.println("TRUE PERCEPTS:");
+			System.out.println(perceptTracker.get(stepNum));
 			System.out.println("MODELS:");
 			for (int i = 0 ; i < hypergames.size() ; i++) {
 				Model<TermType> mod = hypergames.get(i);
@@ -164,12 +246,17 @@ public class HyperPlayer<
 				for (JointMove<TermType> jointActionInPath : mod.getActionPath()) {
 					System.out.println("\t\t" + jointActionInPath);
 				}
+				System.out.println("\tPercept Path: ");
+				for (Collection<TermType> perceptsInPath : mod.getPerceptPath()) {
+					System.out.println("\t\t" + perceptsInPath);
+				}
+				System.out.println("\tState Path: ");
+				for (StateInterface<TermType, ?> statesInPath : mod.getStatePath()) {
+					System.out.println("\t\t" + statesInPath);
+				}
 				System.out.println();
 			}
 			System.out.println(hypergameHashSet.size());
-
-			// Get legal moves from model
-			legalMoves = new ArrayList<MoveInterface<TermType>>(model.computeLegalMoves(role));
 		}
 
 		int i = random.nextInt(legalMoves.size());

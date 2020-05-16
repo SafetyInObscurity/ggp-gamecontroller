@@ -37,6 +37,10 @@ public class LikelihoodTracker {
         this.likelihoodScore = 0.0;
         this.optionsList = new ArrayList<Integer>();
     }
+    public LikelihoodTracker(LikelihoodTracker likelihoodTracker){
+        this.likelihoodScore = likelihoodTracker.getLikelihoodScore();
+        this.optionsList = new ArrayList<Integer>(likelihoodTracker.getOptionsList());
+    }
 
     public double getLikelihoodScore() {
         return likelihoodScore;

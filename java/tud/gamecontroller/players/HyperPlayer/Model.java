@@ -41,48 +41,61 @@ import tud.gamecontroller.term.TermInterface;
  */
 public class Model<TermType extends TermInterface> implements Cloneable{
 
-    /*
-        gameplayTracker tracks the state of the game as it progresses by maintaining a collection of:
-            Percepts seen at each step
-            Joint Move made to get to state
-            State at step
-        And is hashed according to stepNum
-     */
-    private HashMap<Integer, StateTrackerTriple<TermType>> gameplayTracker;
     private LikelihoodTracker likelihoodTracker; // Tracks the likelihood of the model representing the true state
     private ArrayList<JointMove<TermType>> actionPath;
+    private ArrayList<StateInterface<TermType, ?>> statePath;
+    private ArrayList<Collection<TermType>> perceptPath;
     private int actionPathHash = -1;
 
     public Model() {
-        this.gameplayTracker = new HashMap<Integer, StateTrackerTriple<TermType>>();
         this.likelihoodTracker = new LikelihoodTracker();
         this.actionPath = new ArrayList<JointMove<TermType>>();
+        this.statePath = new ArrayList<StateInterface<TermType, ?>>();
+        this.perceptPath = new ArrayList<Collection<TermType>>();
     }
     public Model(Model<TermType> model) {
-        this.gameplayTracker = model.getGameplayTracker();
-        this.likelihoodTracker = model.getLikelihoodTracker();
+        this.likelihoodTracker = new LikelihoodTracker(model.getLikelihoodTracker());
         this.actionPath = new ArrayList<JointMove<TermType>>(model.getActionPath());
+        this.statePath = new ArrayList<StateInterface<TermType, ?>>(model.getStatePath());
+        this.perceptPath = new ArrayList<Collection<TermType>>(model.getPerceptPath());
         this.actionPathHash = model.getActionPathHash();
     }
 
-    public HashMap<Integer, StateTrackerTriple<TermType>> getGameplayTracker() { return this.gameplayTracker; }
     public LikelihoodTracker getLikelihoodTracker() { return this.likelihoodTracker; }
     public ArrayList<JointMove<TermType>> getActionPath() { return this.actionPath; }
+    public ArrayList<StateInterface<TermType, ?>> getStatePath() { return statePath; }
+    public ArrayList<Collection<TermType>> getPerceptPath() { return perceptPath; }
     public int getActionPathHash() { return this.actionPathHash; }
 
 
-    public void updateGameplayTracker(int stepNum, Collection<TermType> percepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> state) {
+    public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role) {
         if(this.actionPath.size() > stepNum) System.err.println("Key already contained");
-//        else {
-            StateTrackerTriple<TermType> gameplay = new StateTrackerTriple<TermType>(percepts, jointAction, state);
-            this.gameplayTracker.put(stepNum, gameplay);
+        else {
+            // Calculate next state from joint action, state pair
+            StateInterface<TermType, ?> newState = null;
+            Collection<TermType> expectedPercepts = null;
+            if(jointAction != null) {
+                newState = currState.getSuccessor(jointAction);
+                expectedPercepts = currState.getSeesTerms(role, jointAction);
+            } else {
+                newState = currState;
+                expectedPercepts = initialPercepts;
+            }
+
+            // Add all to the action pairs
             this.actionPath.add(jointAction);
+            this.statePath.add(newState);
+            this.perceptPath.add(expectedPercepts);
             this.actionPathHash = this.actionPath.hashCode();
-//        }
+        }
     }
 
     public StateInterface<TermType, ?> getCurrentState() {
-        return this.gameplayTracker.get(this.gameplayTracker.size() - 1).getState();
+        return this.statePath.get(this.statePath.size() - 1);
+    }
+
+    public Collection<TermType> getLatestExpectedPercepts() {
+        return this.perceptPath.get(this.perceptPath.size() - 1);
     }
 
     /**
