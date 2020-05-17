@@ -66,10 +66,15 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public ArrayList<StateInterface<TermType, ?>> getStatePath() { return statePath; }
     public ArrayList<Collection<TermType>> getPerceptPath() { return perceptPath; }
     public int getActionPathHash() { return this.actionPathHash; }
+    public JointMove<TermType> getLastAction() { return this.actionPath.get(this.actionPath.size() - 1); }
 
 
     public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role) {
-        if(this.actionPath.size() > stepNum) System.err.println("Key already contained");
+        if(this.actionPath.size() > stepNum) {
+            System.err.println("Key already contained");
+            System.err.println("Actions Path: " + this.actionPath);
+            System.exit(0);
+        }
         else {
             // Calculate next state from joint action, state pair
             StateInterface<TermType, ?> newState = null;
@@ -88,6 +93,17 @@ public class Model<TermType extends TermInterface> implements Cloneable{
             this.perceptPath.add(expectedPercepts);
             this.actionPathHash = this.actionPath.hashCode();
         }
+    }
+
+    /**
+     * Backtracks the model by removing the latest state
+     *
+     */
+    public void backtrack() {
+        this.actionPath.remove(this.actionPath.size() - 1);
+        this.statePath.remove(this.statePath.size() - 1);
+        this.perceptPath.remove(this.perceptPath.size() - 1);
+        this.actionPathHash = this.actionPath.hashCode();
     }
 
     public StateInterface<TermType, ?> getCurrentState() {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source tests/testConfig/gdl2_kriegTTT_5x5.txt
+source tests/testConfig/gdl2_montyhall.txt
 PARSERESULTS=false
 
 for ((i=0 ; i < NUMTESTS ; i++));
