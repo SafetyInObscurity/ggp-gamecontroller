@@ -43,6 +43,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
 
     private LikelihoodTracker likelihoodTracker; // Tracks the likelihood of the model representing the true state
     private ArrayList<JointMove<TermType>> actionPath;
+    private ArrayList<Integer> getNumberOfPossibleActionsPath;
     private ArrayList<StateInterface<TermType, ?>> statePath;
     private ArrayList<Collection<TermType>> perceptPath;
     private int actionPathHash = -1;
@@ -50,12 +51,14 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public Model() {
         this.likelihoodTracker = new LikelihoodTracker();
         this.actionPath = new ArrayList<JointMove<TermType>>();
+        this.getNumberOfPossibleActionsPath = new ArrayList<Integer>();
         this.statePath = new ArrayList<StateInterface<TermType, ?>>();
         this.perceptPath = new ArrayList<Collection<TermType>>();
     }
     public Model(Model<TermType> model) {
         this.likelihoodTracker = new LikelihoodTracker(model.getLikelihoodTracker());
         this.actionPath = new ArrayList<JointMove<TermType>>(model.getActionPath());
+        this.getNumberOfPossibleActionsPath = new ArrayList<Integer>(model.getNumberOfPossibleActionsPath());
         this.statePath = new ArrayList<StateInterface<TermType, ?>>(model.getStatePath());
         this.perceptPath = new ArrayList<Collection<TermType>>(model.getPerceptPath());
         this.actionPathHash = model.getActionPathHash();
@@ -63,13 +66,21 @@ public class Model<TermType extends TermInterface> implements Cloneable{
 
     public LikelihoodTracker getLikelihoodTracker() { return this.likelihoodTracker; }
     public ArrayList<JointMove<TermType>> getActionPath() { return this.actionPath; }
+    public ArrayList<Integer> getNumberOfPossibleActionsPath() { return this.getNumberOfPossibleActionsPath; }
     public ArrayList<StateInterface<TermType, ?>> getStatePath() { return statePath; }
     public ArrayList<Collection<TermType>> getPerceptPath() { return perceptPath; }
     public int getActionPathHash() { return this.actionPathHash; }
     public JointMove<TermType> getLastAction() { return this.actionPath.get(this.actionPath.size() - 1); }
+    public int getNumberOfPossibleActions() {
+        int total = 0;
+        for(int num : this.getNumberOfPossibleActionsPath) {
+            total += num;
+        }
+        return total;
+    }
 
 
-    public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role) {
+    public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role, int numPossibleJointMoves) {
         if(this.actionPath.size() > stepNum) {
             System.err.println("Key already contained");
             System.err.println("Actions Path: " + this.actionPath);
@@ -89,6 +100,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
 
             // Add all to the action pairs
             this.actionPath.add(jointAction);
+            this.getNumberOfPossibleActionsPath.add(numPossibleJointMoves);
             this.statePath.add(newState);
             this.perceptPath.add(expectedPercepts);
             this.actionPathHash = this.actionPath.hashCode();
@@ -101,6 +113,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
      */
     public void backtrack() {
         this.actionPath.remove(this.actionPath.size() - 1);
+        this.getNumberOfPossibleActionsPath.remove(this.getNumberOfPossibleActionsPath.size() - 1);
         this.statePath.remove(this.statePath.size() - 1);
         this.perceptPath.remove(this.perceptPath.size() - 1);
         this.actionPathHash = this.actionPath.hashCode();
