@@ -47,6 +47,8 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     private ArrayList<StateInterface<TermType, ?>> statePath;
     private ArrayList<Collection<TermType>> perceptPath;
     private int actionPathHash = -1;
+    private int previousActionPathHash = -1;
+    private boolean isInitalModel;
 
     public Model() {
         this.likelihoodTracker = new LikelihoodTracker();
@@ -54,6 +56,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.getNumberOfPossibleActionsPath = new ArrayList<Integer>();
         this.statePath = new ArrayList<StateInterface<TermType, ?>>();
         this.perceptPath = new ArrayList<Collection<TermType>>();
+        this.isInitalModel = true;
     }
     public Model(Model<TermType> model) {
         this.likelihoodTracker = new LikelihoodTracker(model.getLikelihoodTracker());
@@ -62,14 +65,17 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.statePath = new ArrayList<StateInterface<TermType, ?>>(model.getStatePath());
         this.perceptPath = new ArrayList<Collection<TermType>>(model.getPerceptPath());
         this.actionPathHash = model.getActionPathHash();
+        this.previousActionPathHash = model.getPreviousActionPathHash();
     }
 
     public LikelihoodTracker getLikelihoodTracker() { return this.likelihoodTracker; }
     public ArrayList<JointMove<TermType>> getActionPath() { return this.actionPath; }
     public ArrayList<Integer> getNumberOfPossibleActionsPath() { return this.getNumberOfPossibleActionsPath; }
-    public ArrayList<StateInterface<TermType, ?>> getStatePath() { return statePath; }
-    public ArrayList<Collection<TermType>> getPerceptPath() { return perceptPath; }
+    public ArrayList<StateInterface<TermType, ?>> getStatePath() { return this.statePath; }
+    public ArrayList<Collection<TermType>> getPerceptPath() { return this.perceptPath; }
+    public boolean isInitalModel() { return this.isInitalModel; }
     public int getActionPathHash() { return this.actionPathHash; }
+    public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public JointMove<TermType> getLastAction() { return this.actionPath.get(this.actionPath.size() - 1); }
     public int getNumberOfPossibleActions() {
         int total = 0;
@@ -103,7 +109,9 @@ public class Model<TermType extends TermInterface> implements Cloneable{
             this.getNumberOfPossibleActionsPath.add(numPossibleJointMoves);
             this.statePath.add(newState);
             this.perceptPath.add(expectedPercepts);
+            this.previousActionPathHash = this.actionPathHash;
             this.actionPathHash = this.actionPath.hashCode();
+            this.isInitalModel = false;
         }
     }
 
@@ -117,6 +125,11 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.statePath.remove(this.statePath.size() - 1);
         this.perceptPath.remove(this.perceptPath.size() - 1);
         this.actionPathHash = this.actionPath.hashCode();
+        if(this.actionPath.size() > 0) {
+            this.previousActionPathHash = this.actionPath.subList(0, this.actionPath.size() - 1).hashCode();
+        } else {
+            this.isInitalModel = true;
+        }
     }
 
     public StateInterface<TermType, ?> getCurrentState() {
