@@ -326,6 +326,8 @@ public class HyperPlayer<
 	 *
 	 * 	Therefore, the weighted expected value of a move j is the sum of all (expectations for that move multiplied by the probability of that hypergame) in all hypergames
 	 *
+	 * @todo: Why even include the invChoiceFactorSum when all of the CFs will be divided by it
+	 *
 	 * @param possibleMoves
 	 * @return
 	 */
@@ -335,20 +337,29 @@ public class HyperPlayer<
 		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
 		int choiceFactor;
 		float invChoiceFactorSum = 0;
+		System.out.println("Number of possible actions path for each model");
 		for(Model<TermType> model : hypergames) {
+			// Print some debugging info
+			System.out.println("Model: " + model.getActionPathHash() + " ->" + model.getNumberOfPossibleActionsPath());
+
+			// Calculate the choice factor based on the likelihood of this path being chosen
 			choiceFactor = model.getNumberOfPossibleActions();
 			choiceFactors.put(model.getActionPathHash(), choiceFactor);
 			invChoiceFactorSum += (float)(1.0/(float)choiceFactor);
 		}
-			// Calculate the probability
+		System.out.println();
+
+		// Calculate the probability
 		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
 		float prob;
 		System.out.println("Probabilities:");
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((float)choiceFactor/invChoiceFactorSum);
+			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
 			hyperProbs.put(model.getActionPathHash(), prob);
 			System.out.println(model.getActionPathHash() + ": " + prob);
+			System.out.println("\t inv choice factor: " + (1/(float)choiceFactor));
+			System.out.println("\t inv choice factor sum: " + invChoiceFactorSum);
 		}
 		System.out.println();
 

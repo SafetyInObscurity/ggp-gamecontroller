@@ -78,9 +78,9 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public JointMove<TermType> getLastAction() { return this.actionPath.get(this.actionPath.size() - 1); }
     public int getNumberOfPossibleActions() {
-        int total = 0;
+        int total = 1;
         for(int num : this.getNumberOfPossibleActionsPath) {
-            total += num;
+            total *= num;
         }
         return total;
     }
