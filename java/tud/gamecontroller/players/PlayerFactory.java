@@ -23,6 +23,8 @@ package tud.gamecontroller.players;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.HyperPlayer.HyperPlayer;
 import tud.gamecontroller.players.HyperPlayer.HyperPlayerInfo;
+import tud.gamecontroller.players.ImprovedRandomPlayer.ImprovedRandomPlayer;
+import tud.gamecontroller.players.ImprovedRandomPlayer.ImprovedRandomPlayerInfo;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayer;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayerInfo;
 import tud.gamecontroller.players.XXXXPlayer.XXXXPlayer;
@@ -67,6 +69,11 @@ public class PlayerFactory {
 	Player<TermType, StateType> createHyperPlayer(HyperPlayerInfo info) {
 		return new HyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
 	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createImprovedRandomPlayer(ImprovedRandomPlayerInfo info) {
+		return new ImprovedRandomPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
 	
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createPlayer(PlayerInfo info, GameScramblerInterface gameScrambler) {
@@ -87,6 +94,9 @@ public class PlayerFactory {
 		}
 		else if(info instanceof HyperPlayerInfo){
 			return PlayerFactory. <TermType, StateType> createHyperPlayer((HyperPlayerInfo)info);
+		}
+		else if(info instanceof ImprovedRandomPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createImprovedRandomPlayer((ImprovedRandomPlayerInfo)info);
 		}
 		return null;
 	}

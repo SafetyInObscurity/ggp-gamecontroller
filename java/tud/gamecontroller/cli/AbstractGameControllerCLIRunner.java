@@ -34,6 +34,7 @@ import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 import tud.gamecontroller.logging.UnbufferedStreamHandler;
 import tud.gamecontroller.players.HyperPlayer.HyperPlayerInfo;
+import tud.gamecontroller.players.ImprovedRandomPlayer.ImprovedRandomPlayerInfo;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
@@ -229,6 +230,19 @@ public abstract class AbstractGameControllerCLIRunner<
 					System.exit(-1);
 				}
 				player=new HyperPlayerInfo(roleindex-1, getGdlVersion());
+			}else{
+				missingArgumentsExit(argv[index-1]);
+			}
+		}else if(argv[index].equals("-imprandom")){
+			++index;
+			if(argv.length>=index+1){
+				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
+				if(roleindex<1){
+					System.err.println("roleindex out of bounds");
+					printUsage();
+					System.exit(-1);
+				}
+				player=new ImprovedRandomPlayerInfo(roleindex-1, getGdlVersion());
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}

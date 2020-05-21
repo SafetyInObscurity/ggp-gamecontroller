@@ -19,7 +19,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.players.HyperPlayer;
+package tud.gamecontroller.players.ImprovedRandomPlayer;
 
 import tud.auxiliary.CrossProductMap;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
@@ -27,7 +27,6 @@ import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.*;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
-import tud.gamecontroller.players.StatesTracker;
 import tud.gamecontroller.term.TermInterface;
 
 import java.util.*;
@@ -65,15 +64,11 @@ import java.util.*;
 	Move Selection:
 		Random
 		Weighted based on number of nodes
-		@todo: add a MCS player to this for each hypergame
  */
 
 /**
- * HyperPlayer is an agent that can play imperfect information and non-deterministic two player extensive-form games
- * with perfect recall by holding many 'hypergames' as models that may represent the true state of the game in perfect
- * information representation. It then calculates the best move for each hypergame weighted against the likelihood of
- * it representing the true state of the game and returns the moves with the greatest weighted expected payoff.
- * Implements the algorithm descrived in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
+ * Uses HyperPlayer model to hold representations of the true state
+ * Selects a legal move from these at random
  * @see "https://staff.cdms.westernsydney.edu.au/~dongmo/GTLW/Michael_Tim.pdf"
  *
  *
@@ -81,17 +76,16 @@ import java.util.*;
  * @version 1.0
  * @since 1.0
  */
-public class HyperPlayer<
+public class ImprovedRandomPlayer<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
 	private Random random;
-	private int numHyperGames = 50;
-	private int numHyperBranches = 25;
+	private int numHyperGames = 100;
+	private int numHyperBranches = 20;
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves;
 	private Model<TermType> initialModel;
 	private int initialModelHash;
-	private int numProbes = 4;
 
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
@@ -99,7 +93,7 @@ public class HyperPlayer<
 	private HashMap<Integer, Collection<JointMove<TermType>>> badMovesTracker; // Tracks the invalid moves from each perfect-information state
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 
-	public HyperPlayer(String name, GDLVersion gdlVersion) {
+	public ImprovedRandomPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
 		random = new Random();
 	}
@@ -148,7 +142,7 @@ public class HyperPlayer<
 	 * @return A legal move
 	 */
 	public MoveInterface<TermType> getNextMove() {
-		long startTime =  System.currentTimeMillis();
+		long startTime = System.currentTimeMillis();
 
 		HashSet<MoveInterface<TermType>> legalMoves = new HashSet<MoveInterface<TermType>>();
 		HashSet<MoveInterface<TermType>> legalMovesInState = null;
@@ -278,19 +272,19 @@ public class HyperPlayer<
 		}
 
 		//Calculate how long the update took
-		long endTime =  System.currentTimeMillis();
-		System.out.println("HyperPlayer finished updating state in " + (endTime - startTime) + " milliseconds");
+		long endTime = System.currentTimeMillis();
+		System.out.println("ImprovedRandom finished updating state in " + (endTime - startTime) + " milliseconds");
 
 		// Print all models
 //		printHypergames();
 
 		// Select a move
-		startTime =  System.currentTimeMillis();
-		MoveInterface<TermType> bestMove = moveSelection(legalMoves);
-		endTime =  System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
+		MoveInterface<TermType> bestMove = randomMoveSelection(legalMoves);
+		endTime = System.currentTimeMillis();
 
 		// Indicate the player is ready to return a move
-		System.out.println("HyperPlayer chose move: " + bestMove + " in " + (endTime - startTime) + " milliseconds");
+		System.out.println("ImprovedRandom chose move: " + bestMove + " in " + (endTime - startTime) + " milliseconds");
 
 		return bestMove;
 	}
@@ -387,6 +381,7 @@ public class HyperPlayer<
 
 		// Calculate expected move value for each hypergame
 //		System.out.println("Calculating move value for each hypergame:");
+		int numProbes = 10;
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		for(Model<TermType> model : hypergames) {
