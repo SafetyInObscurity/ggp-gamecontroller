@@ -86,7 +86,7 @@ public class HyperPlayer<
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
 	private Random random;
-	private int numHyperGames = 10;
+	private int numHyperGames = 100;
 	private int numHyperBranches = 20;
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves;
 	private Model<TermType> initialModel;
@@ -165,26 +165,31 @@ public class HyperPlayer<
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
 			for (Model<TermType> model : currentHypergames) {
 				// Save a copy of the model
-				System.out.println();
-				System.out.println();
-				System.out.println("Model HASH: " + model.getActionPathHash());
+//				System.out.println();
+//				System.out.println();
+//				System.out.println("Model HASH: " + model.getActionPathHash());
 				Model<TermType> cloneModel = new Model<TermType>(model);
 				int previousActionPathHash = model.getPreviousActionPathHash();
 				int currActionPathHash = model.getActionPathHash();
 				JointMove<TermType> previousAction = model.getLastAction();
 
 				// Forward the model
+				System.out.println("Model: " + model.getActionPathHash());
 				int step = model.getActionPath().size();
 				while(step < stepNum + 1) {
 					step = forwardHypergame(model, step);
-					if(model.isInitalModel() || model.getActionPathHash() == initialModelHash) break;
+					System.out.println("\t step: " + step);
+					if(model.isInitalModel() || model.getActionPathHash() == initialModelHash) {
+						System.out.println("\t IS INITIAL MODEL");
+					}
+					if(step == 0) break;
 				}
 				// If the hypergame has gone all the way back to the initial state then remove it
-				if(model.isInitalModel() || model.getActionPathHash() == initialModelHash) {
+				if(step == 0) {
 					hypergames.remove(model);
 					continue;
 				}
-				System.out.println("Chosen Move: " + model.getLastAction());
+//				System.out.println("Chosen Move: " + model.getLastAction());
 
 				// Keep track of moves in use
 				HashSet<JointMove<TermType>> inuse = new HashSet<JointMove<TermType>>();
@@ -196,13 +201,13 @@ public class HyperPlayer<
 					inuse.add(model.getLastAction());
 					currentlyInUseMoves.put(currActionPathHash, inuse);
 				}
-				System.out.println("Added move to inuse: ( " + currActionPathHash + " , " + model.getLastAction() + " )");
+//				System.out.println("Added move to inuse: ( " + currActionPathHash + " , " + model.getLastAction() + " )");
 				// Remove the previous state-action pair from inuse
 				if(currentlyInUseMoves.containsKey(previousActionPathHash)) {
 					inuse = (HashSet<JointMove<TermType>>) currentlyInUseMoves.get(previousActionPathHash);
 					inuse.remove(previousAction);
 				}
-				System.out.println("Removed move from inuse: ( " + previousActionPathHash + " , " + previousAction + " )");
+//				System.out.println("Removed move from inuse: ( " + previousActionPathHash + " , " + previousAction + " )");
 
 				// Get legal moves
 				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
@@ -218,27 +223,30 @@ public class HyperPlayer<
 						currActionPathHash = newModel.getActionPathHash();
 						previousAction = newModel.getLastAction();
 
-						System.out.println();
-						System.out.println();
-						System.out.println("Branch Model HASH: " + newModel.getActionPathHash());
+//						System.out.println();
+//						System.out.println();
+//						System.out.println("Branch Model HASH: " + newModel.getActionPathHash());
 
 						// Forward the new model
 						step = newModel.getActionPath().size();
+						System.out.println("Branch Model: " + newModel.getActionPathHash());
 						while(step < stepNum + 1) {
 							step = forwardHypergame(newModel, step);
+							System.out.println("\t step: " + step);
 							if(newModel.isInitalModel() || newModel.getActionPathHash() == initialModelHash) {
-								System.out.println();
-								System.out.println("IS INITIAL MODEL");
-								break;
+//								System.out.println();
+								System.out.println("\t IS INITIAL MODEL");
+//								break;
 							}
+							if(step == 0) break;
 						}
-						if(newModel.isInitalModel() || newModel.getActionPathHash() == initialModelHash) {
-							System.out.println("STOP BRANCHING");
-							System.out.println();
+						if(step == 0) {
+//							System.out.println("STOP BRANCHING");
+//							System.out.println();
 							keepBranching = false;
 							break;
 						}
-						System.out.println("Chosen Move: " + newModel.getLastAction());
+//						System.out.println("Chosen Move: " + newModel.getLastAction());
 
 						// Add to hypergames set and get legal moves
 						hypergames.add(newModel);
@@ -254,23 +262,28 @@ public class HyperPlayer<
 							inuse.add(newModel.getLastAction());
 							currentlyInUseMoves.put(currActionPathHash, inuse);
 						}
-						System.out.println("Added move to inuse: ( " + currActionPathHash + " , " + newModel.getLastAction() + " )");
+//						System.out.println("Added move to inuse: ( " + currActionPathHash + " , " + newModel.getLastAction() + " )");
 						// Remove the previous state-action pair from inuse
 						if(currentlyInUseMoves.containsKey(previousActionPathHash)) {
 							inuse = (HashSet<JointMove<TermType>>) currentlyInUseMoves.get(previousActionPathHash);
 							inuse.remove(previousAction);
 						}
-						System.out.println("Removed move from inuse: ( " + previousActionPathHash + " , " + previousAction + " )");
+//						System.out.println("Removed move from inuse: ( " + previousActionPathHash + " , " + previousAction + " )");
 					} else break;
 				}
 			}
 		}
 
 		// Print all models
-		printHypergames();
+//		printHypergames();
 
 		// Select a move
-		return moveSelection(legalMoves);
+		MoveInterface<TermType> bestMove = moveSelection(legalMoves);
+
+		// Indicate the player is ready to return a move
+		System.out.println("Chosen move: " + bestMove);
+
+		return bestMove;
 	}
 
 	public void printHypergames() {
@@ -337,50 +350,50 @@ public class HyperPlayer<
 		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
 		int choiceFactor;
 		float invChoiceFactorSum = 0;
-		System.out.println("Number of possible actions path for each model");
+//		System.out.println("Number of possible actions path for each model");
 		for(Model<TermType> model : hypergames) {
 			// Print some debugging info
-			System.out.println("Model: " + model.getActionPathHash() + " ->" + model.getNumberOfPossibleActionsPath());
+//			System.out.println("Model: " + model.getActionPathHash() + " ->" + model.getNumberOfPossibleActionsPath());
 
 			// Calculate the choice factor based on the likelihood of this path being chosen
 			choiceFactor = model.getNumberOfPossibleActions();
 			choiceFactors.put(model.getActionPathHash(), choiceFactor);
 			invChoiceFactorSum += (float)(1.0/(float)choiceFactor);
 		}
-		System.out.println();
+//		System.out.println();
 
 		// Calculate the probability
 		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
 		float prob;
-		System.out.println("Probabilities:");
+//		System.out.println("Probabilities:");
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
 			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
 			hyperProbs.put(model.getActionPathHash(), prob);
-			System.out.println(model.getActionPathHash() + ": " + prob);
-			System.out.println("\t inv choice factor: " + (1/(float)choiceFactor));
-			System.out.println("\t inv choice factor sum: " + invChoiceFactorSum);
+//			System.out.println(model.getActionPathHash() + ": " + prob);
+//			System.out.println("\t inv choice factor: " + (1/(float)choiceFactor));
+//			System.out.println("\t inv choice factor sum: " + invChoiceFactorSum);
 		}
-		System.out.println();
+//		System.out.println();
 
 		// Calculate expected move value for each hypergame
-		System.out.println("Calculating move value for each hypergame:");
+//		System.out.println("Calculating move value for each hypergame:");
 		int numProbes = 10;
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		for(Model<TermType> model : hypergames) {
-			System.out.println(model.getActionPathHash());
+//			System.out.println(model.getActionPathHash());
 			StateInterface<TermType, ?> currState = model.getCurrentState();
 			for(MoveInterface<TermType> move : possibleMoves) {
 				moveHashMap.put(move.hashCode(), move);
-				System.out.println("\t" + move.toString());
+//				System.out.println("\t" + move.toString());
 				// Calculate the the expected value for each move using monte carlo simulation
 				float expectedValue = simulateMove(currState, move, numProbes);
-				System.out.println("\t\t" + "Expected Value: " + expectedValue);
+//				System.out.println("\t\t" + "Expected Value: " + expectedValue);
 
 				// Calculate the weighted expected value for each move
 				float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
-				System.out.println("\t\t" + "Weighted Expected Value: " + weightedExpectedValue);
+//				System.out.println("\t\t" + "Weighted Expected Value: " + weightedExpectedValue);
 
 				// Add expected value to hashmap
 				if(!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
@@ -390,10 +403,10 @@ public class HyperPlayer<
 					weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
 				}
 			}
-			System.out.println();
+//			System.out.println();
 		}
-		System.out.println();
-		System.out.println();
+//		System.out.println();
+//		System.out.println();
 
 		// Return the move with the greatest weighted expected value
 		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
@@ -406,7 +419,7 @@ public class HyperPlayer<
 				bestMove = moveHashMap.get(mapElement.getKey());
 				maxVal = val;
 			}
-			System.out.println("Move " + moveHashMap.get(mapElement.getKey()) + " has expected value of: " + mapElement.getValue());
+//			System.out.println("Move " + moveHashMap.get(mapElement.getKey()) + " has expected value of: " + mapElement.getValue());
 		}
 
 		return bestMove;
@@ -463,8 +476,8 @@ public class HyperPlayer<
 			int i = random.nextInt(numCleanJointMoves);
 			jointAction = (JointMove<TermType>) possibleJointMoves.get(i);
 		}
-		System.out.println("Num possible moves: " + numPossibleJointMoves);
-		System.out.println("Num possible clean moves: " + numCleanJointMoves);
+//		System.out.println("Num possible moves: " + numPossibleJointMoves);
+//		System.out.println("Num possible clean moves: " + numCleanJointMoves);
 
 		// If there are no valid moves from this state, then backtrack and try again
 		if (jointAction == null) {
@@ -475,8 +488,8 @@ public class HyperPlayer<
 
 			// Add move to bad move set if there are no other active moves from this point
 			int backtrackedModelHash = model.getActionPathHash();
-			System.out.println("No Valid Moves:");
-			if(!currentlyInUseMoves.containsKey(backtrackedModelHash) || (currentlyInUseMoves.get(backtrackedModelHash).size() == 0)) {
+//			System.out.println("No Valid Moves:");
+//			if(!currentlyInUseMoves.containsKey(backtrackedModelHash) || (currentlyInUseMoves.get(backtrackedModelHash).size() == 0)) {
 				if (badMovesTracker.containsKey(backtrackedModelHash)) {
 					Collection<JointMove<TermType>> badJointActions = badMovesTracker.get(backtrackedModelHash);
 					badJointActions.add(lastAction);
@@ -485,10 +498,10 @@ public class HyperPlayer<
 					badJointActions.add(lastAction);
 					badMovesTracker.put(backtrackedModelHash, badJointActions);
 				}
-				System.out.println("Added move to bad move tracker: ( " + backtrackedModelHash + " , " + lastAction + " )");
-			} else {
-				System.out.println("NOT added move to bad move tracker");
-			}
+//				System.out.println("Added move to bad move tracker: ( " + backtrackedModelHash + " , " + lastAction + " )");
+//			} else {
+////				System.out.println("NOT added move to bad move tracker");
+//			}
 
 			return step - 1;
 		} else {
@@ -503,8 +516,8 @@ public class HyperPlayer<
 
 				// Add move to bad move set
 				int backtrackedModelHash = model.getActionPathHash();
-				System.out.println("Tried move but didn't match percepts:");
-				System.out.println("Considering move: " + jointAction);
+//				System.out.println("Tried move but didn't match percepts:");
+//				System.out.println("Considering move: " + jointAction);
 				if (badMovesTracker.containsKey(backtrackedModelHash)) {
 					Collection<JointMove<TermType>> badJointActions = badMovesTracker.get(backtrackedModelHash);
 					badJointActions.add(jointAction);
@@ -513,7 +526,7 @@ public class HyperPlayer<
 					badJointActions.add(jointAction);
 					badMovesTracker.put(backtrackedModelHash, badJointActions);
 				}
-				System.out.println("Added move to bad move tracker: ( " + backtrackedModelHash + " , " + jointAction + " )");
+//				System.out.println("Added move to bad move tracker: ( " + backtrackedModelHash + " , " + jointAction + " )");
 
 				// Try again
 				return step;
@@ -597,17 +610,19 @@ public class HyperPlayer<
 //			System.out.println("legal joint moves before size: " + jointMoves.size());
 			jointMoves.removeAll(badMovesTracker.get(actionPathHash));
 //			System.out.println("legal joint moves after size: " + jointMoves.size());
-			System.out.println("For Hash: " + actionPathHash);
-			System.out.println("Bad moves: " + badMovesTracker.get(actionPathHash));
-		} else {
-			System.out.println("For Hash: " + actionPathHash);
-			System.out.println("Bad moves: NONE");
+//			System.out.println("For Hash: " + actionPathHash);
+//			System.out.println("Bad moves: " + badMovesTracker.get(actionPathHash));
 		}
+//		else {
+//			System.out.println("For Hash: " + actionPathHash);
+//			System.out.println("Bad moves: NONE");
+//		}
 		if(currentlyInUseMoves.containsKey(actionPathHash)) {
-			System.out.println("Inuse moves: " + currentlyInUseMoves.get(actionPathHash));
+//			System.out.println("Inuse moves: " + currentlyInUseMoves.get(actionPathHash));
 			jointMoves.removeAll(currentlyInUseMoves.get(actionPathHash));
-		} else {
-			System.out.println("Inuse moves: NONE");
 		}
+//		else {
+//			System.out.println("Inuse moves: NONE");
+//		}
 	}
 }

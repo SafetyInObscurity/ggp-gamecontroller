@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source tests/testConfig/gdl2_montyhall.txt
-PARSERESULTS=false
+PARSERESULTS=true
 
 for ((i=0 ; i < NUMTESTS ; i++));
 do
@@ -10,7 +10,11 @@ do
 done
 
 if [ "$PARSERESULTS" == true ]; then
-    python tests/testAgent/parseXML.py $OUTPUT_DIR "${MATCH_ID}_" $NUMTESTS $GAMENAME $GDL_VERSION
+    if [ "$GDL_VERSION" == 1 ]; then
+        python tests/testAgent/parseXML.py $OUTPUT_DIR "${MATCH_ID}_" $NUMTESTS $GAMENAME $GDL_VERSION
+    else
+        python tests/testAgent/parseXML.py $OUTPUT_DIR "${MATCH_ID}_" $NUMTESTS $GAMENAME $GDL_VERSION $ROLE_NAME_1
+    fi
 fi
 
 $SHELL

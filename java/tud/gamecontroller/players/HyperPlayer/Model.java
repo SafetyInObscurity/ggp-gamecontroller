@@ -41,7 +41,6 @@ import tud.gamecontroller.term.TermInterface;
  */
 public class Model<TermType extends TermInterface> implements Cloneable{
 
-    private LikelihoodTracker likelihoodTracker; // Tracks the likelihood of the model representing the true state
     private ArrayList<JointMove<TermType>> actionPath;
     private ArrayList<Integer> getNumberOfPossibleActionsPath;
     private ArrayList<StateInterface<TermType, ?>> statePath;
@@ -51,7 +50,6 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     private boolean isInitalModel;
 
     public Model() {
-        this.likelihoodTracker = new LikelihoodTracker();
         this.actionPath = new ArrayList<JointMove<TermType>>();
         this.getNumberOfPossibleActionsPath = new ArrayList<Integer>();
         this.statePath = new ArrayList<StateInterface<TermType, ?>>();
@@ -59,7 +57,6 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.isInitalModel = true;
     }
     public Model(Model<TermType> model) {
-        this.likelihoodTracker = new LikelihoodTracker(model.getLikelihoodTracker());
         this.actionPath = new ArrayList<JointMove<TermType>>(model.getActionPath());
         this.getNumberOfPossibleActionsPath = new ArrayList<Integer>(model.getNumberOfPossibleActionsPath());
         this.statePath = new ArrayList<StateInterface<TermType, ?>>(model.getStatePath());
@@ -68,7 +65,6 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.previousActionPathHash = model.getPreviousActionPathHash();
     }
 
-    public LikelihoodTracker getLikelihoodTracker() { return this.likelihoodTracker; }
     public ArrayList<JointMove<TermType>> getActionPath() { return this.actionPath; }
     public ArrayList<Integer> getNumberOfPossibleActionsPath() { return this.getNumberOfPossibleActionsPath; }
     public ArrayList<StateInterface<TermType, ?>> getStatePath() { return this.statePath; }

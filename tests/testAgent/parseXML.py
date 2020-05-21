@@ -89,5 +89,9 @@ with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w')
     writer.writeheader()
 
     for i in range(0, num_tests):
-        fname = output_dir + file_prefex + str(i) + '/finalstate.xml'
+        if gdl_version == 1:
+            fname = output_dir + file_prefex + str(i) + '/finalstate.xml'
+        else:
+            player_perspective_name = sys.argv[6]
+            fname = output_dir + file_prefex + str(i) + '-' + player_perspective_name + '/finalstate.xml'
         parse_file_csv(fname, csv_file)
