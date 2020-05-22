@@ -1,0 +1,3 @@
+match_id,game_name,gdl_version,timestamp,startclock,playclock,sight_of,num_steps,role_1,player_1,player_1_score,role_2,player_2,player_2_score
+hypertest_5x5_300_0,kriegTTT_5x5,2,1590113104777,10,300,OPLAYER,6,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_5x5_300_1,kriegTTT_5x5,2,1590113562239,10,300,OPLAYER,6,xplayer,HYPER,100,oplayer,IMPRANDOM,0

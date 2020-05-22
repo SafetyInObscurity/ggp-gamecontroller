@@ -1,8 +1,8 @@
-MATCH_ID="hypertest_5x5"
+MATCH_ID="hypertest_5x5_300"
 GAMEFILE="testdata/games/games_gdl/kriegTTT5x5/kriegTTT_5x5.gdl"
 GAMENAME="kriegTTT_5x5"
 START_CLOCK=10
-PLAY_CLOCK=120
+PLAY_CLOCK=300
 GDL_VERSION=2
 PLAYER_NAME_1="hyper"
 ROLE_ID_1=1
@@ -12,4 +12,4 @@ ROLE_ID_2=2
 ROLE_NAME_1="OPLAYER"
 OUTPUT_DIR="matches/"
 STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
-NUMTESTS=10
+NUMTESTS=2

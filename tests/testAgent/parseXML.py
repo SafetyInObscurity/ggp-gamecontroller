@@ -2,6 +2,7 @@ import sys
 import xml.etree.ElementTree as ET
 import csv
 import time
+import os.path
 
 
 def parse_file_csv(filename, csv):
@@ -54,6 +55,7 @@ def parse_file_csv(filename, csv):
                      'gdl_version': gdl_version,
                      'timestamp': timestamp,
                      'startclock': startclock,
+                     'playclock': play_clock,
                      'sight_of': sight_of,
                      'num_steps': num_steps,
                      'role_1': role_1,
@@ -70,6 +72,7 @@ file_prefex = sys.argv[2]
 num_tests = int(sys.argv[3])
 game_name = sys.argv[4]
 gdl_version = sys.argv[5]
+play_clock = sys.argv[6]
 
 with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w') as csv_file:
     fieldnames = ['match_id',
@@ -77,6 +80,7 @@ with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w')
                   'gdl_version',
                   'timestamp',
                   'startclock',
+                  'playclock',
                   'sight_of',
                   'num_steps',
                   'role_1',
@@ -92,6 +96,7 @@ with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w')
         if gdl_version == 1:
             fname = output_dir + file_prefex + str(i) + '/finalstate.xml'
         else:
-            player_perspective_name = sys.argv[6]
+            player_perspective_name = sys.argv[7]
             fname = output_dir + file_prefex + str(i) + '-' + player_perspective_name + '/finalstate.xml'
-        parse_file_csv(fname, csv_file)
+        if os.path.isfile(fname):
+            parse_file_csv(fname, csv_file)

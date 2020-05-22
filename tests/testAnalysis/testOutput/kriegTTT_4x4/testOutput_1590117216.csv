@@ -1,0 +1,13 @@
+match_id,game_name,gdl_version,timestamp,startclock,playclock,sight_of,num_steps,role_1,player_1,player_1_score,role_2,player_2,player_2_score
+hypertest_0,kriegTTT_4x4,2,1590116904937,10,120,XPLAYER,4,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_1,kriegTTT_4x4,2,1590116920296,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_2,kriegTTT_4x4,2,1590116965326,10,120,XPLAYER,6,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_3,kriegTTT_4x4,2,1590116980146,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_4,kriegTTT_4x4,2,1590117014387,10,120,XPLAYER,5,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_5,kriegTTT_4x4,2,1590117029157,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_6,kriegTTT_4x4,2,1590117044457,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_7,kriegTTT_4x4,2,1590117090577,10,120,XPLAYER,6,xplayer,HYPER,0,oplayer,IMPRANDOM,100
+hypertest_8,kriegTTT_4x4,2,1590117108007,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_9,kriegTTT_4x4,2,1590117124036,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_10,kriegTTT_4x4,2,1590117139267,10,120,XPLAYER,3,xplayer,HYPER,100,oplayer,IMPRANDOM,0
+hypertest_11,kriegTTT_4x4,2,1590117165616,10,120,XPLAYER,4,xplayer,HYPER,100,oplayer,IMPRANDOM,0

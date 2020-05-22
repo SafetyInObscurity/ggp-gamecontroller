@@ -21,6 +21,9 @@
 
 package tud.gamecontroller.players.HyperPlayer;
 
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
+
 import tud.auxiliary.CrossProductMap;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
@@ -85,6 +88,12 @@ public class HyperPlayer<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
+	//Logging
+	private String matchID;
+	private String gameName;
+	private String roleName;
+
+	// Hyperplay
 	private Random random;
 	private int numHyperGames = 50;
 	private int numHyperBranches = 25;
@@ -92,7 +101,6 @@ public class HyperPlayer<
 	private Model<TermType> initialModel;
 	private int initialModelHash;
 	private int numProbes = 4;
-
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -119,6 +127,11 @@ public class HyperPlayer<
 		hypergames = new ArrayList<Model<TermType>>();
 		initialModel = new Model<TermType>();
 		stepNum = 0;
+
+		// Instantiate logging variables
+		matchID = match.getMatchID();
+		gameName = match.getGame().getName();
+		roleName = role.toString();
 	}
 
 	/*
@@ -279,7 +292,8 @@ public class HyperPlayer<
 
 		//Calculate how long the update took
 		long endTime =  System.currentTimeMillis();
-		System.out.println("HyperPlayer finished updating state in " + (endTime - startTime) + " milliseconds");
+		long updateTime = endTime - startTime;
+		System.out.println("HyperPlayer finished updating state in " + updateTime + " milliseconds");
 
 		// Print all models
 //		printHypergames();
@@ -288,9 +302,20 @@ public class HyperPlayer<
 		startTime =  System.currentTimeMillis();
 		MoveInterface<TermType> bestMove = moveSelection(legalMoves);
 		endTime =  System.currentTimeMillis();
+		long selectTime = endTime - startTime;
 
 		// Indicate the player is ready to return a move
-		System.out.println("HyperPlayer chose move: " + bestMove + " in " + (endTime - startTime) + " milliseconds");
+		System.out.println("HyperPlayer chose move: " + bestMove + " in " + selectTime + " milliseconds");
+
+		// Print move to file
+		try {
+			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.close();
+		} catch (IOException e) {
+			System.err.println("An error occurred.");
+			e.printStackTrace();
+		}
 
 		return bestMove;
 	}

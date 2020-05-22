@@ -29,6 +29,8 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /*
@@ -80,13 +82,18 @@ public class ImprovedRandomPlayer<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
+	//Logging
+	private String matchID;
+	private String gameName;
+	private String roleName;
+
+	// Hyperplay
 	private Random random;
 	private int numHyperGames = 100;
 	private int numHyperBranches = 20;
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves;
 	private Model<TermType> initialModel;
 	private int initialModelHash;
-
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -113,6 +120,11 @@ public class ImprovedRandomPlayer<
 		hypergames = new ArrayList<Model<TermType>>();
 		initialModel = new Model<TermType>();
 		stepNum = 0;
+
+		// Instantiate logging variables
+		matchID = match.getMatchID();
+		gameName = match.getGame().getName();
+		roleName = role.toString();
 	}
 
 	/*
@@ -273,7 +285,8 @@ public class ImprovedRandomPlayer<
 
 		//Calculate how long the update took
 		long endTime = System.currentTimeMillis();
-		System.out.println("ImprovedRandom finished updating state in " + (endTime - startTime) + " milliseconds");
+		long updateTime = endTime - startTime;
+		System.out.println("ImprovedRandom finished updating state in " + updateTime + " milliseconds");
 
 		// Print all models
 //		printHypergames();
@@ -282,9 +295,20 @@ public class ImprovedRandomPlayer<
 		startTime = System.currentTimeMillis();
 		MoveInterface<TermType> bestMove = randomMoveSelection(legalMoves);
 		endTime = System.currentTimeMillis();
+		long selectTime = endTime - startTime;
 
 		// Indicate the player is ready to return a move
-		System.out.println("ImprovedRandom chose move: " + bestMove + " in " + (endTime - startTime) + " milliseconds");
+		System.out.println("ImprovedRandom chose move: " + bestMove + " in " + selectTime + " milliseconds");
+
+		// Print move to file
+		try {
+			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.close();
+		} catch (IOException e) {
+			System.err.println("An error occurred.");
+			e.printStackTrace();
+		}
 
 		return bestMove;
 	}
