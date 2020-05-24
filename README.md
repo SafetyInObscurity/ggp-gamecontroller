@@ -194,3 +194,70 @@ Where:
         }
     }
     ```
+## Testing
+The testing script works by reading a config file to run multiple games and uses a python script to parse the results to multiple .csv files.<br>
+The output of the matches is contained in a file 'testOutput_TIMESTAMP' of the format:
+```csv
+match_id, game_name, gdl_version, timestamp, startclock, playclock, sight_of, num_steps, role_1, player_1, player_1_score, role_2, player_2, player_2_score
+```
+And the output of each move for each game is put in a file titles 'match_id' that links to the match_id of the game above. It is of the form:
+```csv
+match_id, game_name, step, role_name, player_name, count_hypergames, num_probes, time_to_update, time_to_select_move, move_chosen
+```
+
+### How to run tests
+1. First build the application by running
+    ```$xslt
+    $ ant -f my-build.xml
+    ```
+
+2. Define a config file of the following format:
+    * MATCH_ID = Identifier for the match to be carried out (will be enumerated for multiple tests)
+    * GAMEFILE = Location of the game to play
+    * GAMENAME =  Name of the game for logging purposes
+    * START_CLOCK = Number of seconds before the game beings
+    * PLAY_CLOCK = Number of seconds each player will have for each turn
+    * GDL_VERSION = The version of GDL the game uses [1 or 2]
+    * PLAYER_NAME_1 = The PlayerInfo type of player
+    * ROLE_ID_1=1
+    * ROLE_NAME_1 = The name of the role player 1 will have in the game for logging purposes 
+    * PLAYER_NAME_2 =  The PlayerInfo type of player
+    * ROLE_ID_2=2
+    * ROLE_NAME_2 = The name of the role player 2 will have in the game for logging purposes 
+    * OUTPUT_DIR = The directory to output the data to
+    * STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
+    * NUMTESTS = Number of games to run
+
+    e.g.
+    ```$xslt
+    MATCH_ID="randomhyper"
+    GAMEFILE="testdata/games/games_gdl/montyhall/montyhall.gdl"
+    GAMENAME="montyhall"
+    START_CLOCK=10
+    PLAY_CLOCK=60
+    GDL_VERSION=2
+    PLAYER_NAME_1="hyper"
+    ROLE_ID_1=1
+    ROLE_NAME_1="CANDIDATE"
+    PLAYER_NAME_2="random"
+    ROLE_ID_2=2
+    ROLE_NAME_2="RANDOM"
+    OUTPUT_DIR="matches/"
+    STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
+    NUMTESTS=10
+    ```
+
+3. Modify the runTest.sh script so the SOURCE points to the config file
+    e.g.
+    ```$xslt
+    source tests/testConfig/gdl2_montyhall.txt
+    ```
+
+4. Run the testing script
+    ```$xslt
+    runTest.sh
+    ```
+
+### How to analyze the results
+A Jupyter Notebook was developed since this is the most obvious way to analyze .csv data and display it in an easy to read and modify way.<br>
+The notebook is stored in the folder '/tests/testAnalysis/TestAnalysis.ipynb'

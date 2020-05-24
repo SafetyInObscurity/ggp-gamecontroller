@@ -36,6 +36,7 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.game.impl.State;
 import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.players.Player;
+import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.playerthreads.AbstractPlayerThread;
 import tud.gamecontroller.playerthreads.PlayerThreadPlay;
 import tud.gamecontroller.playerthreads.PlayerThreadStart;
@@ -177,16 +178,18 @@ public class GameController<
 		for(RoleInterface<TermType> role:game.getOrderedRoles()){
 			logger.info("role: "+role+" => player: "+match.getPlayer(role));
 			playerthreads.add(new PlayerThreadStart<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, startclock*1000+EXTRA_DEADLINE_TIME));
-		}
 
-		// Create a new file to log the moves of each player @todo: Integrate with logger
-		try {
-			FileWriter myWriter = new FileWriter("matches/" + match.getMatchID() + ".csv");
-			myWriter.write("match_id,game_name,step,role_name,player_name,time_to_update,time_to_select_move,move_chosen\n");
-			myWriter.close();
-		} catch (IOException e) {
-			System.err.println("An error occurred.");
-			e.printStackTrace();
+			// Create a new file to log the moves of each player @todo: Integrate with logger
+			if(match.getPlayer(role).getName().equals(PlayerInfo.TYPE_HYPERPLAY) || match.getPlayer(role).getName().equals(PlayerInfo.TYPE_IMPROVEDRANDOM)) {
+				try {
+					FileWriter myWriter = new FileWriter("matches/" + match.getMatchID() + ".csv");
+					myWriter.write("match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen\n");
+					myWriter.close();
+				} catch (IOException e) {
+					System.err.println("An error occurred.");
+					e.printStackTrace();
+				}
+			}
 		}
 
 		logger.info("Sending start messages ...");

@@ -1,0 +1,11 @@
+match_id,game_name,gdl_version,timestamp,startclock,playclock,sight_of,num_steps,role_1,player_1,player_1_score,role_2,player_2,player_2_score
+randomhyper_0,montyhall,2,1590291327841,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_1,montyhall,2,1590291329771,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_2,montyhall,2,1590291331671,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_3,montyhall,2,1590291333570,10,60,CANDIDATE,3,candidate,HYPER,0,random,RANDOM,100
+randomhyper_4,montyhall,2,1590291335431,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_5,montyhall,2,1590291338080,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_6,montyhall,2,1590291339952,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_7,montyhall,2,1590291341810,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_8,montyhall,2,1590291343691,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100
+randomhyper_9,montyhall,2,1590291345561,10,60,CANDIDATE,3,candidate,HYPER,100,random,RANDOM,100

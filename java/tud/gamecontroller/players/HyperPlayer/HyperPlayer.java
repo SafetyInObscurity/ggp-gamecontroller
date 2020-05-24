@@ -310,7 +310,7 @@ public class HyperPlayer<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + numProbes + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
