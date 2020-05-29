@@ -1,0 +1,13 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen
+hypertest_38,kriegTTT_4x4,0,OPLAYER,imprandom,1,4,0,0,(MARK 4 2 )
+hypertest_38,kriegTTT_4x4,0,XPLAYER,hyper,1,4,0,549,(MARK 3 3 )
+hypertest_38,kriegTTT_4x4,1,OPLAYER,imprandom,15,4,19,0,(MARK 3 2 )
+hypertest_38,kriegTTT_4x4,1,XPLAYER,hyper,15,4,19,4121,(MARK 3 4 )
+hypertest_38,kriegTTT_4x4,2,OPLAYER,imprandom,50,4,41,0,(MARK 1 1 )
+hypertest_38,kriegTTT_4x4,2,XPLAYER,hyper,50,4,41,9760,(MARK 3 2 )
+hypertest_38,kriegTTT_4x4,3,OPLAYER,imprandom,50,4,160,0,(MARK 1 3 )
+hypertest_38,kriegTTT_4x4,3,XPLAYER,hyper,50,4,169,9622,(MARK 1 3 )
+hypertest_38,kriegTTT_4x4,4,OPLAYER,imprandom,50,4,139,0,(MARK 3 3 )
+hypertest_38,kriegTTT_4x4,4,XPLAYER,hyper,50,4,160,8989,(MARK 2 3 )
+hypertest_38,kriegTTT_4x4,5,OPLAYER,imprandom,50,4,121,0,(MARK 3 4 )
+hypertest_38,kriegTTT_4x4,5,XPLAYER,hyper,50,4,699,6302,(MARK 1 3 )

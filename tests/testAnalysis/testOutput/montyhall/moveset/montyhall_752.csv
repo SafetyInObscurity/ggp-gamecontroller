@@ -1,0 +1,4 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen
+montyhall_752,montyhall,0,CANDIDATE,hyper,1,4,0,21,(CHOOSE 1 )
+montyhall_752,montyhall,1,CANDIDATE,hyper,3,4,0,0,NOOP
+montyhall_752,montyhall,2,CANDIDATE,hyper,2,4,1,0,SWITCH

@@ -1,4 +1,4 @@
-MATCH_ID="randomhyper"
+MATCH_ID="montyhall"
 GAMEFILE="testdata/games/games_gdl/montyhall/montyhall.gdl"
 GAMENAME="montyhall"
 START_CLOCK=10

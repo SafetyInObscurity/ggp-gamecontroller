@@ -25,51 +25,53 @@ import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.term.TermInterface;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Stack;
 
 /**
  * Holds a model of how the true state of the game may look given the percepts seen so far
  *
  * @author Michael Dorrell
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class Model<TermType extends TermInterface> implements Cloneable{
 
-    private ArrayList<JointMove<TermType>> actionPath;
-    private ArrayList<Integer> getNumberOfPossibleActionsPath;
-    private ArrayList<StateInterface<TermType, ?>> statePath;
-    private ArrayList<Collection<TermType>> perceptPath;
-    private int actionPathHash = -1;
-    private int previousActionPathHash = -1;
-    private boolean isInitalModel;
+    private Stack<JointMove<TermType>> actionPath; // Contains the action taken at each step
+    private Stack<Integer> getNumberOfPossibleActionsPath; // Contains the number of possible actions taken at each step
+    private Stack<StateInterface<TermType, ?>> statePath; // Contains the state at each step
+    private Stack<Collection<TermType>> perceptPath; // Contains the percepts that would be seen at each step
+    private int actionPathHash = -1; // Hashes the action path to give a unique identifier to the path taken
+    private int previousActionPathHash = -1; // Hashes the previous action path to assist with backtracking
 
     public Model() {
-        this.actionPath = new ArrayList<JointMove<TermType>>();
-        this.getNumberOfPossibleActionsPath = new ArrayList<Integer>();
-        this.statePath = new ArrayList<StateInterface<TermType, ?>>();
-        this.perceptPath = new ArrayList<Collection<TermType>>();
-        this.isInitalModel = true;
+        this.actionPath = new Stack<JointMove<TermType>>();
+        this.getNumberOfPossibleActionsPath = new Stack<Integer>();
+        this.statePath = new Stack<StateInterface<TermType, ?>>();
+        this.perceptPath = new Stack<Collection<TermType>>();
     }
     public Model(Model<TermType> model) {
-        this.actionPath = new ArrayList<JointMove<TermType>>(model.getActionPath());
-        this.getNumberOfPossibleActionsPath = new ArrayList<Integer>(model.getNumberOfPossibleActionsPath());
-        this.statePath = new ArrayList<StateInterface<TermType, ?>>(model.getStatePath());
-        this.perceptPath = new ArrayList<Collection<TermType>>(model.getPerceptPath());
+        this.actionPath = (Stack<JointMove<TermType>>)model.getActionPath().clone();
+        this.getNumberOfPossibleActionsPath = (Stack<Integer>)model.getNumberOfPossibleActionsPath().clone();
+        this.statePath = (Stack<StateInterface<TermType, ?>>)model.getStatePath().clone();
+        this.perceptPath = (Stack<Collection<TermType>>)model.getPerceptPath().clone();
         this.actionPathHash = model.getActionPathHash();
         this.previousActionPathHash = model.getPreviousActionPathHash();
     }
 
-    public ArrayList<JointMove<TermType>> getActionPath() { return this.actionPath; }
-    public ArrayList<Integer> getNumberOfPossibleActionsPath() { return this.getNumberOfPossibleActionsPath; }
-    public ArrayList<StateInterface<TermType, ?>> getStatePath() { return this.statePath; }
-    public ArrayList<Collection<TermType>> getPerceptPath() { return this.perceptPath; }
-    public boolean isInitalModel() { return this.isInitalModel; }
+    // Getters for the state of the model
+    public Stack<JointMove<TermType>> getActionPath() { return this.actionPath; }
+    public Stack<Integer> getNumberOfPossibleActionsPath() { return this.getNumberOfPossibleActionsPath; }
+    public Stack<StateInterface<TermType, ?>> getStatePath() { return this.statePath; }
+    public Stack<Collection<TermType>> getPerceptPath() { return this.perceptPath; }
     public int getActionPathHash() { return this.actionPathHash; }
     public int getPreviousActionPathHash() { return this.previousActionPathHash; }
-    public JointMove<TermType> getLastAction() { return this.actionPath.get(this.actionPath.size() - 1); }
+    public JointMove<TermType> getLastAction() { return this.actionPath.peek(); }
+    public StateInterface<TermType, ?> getCurrentState() {
+        return this.statePath.peek();
+    }
+    public Collection<TermType> getLatestExpectedPercepts() { return this.perceptPath.peek(); }
     public int getNumberOfPossibleActions() {
         int total = 1;
         for(int num : this.getNumberOfPossibleActionsPath) {
@@ -78,7 +80,18 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         return total;
     }
 
-
+    /**
+     * Updates the model by getting the successor of the current state according to the joint action chosen. If there is
+     * no joint action chosen, then assume it is the first state and set the inital percepts to the initial percepts seen
+     * Note: If it tries to add to the state in an existing place, then the program exits
+     *
+     * @param stepNum - The number of steps into the game the model is
+     * @param initialPercepts - The inital percepts seen
+     * @param jointAction - The joint action taken to advance the state
+     * @param currState - The current state of the model
+     * @param role - The role of the player (used to find what percepts the player would see upon a state update)
+     * @param numPossibleJointMoves - The number of possible joint moves at the current state
+     */
     public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role, int numPossibleJointMoves) {
         if(this.actionPath.size() > stepNum) {
             System.err.println("Key already contained");
@@ -98,43 +111,35 @@ public class Model<TermType extends TermInterface> implements Cloneable{
             }
 
             // Add all to the action pairs
-            this.actionPath.add(jointAction);
-            this.getNumberOfPossibleActionsPath.add(numPossibleJointMoves);
-            this.statePath.add(newState);
-            this.perceptPath.add(expectedPercepts);
+            this.actionPath.push(jointAction);
+            this.getNumberOfPossibleActionsPath.push(numPossibleJointMoves);
+            this.statePath.push(newState);
+            this.perceptPath.push(expectedPercepts);
             this.previousActionPathHash = this.actionPathHash;
             this.actionPathHash = this.actionPath.hashCode();
-            this.isInitalModel = false;
         }
     }
 
     /**
-     * Backtracks the model by removing the latest state
+     * Backtracks the model by removing the latest state, action and percepts from the stack and updating the hashes
      *
      */
     public void backtrack() {
-        this.actionPath.remove(this.actionPath.size() - 1);
-        this.getNumberOfPossibleActionsPath.remove(this.getNumberOfPossibleActionsPath.size() - 1);
-        this.statePath.remove(this.statePath.size() - 1);
-        this.perceptPath.remove(this.perceptPath.size() - 1);
+        this.actionPath.pop();
+        this.getNumberOfPossibleActionsPath.pop();
+        this.statePath.pop();
+        this.perceptPath.pop();
         this.actionPathHash = this.actionPath.hashCode();
-        if(this.actionPath.size() > 0) {
+        if(!this.actionPath.isEmpty()) {
             this.previousActionPathHash = this.actionPath.subList(0, this.actionPath.size() - 1).hashCode();
-        } else {
-            this.isInitalModel = true;
         }
     }
 
-    public StateInterface<TermType, ?> getCurrentState() {
-        return this.statePath.get(this.statePath.size() - 1);
-    }
-
-    public Collection<TermType> getLatestExpectedPercepts() {
-        return this.perceptPath.get(this.perceptPath.size() - 1);
-    }
-
     /**
-     * @return moves that are legal in all of the current possible states
+     * Computes all moves that are legal for the player's role in the current state
+     *
+     * @param role
+     * @return
      */
     public Collection<? extends MoveInterface<TermType>> computeLegalMoves(RoleInterface<TermType> role) {
         // Get current state

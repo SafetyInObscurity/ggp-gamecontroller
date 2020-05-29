@@ -1,4 +1,0 @@
-match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen
-randomhyper_1,montyhall,0,CANDIDATE,hyper,1,4,0,29,(CHOOSE 3 )
-randomhyper_1,montyhall,1,CANDIDATE,hyper,3,4,21,9,NOOP
-randomhyper_1,montyhall,2,CANDIDATE,hyper,2,4,31,0,SWITCH

@@ -1,6 +1,0 @@
-match_id,game_name,gdl_version,timestamp,startclock,sight_of,num_steps,role_1,player_1,player_1_score,role_2,player_2,player_2_score
-hypertest_5x5_0,kriegTTT_5x5,2,1590109294250,10,OPLAYER,5,xplayer,HYPER,100,oplayer,IMPRANDOM,0
-hypertest_5x5_3,kriegTTT_5x5,2,1590110234581,10,OPLAYER,4,xplayer,HYPER,100,oplayer,IMPRANDOM,0
-hypertest_5x5_5,kriegTTT_5x5,2,1590110776715,10,OPLAYER,4,xplayer,HYPER,100,oplayer,IMPRANDOM,0
-hypertest_5x5_7,kriegTTT_5x5,2,1590111353420,10,OPLAYER,5,xplayer,HYPER,100,oplayer,IMPRANDOM,0
-hypertest_5x5_8,kriegTTT_5x5,2,1590111554421,10,OPLAYER,5,xplayer,HYPER,100,oplayer,IMPRANDOM,0

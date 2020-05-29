@@ -25,7 +25,7 @@ import tud.gamecontroller.players.LocalPlayerInfo;
 public class HyperPlayerInfo extends LocalPlayerInfo {
 
 	public HyperPlayerInfo(int roleindex, GDLVersion gdlVersion) {
-		super(roleindex, "hyper", gdlVersion);
+		super(roleindex, TYPE_HYPERPLAY, gdlVersion);
 	}
 
 	@Override
