@@ -30,6 +30,7 @@ public abstract class PlayerInfo {
 	public static final String TYPE_XXXX = "xxxx"; // ADDED
 	public static final String TYPE_MCS = "mcs";
 	public static final String TYPE_HYPERPLAY = "hyper";
+	public static final String TYPE_ANYTIMEHYPERPLAY = "ahyper";
 	public static final String TYPE_IMPROVEDRANDOM = "imprandom";
 
 	private int roleindex;

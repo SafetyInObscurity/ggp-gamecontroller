@@ -1,13 +1,13 @@
-MATCH_ID="montyhall"
+MATCH_ID="montyhallAnytime"
 GAMEFILE="testdata/games/games_gdl/montyhall/montyhall.gdl"
 GAMENAME="montyhall"
 START_CLOCK=10
 PLAY_CLOCK=60
 GDL_VERSION=2
-PLAYER_NAME_1="hyper"
+PLAYER_NAME_1="ahyper"
 ROLE_ID_1=1
 ROLE_NAME_1="CANDIDATE"
-PLAYER_NAME_2="random"
+PLAYER_NAME_2="hyper"
 ROLE_ID_2=2
 ROLE_NAME_2="RANDOM"
 OUTPUT_DIR="matches/"

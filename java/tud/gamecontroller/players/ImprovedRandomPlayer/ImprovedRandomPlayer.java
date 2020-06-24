@@ -93,10 +93,15 @@ public class ImprovedRandomPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 50; // The maximum number of hypergames allowable
-	private int numHyperBranches = 25; // The amount of branches allowed (~branchFactor is reasonable unless it is very large e.g. Go)
+	/* FOR BASIC TESTING:
+		numHyperGames = 50
+		numHyperBranches = 25 (16 also works for 4x4)
+		numProbes = 4 (although this shouldn't matter since it isn't used)
+	 */
+	private int numHyperGames = 16; // The maximum number of hypergames allowable
+	private int numHyperBranches = 2; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = 4; // The number of simulations to run for each possible move for each hypergame
+	private int numProbes = -1; // The number of simulations to run for each possible move for each hypergame
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -243,6 +248,7 @@ public class ImprovedRandomPlayer<
 				}
 			}
 		}
+		System.out.println("UPDATED STATE IMPRANDOM");
 
 		//Calculate how long the update took
 		long endTime =  System.currentTimeMillis();
@@ -256,6 +262,7 @@ public class ImprovedRandomPlayer<
 		MoveInterface<TermType> bestMove = randomMoveSelection(legalMoves);
 		endTime =  System.currentTimeMillis();
 		long selectTime = endTime - startTime;
+		System.out.println("CHOSE MOVE IMPRANDOM");
 
 		// Print move to file
 		try {

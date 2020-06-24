@@ -25,8 +25,7 @@ import tud.gamecontroller.players.LocalPlayerInfo;
 public class XXXXPlayerInfo extends LocalPlayerInfo {
 
 	public XXXXPlayerInfo(int roleindex, GDLVersion gdlVersion) {
-//		super(roleindex, "XXXX", GDLVersion.v1); // If it will only work for GDL-I games
-		super(roleindex, "XXXX", gdlVersion);
+		super(roleindex, TYPE_XXXX, gdlVersion);
 	}
 
 	@Override
