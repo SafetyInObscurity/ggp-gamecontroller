@@ -98,10 +98,10 @@ public class ImprovedRandomPlayer<
 		numHyperBranches = 25 (16 also works for 4x4)
 		numProbes = 4 (although this shouldn't matter since it isn't used)
 	 */
-	private int numHyperGames = 16; // The maximum number of hypergames allowable
-	private int numHyperBranches = 2; // The amount of branches allowed
+	private int numHyperGames = 50; // The maximum number of hypergames allowable
+	private int numHyperBranches = 16; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = -1; // The number of simulations to run for each possible move for each hypergame
+	private int numProbes = 4; // The number of simulations to run for each possible move for each hypergame
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)

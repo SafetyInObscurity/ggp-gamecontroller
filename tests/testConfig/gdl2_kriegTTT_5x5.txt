@@ -1,4 +1,4 @@
-MATCH_ID="hypertest_5x5_AnytimeTest"
+MATCH_ID="hypertest_5x5_AnytimeTest_numHyperBranches2_numProbes4"
 GAMEFILE="testdata/games/games_gdl/kriegTTT5x5/kriegTTT_5x5.gdl"
 GAMENAME="kriegTTT_5x5"
 START_CLOCK=10
@@ -12,4 +12,4 @@ ROLE_ID_2=2
 ROLE_NAME_1="OPLAYER"
 OUTPUT_DIR="matches/"
 STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
-NUMTESTS=40
+NUMTESTS=50

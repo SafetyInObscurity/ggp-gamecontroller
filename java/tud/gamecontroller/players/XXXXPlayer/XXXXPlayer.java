@@ -179,7 +179,7 @@ public class XXXXPlayer<
 			hypergames.add(model);
 
 			// Get legal moves from this model
-			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 		} else {
 			// For each model in the the current hypergames set, update it with a random joint action that matches player's last action and branch by the branching factor
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
@@ -212,7 +212,7 @@ public class XXXXPlayer<
 				updateCurrentlyInUseMoves(model, currActionPathHash, previousActionPathHash, previousAction);
 
 				// Get legal moves
-				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
@@ -229,13 +229,13 @@ public class XXXXPlayer<
 						step = newModel.getActionPath().size();
 						while(step < stepNum + 1) {
 							step = forwardHypergame(newModel, step);
-							if(step < stepNum - 1) break;
+							if(step < stepNum - 1 || step == 0) break;
 						}
 						// If the hypergame has gone through all possible updates from the current state, then break and don't add it to the hyperset
 						/* If this occurs on a branch then there must be a successful state after the current state, but not enough to branch
 							Therefore no need to discard the current state yet
 						 */
-						if(step < stepNum - 1) {
+						if(step < stepNum - 1 || step == 0) {
 							keepBranching = false;
 							break;
 						}
@@ -247,7 +247,7 @@ public class XXXXPlayer<
 						updateCurrentlyInUseMoves(newModel, currActionPathHash, previousActionPathHash, previousAction);
 
 						// Get legal moves
-						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role));
+						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role, match));
 						legalMoves.addAll(legalMovesInState);
 					} else break;
 				}
@@ -255,9 +255,9 @@ public class XXXXPlayer<
 		}
 
 		// If no hypergames left, then run until one exists
-		System.out.println("Number of hypergames: " + hypergames.size());
+		System.out.println(this.getName() + ": Number of hypergames after updating: " + hypergames.size());
 		while(hypergames.size() == 0) {
-			System.out.println("XXXX: Trying to find another path");
+			System.out.println(this.getName() + ": Trying to find another path");
 			// Create first model to represent the empty state
 			Model<TermType> model = new Model<TermType>();
 			Collection<TermType> initialPercepts = perceptTracker.get(0);
@@ -275,9 +275,9 @@ public class XXXXPlayer<
 			hypergames.add(model);
 
 			// Get legal moves from this model
-			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 		}
-		System.out.println("Number of hypergames: " + hypergames.size());
+		System.out.println(this.getName() + ": Number of hypergames after >=1 found: " + hypergames.size());
 
 		//Calculate how long the update took
 		long endTime =  System.currentTimeMillis();
@@ -427,7 +427,7 @@ public class XXXXPlayer<
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		for(Model<TermType> model : hypergames) {
-			StateInterface<TermType, ?> currState = model.getCurrentState();
+			StateInterface<TermType, ?> currState = model.getCurrentState(match);
 			for(MoveInterface<TermType> move : possibleMoves) {
 				moveHashMap.put(move.hashCode(), move);
 				// Calculate the the expected value for each move using monte carlo simulation
@@ -512,7 +512,7 @@ public class XXXXPlayer<
 	 */
 	public int forwardHypergame(Model<TermType> model, int step) {
 		// Update the model using a random joint move
-		StateInterface<TermType, ?> state = model.getCurrentState();
+		StateInterface<TermType, ?> state = model.getCurrentState(match);
 		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, actionTracker.get(step - 1)));
 		int numPossibleJointMoves = possibleJointMoves.size();
 		cleanJointMoves(possibleJointMoves, model.getActionPathHash());

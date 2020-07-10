@@ -92,10 +92,10 @@ public class AnytimeHyperPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 16; // The maximum number of hypergames allowable
+	private int numHyperGames = 50; // The maximum number of hypergames allowable
 	private int numHyperBranches = 2; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = 16; // The number of simulations to run for each possible move for each hypergame
+	private int numProbes = 4; // The number of simulations to run for each possible move for each hypergame
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -179,7 +179,7 @@ public class AnytimeHyperPlayer<
 			hypergames.add(model);
 
 			// Get legal moves from this model
-			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 		} else {
 			// For each model in the the current hypergames set, update it with a random joint action that matches player's last action and branch by the branching factor
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
@@ -212,7 +212,7 @@ public class AnytimeHyperPlayer<
 				updateCurrentlyInUseMoves(model, currActionPathHash, previousActionPathHash, previousAction);
 
 				// Get legal moves
-				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
@@ -247,7 +247,7 @@ public class AnytimeHyperPlayer<
 						updateCurrentlyInUseMoves(newModel, currActionPathHash, previousActionPathHash, previousAction);
 
 						// Get legal moves
-						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role));
+						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role, match));
 						legalMoves.addAll(legalMovesInState);
 					} else break;
 				}
@@ -255,9 +255,9 @@ public class AnytimeHyperPlayer<
 		}
 
 		// If no hypergames left, then run until one exists
-		System.out.println("Number of hypergames: " + hypergames.size());
+		System.out.println(this.getName() + ": Number of hypergames after updating: " + hypergames.size());
 		while(hypergames.size() == 0) {
-			System.out.println("AnytimeHyperplayer: Trying to find another path");
+			System.out.println(this.getName() + ": Trying to find another path");
 			// Create first model to represent the empty state
 			Model<TermType> model = new Model<TermType>();
 			Collection<TermType> initialPercepts = perceptTracker.get(0);
@@ -275,9 +275,9 @@ public class AnytimeHyperPlayer<
 			hypergames.add(model);
 
 			// Get legal moves from this model
-			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 		}
-		System.out.println("Number of hypergames: " + hypergames.size());
+		System.out.println(this.getName() + ": Number of hypergames after >=1 found: " + hypergames.size());
 
 		//Calculate how long the update took
 		long endTime =  System.currentTimeMillis();
@@ -427,7 +427,7 @@ public class AnytimeHyperPlayer<
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		for(Model<TermType> model : hypergames) {
-			StateInterface<TermType, ?> currState = model.getCurrentState();
+			StateInterface<TermType, ?> currState = model.getCurrentState(match);
 			for(MoveInterface<TermType> move : possibleMoves) {
 				moveHashMap.put(move.hashCode(), move);
 				// Calculate the the expected value for each move using monte carlo simulation
@@ -494,7 +494,7 @@ public class AnytimeHyperPlayer<
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		for(Model<TermType> model : hypergames) {
-			StateInterface<TermType, ?> currState = model.getCurrentState();
+			StateInterface<TermType, ?> currState = model.getCurrentState(match);
 			for(MoveInterface<TermType> move : possibleMoves) {
 				moveHashMap.put(move.hashCode(), move);
 				// Calculate the the expected value for each move using monte carlo simulation
@@ -579,7 +579,7 @@ public class AnytimeHyperPlayer<
 	 */
 	public int forwardHypergame(Model<TermType> model, int step) {
 		// Update the model using a random joint move
-		StateInterface<TermType, ?> state = model.getCurrentState();
+		StateInterface<TermType, ?> state = model.getCurrentState(match);
 		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, actionTracker.get(step - 1)));
 		int numPossibleJointMoves = possibleJointMoves.size();
 		cleanJointMoves(possibleJointMoves, model.getActionPathHash());

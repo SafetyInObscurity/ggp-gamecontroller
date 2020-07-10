@@ -21,6 +21,7 @@ package tud.gamecontroller.players.XXXXPlayer;
 
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
+import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.term.TermInterface;
@@ -68,8 +69,8 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public int getActionPathHash() { return this.actionPathHash; }
     public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public JointMove<TermType> getLastAction() { return this.actionPath.peek(); }
-    public StateInterface<TermType, ?> getCurrentState() {
-        return this.statePath.peek();
+    public StateInterface<TermType, ?> getCurrentState(RunnableMatchInterface<TermType, ?>  match) {
+        return this.statePath.isEmpty() ? match.getGame().getInitialState() : this.statePath.peek();
     }
     public Collection<TermType> getLatestExpectedPercepts() { return this.perceptPath.peek(); }
     public int getNumberOfPossibleActions() {
@@ -141,9 +142,9 @@ public class Model<TermType extends TermInterface> implements Cloneable{
      * @param role
      * @return
      */
-    public Collection<? extends MoveInterface<TermType>> computeLegalMoves(RoleInterface<TermType> role) {
+    public Collection<? extends MoveInterface<TermType>> computeLegalMoves(RoleInterface<TermType> role, RunnableMatchInterface<TermType, ?> match) {
         // Get current state
-        StateInterface<TermType, ?> state = getCurrentState();
+        StateInterface<TermType, ?> state = getCurrentState(match);
 
         // Compute legal moves
         Collection<? extends MoveInterface<TermType>> stateLegalMoves = state.getLegalMoves(role);

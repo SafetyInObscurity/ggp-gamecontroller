@@ -1,4 +1,4 @@
-MATCH_ID="hypertest_numBranches8"
+MATCH_ID="hypertest_numBranchesFixedNumSim4"
 GAMEFILE="testdata/games/games_gdl/kriegTTT4x4/kriegTTT_4x4.gdl"
 GAMENAME="kriegTTT_4x4"
 START_CLOCK=10

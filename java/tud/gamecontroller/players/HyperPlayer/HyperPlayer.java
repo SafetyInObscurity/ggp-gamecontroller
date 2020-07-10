@@ -94,9 +94,9 @@ public class HyperPlayer<
 	// Hyperplay variables
 	private Random random;
 	private int numHyperGames = 16; // The maximum number of hypergames allowable
-	private int numHyperBranches = 8; // The amount of branches allowed (~branchFactor is reasonable unless it is very large e.g. Go)
+	private int numHyperBranches = 4; // The amount of branches allowed (~branchFactor is reasonable unless it is very large e.g. Go)
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = 4; // The number of simulations to run for each possible move for each hypergame
+	private int numProbes = 6; // The number of simulations to run for each possible move for each hypergame
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -377,7 +377,8 @@ public class HyperPlayer<
 			for(MoveInterface<TermType> move : possibleMoves) {
 				moveHashMap.put(move.hashCode(), move);
 				// Calculate the the expected value for each move using monte carlo simulation
-				float expectedValue = simulateMove(currState, move, numProbes);
+				int calcNumProbes = (int)( numProbes * (16 / hypergames.size()) ); // @todo: Remove this and change below to numProbes
+				float expectedValue = simulateMove(currState, move, calcNumProbes);
 
 				// Calculate the weighted expected value for each move
 				float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());

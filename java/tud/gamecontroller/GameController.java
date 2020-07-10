@@ -180,7 +180,7 @@ public class GameController<
 			playerthreads.add(new PlayerThreadStart<TermType, State<TermType, ReasonerStateInfoType>>(role, match.getPlayer(role), match, startclock*1000+EXTRA_DEADLINE_TIME));
 
 			// Create a new file to log the moves of each player @todo: Integrate with logger
-			if(match.getPlayer(role).getName().equals(PlayerInfo.TYPE_HYPERPLAY) || match.getPlayer(role).getName().equals(PlayerInfo.TYPE_IMPROVEDRANDOM)) {
+			if(match.getPlayer(role).getName().equals(PlayerInfo.TYPE_HYPERPLAY) || match.getPlayer(role).getName().equals(PlayerInfo.TYPE_IMPROVEDRANDOM) || match.getPlayer(role).getName().equals(PlayerInfo.TYPE_ANYTIMEHYPERPLAY)) {
 				try {
 					FileWriter myWriter = new FileWriter("matches/" + match.getMatchID() + ".csv");
 					myWriter.write("match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen\n");
