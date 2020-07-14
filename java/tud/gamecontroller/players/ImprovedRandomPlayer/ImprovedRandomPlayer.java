@@ -21,9 +21,6 @@
 
 package tud.gamecontroller.players.ImprovedRandomPlayer;
 
-import java.io.FileWriter;   // Import the FileWriter class
-import java.io.IOException;  // Import the IOException class to handle errors
-
 import tud.auxiliary.CrossProductMap;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
@@ -32,6 +29,8 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /*
@@ -59,22 +58,22 @@ import java.util.*;
 			Branch the model by:
 				Cloning the original model and update such that:
 					Player's move matches the last move actually performed
-					The move chosen isn't the same move as was chosen for a previoud update/branch from this state
+					The move chosen isn't the same move as was chosen for a previous update/branch from the initial state
 				Ensure percepts match, then add to hypergame set up to limit
 			For all updates and branches, add the legal moves to a set
 		Select a move from the legal moves set
 
 	Move Selection:
-		Random amongst legal hypergames
+		Weighted based on likelihood of each hypergame using uniform opponent modelling
  */
 
 /**
- * ImprovedRandomPlayer is an agent that can play imperfect information and non-deterministic two player extensive-form
- * games with perfect recall by holding many 'hypergames' as models that may represent the true state of the game in
- * perfect information representation. It then chooses a random move from the legal moves available to it in any of these
- * hypergames.
+ * HyperPlayer is an agent that can play imperfect information and non-deterministic two player extensive-form games
+ * with perfect recall by holding many 'hypergames' as models that may represent the true state of the game in perfect
+ * information representation. It then calculates the best move for each hypergame weighted against the likelihood of
+ * it representing the true state of the game and returns the moves with the greatest weighted expected payoff.
  *
- * Mostly implements the algorithm described in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
+ * Implements the algorithm described in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
  * @see "https://staff.cdms.westernsydney.edu.au/~dongmo/GTLW/Michael_Tim.pdf"
  *
  *
@@ -93,20 +92,16 @@ public class ImprovedRandomPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	/* FOR BASIC TESTING:
-		numHyperGames = 50
-		numHyperBranches = 25 (16 also works for 4x4)
-		numProbes = 4 (although this shouldn't matter since it isn't used)
-	 */
-	private int numHyperGames = 50; // The maximum number of hypergames allowable
-	private int numHyperBranches = 16; // The amount of branches allowed
+	private int numHyperGames = 16; // The maximum number of hypergames allowable
+	private int numHyperBranches = 2; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = 4; // The number of simulations to run for each possible move for each hypergame
+	private int numProbes = -1; // The number of simulations to run for each possible move for each hypergame
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
 	private HashMap<Integer, Collection<JointMove<TermType>>> badMovesTracker; // Tracks the invalid moves from each perfect-information state
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
+	private StateInterface<TermType, ?> initialState; // Holds the initial state
 
 	public ImprovedRandomPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
@@ -178,13 +173,13 @@ public class ImprovedRandomPlayer<
 			// Create first model to represent the empty state
 			Model<TermType> model = new Model<TermType>();
 			Collection<TermType> initialPercepts = perceptTracker.get(stepNum);
-			StateInterface<TermType, ?> initialState = match.getGame().getInitialState();
+			initialState = match.getGame().getInitialState();
 			model.updateGameplayTracker(stepNum, initialPercepts, null, initialState, role, 1);
 
 			hypergames.add(model);
 
 			// Get legal moves from this model
-			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 		} else {
 			// For each model in the the current hypergames set, update it with a random joint action that matches player's last action and branch by the branching factor
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
@@ -199,10 +194,17 @@ public class ImprovedRandomPlayer<
 				int step = model.getActionPath().size();
 				while(step < stepNum + 1) {
 					step = forwardHypergame(model, step);
-					if(step == 0) break;
+					if(step < stepNum - 1 || step == 0) break;
 				}
-				// If the hypergame has gone all the way back to the initial state and there are no valid moves here, then remove it from the set of hypergames
-				if(step == 0) {
+				// If the hypergame has gone through all possible updates from the current state, then remove it from the set of hypergames
+				/* This can be done without checking if future states are in use since this is updating the state, rather than branching
+				 	Therefore: No states can be beyond this one from the same node
+				 */
+				if(step < stepNum - 1 || step == 0) {
+					// Add state to bad move tracker
+					updateBadMoveTracker(model.getPreviousActionPathHash(), model.getLastAction());
+
+					// Remove model
 					hypergames.remove(model);
 					continue;
 				}
@@ -210,7 +212,7 @@ public class ImprovedRandomPlayer<
 				updateCurrentlyInUseMoves(model, currActionPathHash, previousActionPathHash, previousAction);
 
 				// Get legal moves
-				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role));
+				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
@@ -227,10 +229,13 @@ public class ImprovedRandomPlayer<
 						step = newModel.getActionPath().size();
 						while(step < stepNum + 1) {
 							step = forwardHypergame(newModel, step);
-							if(step == 0) break;
+							if(step < stepNum - 1 || step == 0) break;
 						}
-						// If the hypergame has gone all the way back to the initial state and there are no valid moves here, then break and don't add it to the hyperset
-						if(step == 0) {
+						// If the hypergame has gone through all possible updates from the current state, then break and don't add it to the hyperset
+						/* If this occurs on a branch then there must be a successful state after the current state, but not enough to branch
+							Therefore no need to discard the current state yet
+						 */
+						if(step < stepNum - 1 || step == 0) {
 							keepBranching = false;
 							break;
 						}
@@ -242,13 +247,37 @@ public class ImprovedRandomPlayer<
 						updateCurrentlyInUseMoves(newModel, currActionPathHash, previousActionPathHash, previousAction);
 
 						// Get legal moves
-						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role));
+						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role, match));
 						legalMoves.addAll(legalMovesInState);
 					} else break;
 				}
 			}
 		}
-		System.out.println("UPDATED STATE IMPRANDOM");
+
+		// If no hypergames left, then run until one exists
+		System.out.println(this.getName() + ": Number of hypergames after updating: " + hypergames.size());
+		while(hypergames.size() == 0) {
+			System.out.println(this.getName() + ": Trying to find another path");
+			// Create first model to represent the empty state
+			Model<TermType> model = new Model<TermType>();
+			Collection<TermType> initialPercepts = perceptTracker.get(0);
+			model.updateGameplayTracker(0, initialPercepts, null, initialState, role, 1);
+
+			int step = model.getActionPath().size();
+			int maxStep = step;
+			while(step < stepNum + 1) {
+				step = forwardHypergame(model, step);
+				if(step < maxStep - 1) break;
+				maxStep = Math.max(step, maxStep);
+			}
+			if(step < maxStep - 1) continue;
+
+			hypergames.add(model);
+
+			// Get legal moves from this model
+			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
+		}
+		System.out.println(this.getName() + ": Number of hypergames after >=1 found: " + hypergames.size());
 
 		//Calculate how long the update took
 		long endTime =  System.currentTimeMillis();
@@ -259,10 +288,13 @@ public class ImprovedRandomPlayer<
 
 		// Select a move
 		startTime =  System.currentTimeMillis();
-		MoveInterface<TermType> bestMove = randomMoveSelection(legalMoves);
+		Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
+		MoveInterface<TermType> bestMove = iter.next();
+		if(legalMoves.size() > 1) {
+			bestMove = randomMoveSelection(legalMoves);
+		}
 		endTime =  System.currentTimeMillis();
 		long selectTime = endTime - startTime;
-		System.out.println("CHOSE MOVE IMPRANDOM");
 
 		// Print move to file
 		try {
@@ -275,6 +307,25 @@ public class ImprovedRandomPlayer<
 		}
 
 		return bestMove;
+	}
+
+	/**
+	 * Select a move amongst the possible moves randomly
+	 *
+	 * @param possibleMoves - A set of the possible moves
+	 * @return The chosen move
+	 */
+	public MoveInterface<TermType> randomMoveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
+		int rand = random.nextInt(possibleMoves.size());
+		MoveInterface<TermType> chosenMove = null;
+		int i = 0;
+		for(MoveInterface<TermType> move : possibleMoves) {
+			if(i == rand) {
+				chosenMove = move;
+			}
+			i++;
+		}
+		return chosenMove;
 	}
 
 	/**
@@ -332,59 +383,6 @@ public class ImprovedRandomPlayer<
 	}
 
 	/**
-	 * Select a move amongst the possible moves randomly
-	 *
-	 * @param possibleMoves - A set of the possible moves
-	 * @return The chosen move
-	 */
-	public MoveInterface<TermType> randomMoveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
-		int rand = random.nextInt(possibleMoves.size());
-		MoveInterface<TermType> chosenMove = null;
-		int i = 0;
-		for(MoveInterface<TermType> move : possibleMoves) {
-			if(i == rand) {
-				chosenMove = move;
-			}
-			i++;
-		}
-		return chosenMove;
-	}
-
-	/**
-	 * Get the expected result of a move from a given state using monte carlo simulation
-	 *
-	 * @param state - The current state of the game
-	 * @param move - The first move to be tried
-	 * @param numProbes - The number of simulations to run
-	 * @return The statistical expected result of a move
-	 */
-	public float simulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, int numProbes) {
-		int expectedOutcome = 0;
-		// Repeatedly select random joint moves until a terminal state is reached
-		for (int i = 0; i < numProbes; i++) {
-			StateInterface<TermType, ?> currState = state;
-			JointMoveInterface<TermType> randJointMove;
-			boolean isFirstMove = true;
-			while(!currState.isTerminal()) {
-				if(isFirstMove) {
-					try {
-						randJointMove = getRandomJointMove(currState, move);
-					} catch(Exception e) {
-						return 0;
-					}
-					isFirstMove = false;
-				} else {
-					randJointMove = getRandomJointMove(currState);
-				}
-				currState = currState.getSuccessor(randJointMove);
-			}
-			expectedOutcome += currState.getGoalValue(role);
-		}
-		return (float)expectedOutcome/(float)numProbes;
-	}
-
-
-	/**
 	 * Forwards the hypergame by trying a random joint move such that:
 	 * 		The action taken by the player is the same action that was taken in reality last round
 	 * 		The action-path generated is not already in use
@@ -400,7 +398,7 @@ public class ImprovedRandomPlayer<
 	 */
 	public int forwardHypergame(Model<TermType> model, int step) {
 		// Update the model using a random joint move
-		StateInterface<TermType, ?> state = model.getCurrentState();
+		StateInterface<TermType, ?> state = model.getCurrentState(match);
 		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, actionTracker.get(step - 1)));
 		int numPossibleJointMoves = possibleJointMoves.size();
 		cleanJointMoves(possibleJointMoves, model.getActionPathHash());
