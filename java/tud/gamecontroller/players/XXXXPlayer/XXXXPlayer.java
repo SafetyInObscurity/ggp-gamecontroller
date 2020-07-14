@@ -95,7 +95,7 @@ public class XXXXPlayer<
 	private int numHyperGames = 16; // The maximum number of hypergames allowable
 	private int numHyperBranches = 2; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = 16; // The number of simulations to run for each possible move for each hypergame
+	private int numProbes = -1; // The number of simulations to run for each possible move for each hypergame
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -291,7 +291,7 @@ public class XXXXPlayer<
 		Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
 		MoveInterface<TermType> bestMove = iter.next();
 		if(legalMoves.size() > 1) {
-			bestMove = randomMoveSelection(legalMoves); // @todo: Change to weighted MCS
+			bestMove = randomMoveSelection(legalMoves);
 		}
 		endTime =  System.currentTimeMillis();
 		long selectTime = endTime - startTime;
@@ -381,120 +381,6 @@ public class XXXXPlayer<
 		}
 		System.out.println("Num hypergames: " + hypergames.size());
 	}
-
-	/**
-	 * moveSelection selects a move from the list of possibleMoves
-	 * It does this by considering:
-	 * 		The expected value for that move given a hypergame
-	 * 		The probability that that hypergame is the true game
-	 *
-	 * 	Assumptions:
-	 * 		P(HG | Percepts) ~ P(HG) : HG = Hypergame is the true Game
-	 * 		The opponent's move preferences will be approximated as being uniformly distributed over all possible moves
-	 *
-	 * 	The P(HG) = 1/ChoiceFactor[i] / SUM(1/ChoiceFactor[i])
-	 * 	The expected payoff will be calculated using MCS
-	 *
-	 * 	Therefore, the weighted expected value of a move j is the sum of all (expectations for that move multiplied by the probability of that hypergame) in all hypergames
-	 *
-	 * @todo: Why even include the invChoiceFactorSum when all of the CFs will be divided by it
-	 *
-	 * @param possibleMoves
-	 * @return
-	 */
-	public MoveInterface<TermType> moveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
-		// Calculate P(HG)
-		// Calculate inverse choice factor sum @todo: is this necessary to get the invChoiceFactorSum?
-		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
-		int choiceFactor;
-		float invChoiceFactorSum = 0;
-		for(Model<TermType> model : hypergames) {
-			choiceFactor = model.getNumberOfPossibleActions();
-			choiceFactors.put(model.getActionPathHash(), choiceFactor);
-			invChoiceFactorSum += (float)(1.0/(float)choiceFactor);
-		}
-
-		// Calculate the probability of each hypergame
-		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
-		float prob;
-		for(Model<TermType> model : hypergames) {
-			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
-			hyperProbs.put(model.getActionPathHash(), prob);
-		}
-
-		// Calculate expected move value for each hypergame
-		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
-		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
-		for(Model<TermType> model : hypergames) {
-			StateInterface<TermType, ?> currState = model.getCurrentState(match);
-			for(MoveInterface<TermType> move : possibleMoves) {
-				moveHashMap.put(move.hashCode(), move);
-				// Calculate the the expected value for each move using monte carlo simulation
-				float expectedValue = simulateMove(currState, move, numProbes);
-
-				// Calculate the weighted expected value for each move
-				float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
-
-				// Add expected value to hashmap
-				if(!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
-					weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
-				} else {
-					float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
-					weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
-				}
-			}
-		}
-
-		// Return the move with the greatest weighted expected value
-		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		float maxVal = Float.MIN_VALUE;
-		MoveInterface<TermType> bestMove = null;
-		while(it.hasNext()){
-			HashMap.Entry<Integer, Float> mapElement = (HashMap.Entry<Integer, Float>)it.next();
-			float val = mapElement.getValue();
-			if(val > maxVal) {
-				bestMove = moveHashMap.get(mapElement.getKey());
-				maxVal = val;
-			}
-		}
-
-		return bestMove;
-	}
-
-	/**
-	 * Get the expected result of a move from a given state using monte carlo simulation
-	 *
-	 * @param state - The current state of the game
-	 * @param move - The first move to be tried
-	 * @param numProbes - The number of simulations to run
-	 * @return The statistical expected result of a move
-	 */
-	public float simulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, int numProbes) {
-		int expectedOutcome = 0;
-		// Repeatedly select random joint moves until a terminal state is reached
-		for (int i = 0; i < numProbes; i++) {
-			StateInterface<TermType, ?> currState = state;
-			JointMoveInterface<TermType> randJointMove;
-			boolean isFirstMove = true;
-			while(!currState.isTerminal()) {
-				if(isFirstMove) {
-					try {
-						randJointMove = getRandomJointMove(currState, move);
-					} catch(Exception e) {
-						return 0;
-					}
-					isFirstMove = false;
-				} else {
-					randJointMove = getRandomJointMove(currState);
-				}
-				currState = currState.getSuccessor(randJointMove);
-			}
-			expectedOutcome += currState.getGoalValue(role);
-		}
-		return (float)expectedOutcome/(float)numProbes;
-	}
-
 
 	/**
 	 * Forwards the hypergame by trying a random joint move such that:

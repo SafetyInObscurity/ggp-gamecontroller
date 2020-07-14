@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source tests/testConfig/gdl2_mastermind.txt
+source tests/testConfig/gdl2_kriegTTT_4x4.txt
 PARSERESULTS=true
 
 for ((i=0 ; i < NUMTESTS ; i++));

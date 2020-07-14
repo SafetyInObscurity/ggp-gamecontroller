@@ -69,7 +69,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public int getActionPathHash() { return this.actionPathHash; }
     public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public JointMove<TermType> getLastAction() { return this.actionPath.peek(); }
-    public StateInterface<TermType, ?> getCurrentState(RunnableMatchInterface<TermType, ?>  match) {
+    public StateInterface<TermType, ?> getCurrentState(RunnableMatchInterface<TermType, ?> match) {
         return this.statePath.isEmpty() ? match.getGame().getInitialState() : this.statePath.peek();
     }
     public Collection<TermType> getLatestExpectedPercepts() { return this.perceptPath.peek(); }

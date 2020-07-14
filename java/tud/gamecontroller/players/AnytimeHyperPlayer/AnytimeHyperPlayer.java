@@ -92,16 +92,22 @@ public class AnytimeHyperPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 50; // The maximum number of hypergames allowable
+	private int numHyperGames = 16; // The maximum number of hypergames allowable
 	private int numHyperBranches = 2; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
-	private int numProbes = 4; // The number of simulations to run for each possible move for each hypergame
+	private int depth; // Tracks the number of simulations run @todo: name better
+	private int maxNumProbes = 50; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
 	private HashMap<Integer, Collection<JointMove<TermType>>> badMovesTracker; // Tracks the invalid moves from each perfect-information state
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
+
+	private long timeLimit; // The total amount of time that can be
+	private long startTime;
+	private long timeexpired;
+	private static final long PREFERRED_PLAY_BUFFER = 1000; // 10 second buffer before end of game to select optimal move
 
 	public AnytimeHyperPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
@@ -126,6 +132,7 @@ public class AnytimeHyperPlayer<
 		currentlyInUseMoves = new HashMap<Integer, Collection<JointMove<TermType>>>();
 		hypergames = new ArrayList<Model<TermType>>();
 		stepNum = 0;
+		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
 
 		// Instantiate logging variables
 		matchID = match.getMatchID();
@@ -164,7 +171,9 @@ public class AnytimeHyperPlayer<
 	 * @return A legal move
 	 */
 	public MoveInterface<TermType> getNextMove() {
-		long startTime =  System.currentTimeMillis();
+		startTime =  System.currentTimeMillis();
+		timeexpired = 0;
+
 		HashSet<MoveInterface<TermType>> legalMoves = new HashSet<MoveInterface<TermType>>();
 		HashSet<MoveInterface<TermType>> legalMovesInState = null;
 
@@ -227,9 +236,9 @@ public class AnytimeHyperPlayer<
 
 						// Forward the new model
 						step = newModel.getActionPath().size();
-						while(step < stepNum + 1) {
+						while(step < stepNum + 1 || step == 0) {
 							step = forwardHypergame(newModel, step);
-							if(step < stepNum - 1) break;
+							if(step < stepNum - 1 || step == 0) break;
 						}
 						// If the hypergame has gone through all possible updates from the current state, then break and don't add it to the hyperset
 						/* If this occurs on a branch then there must be a successful state after the current state, but not enough to branch
@@ -287,19 +296,19 @@ public class AnytimeHyperPlayer<
 //		printHypergames();
 
 		// Select a move
-		startTime =  System.currentTimeMillis();
+		long selectStartTime =  System.currentTimeMillis();
 		Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
 		MoveInterface<TermType> bestMove = iter.next();
 		if(legalMoves.size() > 1) {
-			bestMove = moveSelection(legalMoves);
+			bestMove = anytimeMoveSelection(legalMoves);
 		}
-		endTime =  System.currentTimeMillis();
-		long selectTime = endTime - startTime;
+		long selectEndTime =  System.currentTimeMillis();
+		long selectTime = selectEndTime - selectStartTime;
 
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + numProbes + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
@@ -383,86 +392,6 @@ public class AnytimeHyperPlayer<
 	}
 
 	/**
-	 * moveSelection selects a move from the list of possibleMoves
-	 * It does this by considering:
-	 * 		The expected value for that move given a hypergame
-	 * 		The probability that that hypergame is the true game
-	 *
-	 * 	Assumptions:
-	 * 		P(HG | Percepts) ~ P(HG) : HG = Hypergame is the true Game
-	 * 		The opponent's move preferences will be approximated as being uniformly distributed over all possible moves
-	 *
-	 * 	The P(HG) = 1/ChoiceFactor[i] / SUM(1/ChoiceFactor[i])
-	 * 	The expected payoff will be calculated using MCS
-	 *
-	 * 	Therefore, the weighted expected value of a move j is the sum of all (expectations for that move multiplied by the probability of that hypergame) in all hypergames
-	 *
-	 * @todo: Why even include the invChoiceFactorSum when all of the CFs will be divided by it
-	 *
-	 * @param possibleMoves
-	 * @return
-	 */
-	public MoveInterface<TermType> moveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
-		// Calculate P(HG)
-		// Calculate inverse choice factor sum @todo: is this necessary to get the invChoiceFactorSum?
-		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
-		int choiceFactor;
-		float invChoiceFactorSum = 0;
-		for(Model<TermType> model : hypergames) {
-			choiceFactor = model.getNumberOfPossibleActions();
-			choiceFactors.put(model.getActionPathHash(), choiceFactor);
-			invChoiceFactorSum += (float)(1.0/(float)choiceFactor);
-		}
-
-		// Calculate the probability of each hypergame
-		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
-		float prob;
-		for(Model<TermType> model : hypergames) {
-			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
-			hyperProbs.put(model.getActionPathHash(), prob);
-		}
-
-		// Calculate expected move value for each hypergame
-		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
-		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
-		for(Model<TermType> model : hypergames) {
-			StateInterface<TermType, ?> currState = model.getCurrentState(match);
-			for(MoveInterface<TermType> move : possibleMoves) {
-				moveHashMap.put(move.hashCode(), move);
-				// Calculate the the expected value for each move using monte carlo simulation
-				float expectedValue = simulateMove(currState, move, numProbes);
-
-				// Calculate the weighted expected value for each move
-				float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
-
-				// Add expected value to hashmap
-				if(!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
-					weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
-				} else {
-					float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
-					weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
-				}
-			}
-		}
-
-		// Return the move with the greatest weighted expected value
-		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		float maxVal = Float.MIN_VALUE;
-		MoveInterface<TermType> bestMove = null;
-		while(it.hasNext()){
-			HashMap.Entry<Integer, Float> mapElement = (HashMap.Entry<Integer, Float>)it.next();
-			float val = mapElement.getValue();
-			if(val > maxVal) {
-				bestMove = moveHashMap.get(mapElement.getKey());
-				maxVal = val;
-			}
-		}
-
-		return bestMove;
-	}
-
-	/**
 	 * anytimeMoveSelection calculates the optimal move to select given a set of possible moves and a bag of hypergames
 	 * with increasing accuracy by running more simulations as time permits
 	 *
@@ -490,30 +419,38 @@ public class AnytimeHyperPlayer<
 			hyperProbs.put(model.getActionPathHash(), prob);
 		}
 
-		// Calculate expected move value for each hypergame
+		// Calculate expected move value for each hypergame until almost out of time
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
-		for(Model<TermType> model : hypergames) {
-			StateInterface<TermType, ?> currState = model.getCurrentState(match);
-			for(MoveInterface<TermType> move : possibleMoves) {
-				moveHashMap.put(move.hashCode(), move);
-				// Calculate the the expected value for each move using monte carlo simulation
-				float expectedValue = simulateMove(currState, move, numProbes);
+		depth = 1;
+		while(timeexpired < timeLimit && depth < maxNumProbes) {
+			for (Model<TermType> model : hypergames) {
+				StateInterface<TermType, ?> currState = model.getCurrentState(match);
+				for (MoveInterface<TermType> move : possibleMoves) {
+					moveHashMap.put(move.hashCode(), move);
+					// Calculate the the expected value for each move using monte carlo simulation
+					float expectedValue = anytimeSimulateMove(currState, move);
 
-				// Calculate the weighted expected value for each move
-				float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
+					// Calculate the weighted expected value for each move
+					float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
 
-				// Add expected value to hashmap
-				if(!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
-					weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
-				} else {
-					float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
-					weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
+					// Add expected value to hashmap
+					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
+						weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
+					} else {
+						float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
+						weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
+					}
 				}
 			}
+			timeexpired = System.currentTimeMillis() - startTime;
+			depth++;
 		}
+		System.out.println("Ran " + depth + " simulations TOTAL");
 
 		// Return the move with the greatest weighted expected value
+		long startFinalCalcTime =  System.currentTimeMillis();
+
 		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
 		float maxVal = Float.MIN_VALUE;
 		MoveInterface<TermType> bestMove = null;
@@ -525,43 +462,42 @@ public class AnytimeHyperPlayer<
 				maxVal = val;
 			}
 		}
+		long endFinalCalcTime =  System.currentTimeMillis();
+		long updateTime = endFinalCalcTime - startFinalCalcTime;
+		System.out.println("Took " + updateTime + " ms to run final calc");
 
 		return bestMove;
 	}
 
 	/**
-	 * Get the expected result of a move from a given state using monte carlo simulation
+	 * Get the expected result of a move from a given state using a single monte carlo simulation
 	 *
 	 * @param state - The current state of the game
 	 * @param move - The first move to be tried
-	 * @param numProbes - The number of simulations to run
 	 * @return The statistical expected result of a move
 	 */
-	public float simulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, int numProbes) {
+	public float anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move) {
 		int expectedOutcome = 0;
 		// Repeatedly select random joint moves until a terminal state is reached
-		for (int i = 0; i < numProbes; i++) {
-			StateInterface<TermType, ?> currState = state;
-			JointMoveInterface<TermType> randJointMove;
-			boolean isFirstMove = true;
-			while(!currState.isTerminal()) {
-				if(isFirstMove) {
-					try {
-						randJointMove = getRandomJointMove(currState, move);
-					} catch(Exception e) {
-						return 0;
-					}
-					isFirstMove = false;
-				} else {
-					randJointMove = getRandomJointMove(currState);
+		StateInterface<TermType, ?> currState = state;
+		JointMoveInterface<TermType> randJointMove;
+		boolean isFirstMove = true;
+		while(!currState.isTerminal()) {
+			if(isFirstMove) {
+				try {
+					randJointMove = getRandomJointMove(currState, move);
+				} catch(Exception e) {
+					return 0;
 				}
-				currState = currState.getSuccessor(randJointMove);
+				isFirstMove = false;
+			} else {
+				randJointMove = getRandomJointMove(currState);
 			}
-			expectedOutcome += currState.getGoalValue(role);
+			currState = currState.getSuccessor(randJointMove);
 		}
-		return (float)expectedOutcome/(float)numProbes;
+		expectedOutcome += currState.getGoalValue(role);
+		return (float)expectedOutcome;
 	}
-
 
 	/**
 	 * Forwards the hypergame by trying a random joint move such that:
