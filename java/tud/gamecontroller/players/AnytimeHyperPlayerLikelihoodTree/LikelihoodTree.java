@@ -1,9 +1,8 @@
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree;
 
-import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
 
-import java.util.*;
+import java.util.ArrayDeque;
 
 /**
  *  LikelihoodTree holds the likelihood of each state ocurring in a game tree assuming the opponent chooses moves
@@ -54,11 +53,11 @@ public class LikelihoodTree<TermType extends TermInterface> {
     public double getChoiceFactor(ArrayDeque<Integer> actionPathHashPath) {
         Node child = getRoot();
         double value = child.getValue() == 0 ? 1 : child.getValue();
-//        System.out.println(value);
+        System.out.println(value);
         for (Integer actionPathHash : actionPathHashPath) {
             if(actionPathHash == child.getActionPathHash()) continue;
             child = child.getChild(actionPathHash);
-//            System.out.println(child.getValue());
+            System.out.println(child.getValue());
             if(child.getValue() > 0) {
                 value *= child.getValue();
             }

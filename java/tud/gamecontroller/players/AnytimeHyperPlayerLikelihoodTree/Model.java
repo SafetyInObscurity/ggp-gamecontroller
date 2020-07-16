@@ -17,7 +17,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree;
 
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -26,7 +26,10 @@ import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.term.TermInterface;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Stack;
 
 /**
  * Holds a model of how the true state of the game may look given the percepts seen so far

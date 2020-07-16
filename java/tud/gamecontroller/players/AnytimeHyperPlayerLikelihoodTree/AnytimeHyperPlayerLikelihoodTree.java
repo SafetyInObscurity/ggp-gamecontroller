@@ -19,7 +19,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree;
 
 import tud.auxiliary.CrossProductMap;
 import tud.gamecontroller.ConnectionEstablishedNotifier;
@@ -81,7 +81,7 @@ import java.util.*;
  * @version 1.0
  * @since 1.0
  */
-public class XXXXPlayer<
+public class AnytimeHyperPlayerLikelihoodTree<
 	TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
@@ -110,7 +110,7 @@ public class XXXXPlayer<
 	private long timeexpired;
 	private static final long PREFERRED_PLAY_BUFFER = 1000; // 1 second buffer before end of game to select optimal move
 
-	public XXXXPlayer(String name, GDLVersion gdlVersion) {
+	public AnytimeHyperPlayerLikelihoodTree(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
 		random = new Random();
 	}
@@ -549,7 +549,7 @@ public class XXXXPlayer<
 
 		Node node = likelihoodTree.getNode(model.getActionPathHashPath());
 		node.setValue(Math.max(node.getValue(), possibleJointMoves.size()));
-//		System.out.println("Num possibilities: " + possibleJointMoves.size());
+		System.out.println("Num possibilities: " + possibleJointMoves.size());
 //		System.out.println("Updated node: " + likelihoodTree.getNode(model.getActionPathHashPath()));
 
 //		System.exit(0);
@@ -581,10 +581,10 @@ public class XXXXPlayer<
 				// Backtrack
 				model.backtrack();
 
-//				System.out.println();
-//				System.out.println("Latest actionpath hash: " + model.getActionPathHash());
-//				System.out.println("Actionpath hash path: " + model.getActionPathHashPath());
-//				System.out.println();
+				System.out.println();
+				System.out.println("Latest actionpath hash: " + model.getActionPathHash());
+				System.out.println("Actionpath hash path: " + model.getActionPathHashPath());
+				System.out.println();
 
 				// Add move to bad move set
 				updateBadMoveTracker(model.getActionPathHash(), jointAction, model.getActionPathHashPath());
