@@ -93,7 +93,7 @@ public class AnytimeHyperPlayer<
 	// Hyperplay variables
 	private Random random;
 	private int numHyperGames = 16; // The maximum number of hypergames allowable
-	private int numHyperBranches = 2; // The amount of branches allowed
+	private int numHyperBranches = 4; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
 	private int depth; // Tracks the number of simulations run @todo: name better
 	private int maxNumProbes = 50; // @todo: probably remove later
@@ -107,7 +107,7 @@ public class AnytimeHyperPlayer<
 	private long timeLimit; // The total amount of time that can be
 	private long startTime;
 	private long timeexpired;
-	private static final long PREFERRED_PLAY_BUFFER = 1000; // 10 second buffer before end of game to select optimal move
+	private static final long PREFERRED_PLAY_BUFFER = 1000; // 1 second buffer before end of game to select optimal move
 
 	public AnytimeHyperPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
@@ -211,7 +211,9 @@ public class AnytimeHyperPlayer<
 				 */
 				if(step < stepNum - 1 || step == 0) {
 					// Add state to bad move tracker
-					updateBadMoveTracker(model.getPreviousActionPathHash(), model.getLastAction());
+					if(step > 0) {
+						updateBadMoveTracker(model.getPreviousActionPathHash(), model.getLastAction());
+					}
 
 					// Remove model
 					hypergames.remove(model);
@@ -423,7 +425,7 @@ public class AnytimeHyperPlayer<
 		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 1;
-		while(timeexpired < timeLimit && depth < maxNumProbes) {
+		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
 			for (Model<TermType> model : hypergames) {
 				StateInterface<TermType, ?> currState = model.getCurrentState(match);
 				for (MoveInterface<TermType> move : possibleMoves) {
