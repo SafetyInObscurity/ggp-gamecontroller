@@ -206,13 +206,13 @@ public class AnytimeHyperPlayerLikelihoodTree<
 				int step = model.getActionPath().size();
 				while(step < stepNum + 1) {
 					step = forwardHypergame(model, step);
-					if(step < stepNum || step == 0) break;
+					if(step < stepNum - 1 || step == 0) break;
 				}
 				// If the hypergame has gone through all possible updates from the current state, then remove it from the set of hypergames
 				/* This can be done without checking if future states are in use since this is updating the state, rather than branching
 				 	Therefore: No states can be beyond this one from the same node
 				 */
-				if(step < stepNum || step == 0) {
+				if(step < stepNum - 1 || step == 0) {
 					// Add state to bad move tracker
 					if(step > 1) {
 						updateBadMoveTracker(model.getPreviousActionPathHash(), model.getLastAction(), model.getActionPathHashPath());
@@ -243,13 +243,13 @@ public class AnytimeHyperPlayerLikelihoodTree<
 						step = newModel.getActionPath().size();
 						while(step < stepNum + 1) {
 							step = forwardHypergame(newModel, step);
-							if(step < stepNum || step == 0) break;
+							if(step < stepNum - 1 || step == 0) break;
 						}
 						// If the hypergame has gone through all possible updates from the current state, then break and don't add it to the hyperset
 						/* If this occurs on a branch then there must be a successful state after the current state, but not enough to branch
 							Therefore no need to discard the current state yet
 						 */
-						if(step < stepNum || step == 0) {
+						if(step < stepNum - 1 || step == 0) {
 							keepBranching = false;
 							break;
 						}

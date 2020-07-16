@@ -5,20 +5,23 @@ import java.util.ArrayList;
 public class Node {
 
     // Instance Variables
-    private int value;
-    private int actionPathHash;
-    private ArrayList<Node> children;
+    private double value; // The value of this node from the opponent's perspective
+    private int actionPathHash; // The action-path leading to this state
+    private double relLikelihood; // The relative quality of the node compared to the other options from the opponent's perspective
+    private ArrayList<Node> children; // The nodes below it
 
     /**
      * Instantiates a Node object with 0 children
      */
     public Node(int actionPathHash) {
-        this.value = 0;
+        this.value = 0.0;
+        this.relLikelihood = 0.0;
         this.actionPathHash = actionPathHash;
         this.children = new ArrayList<Node>();
     }
 
-    public int getValue() { return this.value; }
+    public double getValue() { return this.value; }
+    public double getRelLikelihood() { return this.relLikelihood; }
     public int getActionPathHash() { return this.actionPathHash; }
     public ArrayList<Node> getChildren() { return this.children; }
     public Node getChild(int actionPathHash) {
@@ -30,8 +33,11 @@ public class Node {
         return null;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
+    }
+    public void setRelLikelihood(double likelihood) {
+        this.relLikelihood = likelihood;
     }
 
     /**

@@ -96,7 +96,7 @@ public class XXXXPlayer<
 	private int numHyperBranches = 4; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 50; // @todo: probably remove later
+	private int maxNumProbes = 16; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -104,6 +104,8 @@ public class XXXXPlayer<
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
 	private LikelihoodTree<TermType> likelihoodTree;
+	private RoleInterface<TermType> opponentRole;
+	private HashSet<Integer> likelihoodTreeExpansionTracker;
 
 	private long timeLimit; // The total amount of time that can be
 	private long startTime;
@@ -135,6 +137,13 @@ public class XXXXPlayer<
 		likelihoodTree = new LikelihoodTree<TermType>(0);
 		stepNum = 0;
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
+
+		likelihoodTreeExpansionTracker = new  HashSet<Integer>();
+		for(RoleInterface<TermType> currRole: match.getGame().getOrderedRoles()) {
+			if(currRole != this.role) {
+				opponentRole = currRole;
+			}
+		}
 
 		// Instantiate logging variables
 		matchID = match.getMatchID();
@@ -187,6 +196,7 @@ public class XXXXPlayer<
 			initialState = match.getGame().getInitialState();
 			model.updateGameplayTracker(stepNum, initialPercepts, null, initialState, role, 1);
 			likelihoodTree = new LikelihoodTree<TermType>(model.getActionPathHash());
+			likelihoodTree.getRoot().setValue(100.0);
 
 			hypergames.add(model);
 
@@ -206,13 +216,13 @@ public class XXXXPlayer<
 				int step = model.getActionPath().size();
 				while(step < stepNum + 1) {
 					step = forwardHypergame(model, step);
-					if(step < stepNum || step == 0) break;
+					if(step < stepNum - 1|| step == 0) break;
 				}
 				// If the hypergame has gone through all possible updates from the current state, then remove it from the set of hypergames
 				/* This can be done without checking if future states are in use since this is updating the state, rather than branching
 				 	Therefore: No states can be beyond this one from the same node
 				 */
-				if(step < stepNum || step == 0) {
+				if(step < stepNum - 1 || step == 0) {
 					// Add state to bad move tracker
 					if(step > 1) {
 						updateBadMoveTracker(model.getPreviousActionPathHash(), model.getLastAction(), model.getActionPathHashPath());
@@ -243,13 +253,13 @@ public class XXXXPlayer<
 						step = newModel.getActionPath().size();
 						while(step < stepNum + 1) {
 							step = forwardHypergame(newModel, step);
-							if(step < stepNum || step == 0) break;
+							if(step < stepNum - 1 || step == 0) break;
 						}
 						// If the hypergame has gone through all possible updates from the current state, then break and don't add it to the hyperset
 						/* If this occurs on a branch then there must be a successful state after the current state, but not enough to branch
 							Therefore no need to discard the current state yet
 						 */
-						if(step < stepNum || step == 0) {
+						if(step < stepNum - 1 || step == 0) {
 							keepBranching = false;
 							break;
 						}
@@ -299,9 +309,9 @@ public class XXXXPlayer<
 
 		// Print all models
 //		printHypergames();
-		System.out.println();
-		System.out.println(likelihoodTree.toString());
-		System.out.println();
+//		System.out.println();
+//		System.out.println(likelihoodTree.toString());
+//		System.out.println();
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
@@ -355,33 +365,37 @@ public class XXXXPlayer<
 	public MoveInterface<TermType> anytimeMoveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
 		// Calculate P(HG)
 		// Calculate inverse choice factor sum @todo: is this necessary to get the invChoiceFactorSum?
-		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
+		HashMap<Integer, Double> choiceFactors = new HashMap<Integer, Double>();
 		double choiceFactor;
-		float invChoiceFactorSum = 0;
+		double invChoiceFactorSum = 0;
 		for(Model<TermType> model : hypergames) {
-			choiceFactor = likelihoodTree.getChoiceFactor(model.getActionPathHashPath());
-			double treecf = model.getNumberOfPossibleActions();
-			if(choiceFactor != treecf) {
-				System.out.println("NO MATCH");
-				System.out.println("Current choice factor: " + choiceFactor);
-				System.out.println("likelihoodTree choice factor: " + treecf);
-				System.exit(0);
-			}
-			choiceFactors.put(model.getActionPathHash(), (int) choiceFactor);
+			choiceFactor = likelihoodTree.getRelativeLikelihood(model.getActionPathHashPath());
+
+//			double treecf = model.getNumberOfPossibleActions(); @todo: Use for comparison when using non-uniform opponent modelling
+//			if(choiceFactor != treecf) {
+//				System.out.println("NO MATCH");
+//				System.out.println("Current choice factor: " + choiceFactor);
+//				System.out.println("likelihoodTree choice factor: " + treecf);
+//				System.exit(0);
+//			}
+			choiceFactors.put(model.getActionPathHash(), choiceFactor);
 			invChoiceFactorSum += (1.0/choiceFactor);
 		}
+//		System.out.println("invChoiceFactorSum: " + invChoiceFactorSum);
 
 		// Calculate the probability of each hypergame
-		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
-		float prob;
+		HashMap<Integer, Double> hyperProbs = new HashMap<Integer, Double>();
+		double prob;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
+			prob = ( ( 1.0 / choiceFactor ) / invChoiceFactorSum );
+//			System.out.println("Model " + model.getActionPathHash() + " has choiceFactor: " + choiceFactor);
+//			System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
 			hyperProbs.put(model.getActionPathHash(), prob);
 		}
 
 		// Calculate expected move value for each hypergame until almost out of time
-		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
+		HashMap<Integer, Double> weightedExpectedValuePerMove = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 1;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
@@ -390,16 +404,16 @@ public class XXXXPlayer<
 				for (MoveInterface<TermType> move : possibleMoves) {
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
-					float expectedValue = anytimeSimulateMove(currState, move);
+					float expectedValue = anytimeSimulateMove(currState, move, role);
 
 					// Calculate the weighted expected value for each move
-					float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
+					double weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
 						weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
 					} else {
-						float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
+						Double prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
 						weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
 					}
 				}
@@ -412,12 +426,12 @@ public class XXXXPlayer<
 		// Return the move with the greatest weighted expected value
 		long startFinalCalcTime =  System.currentTimeMillis();
 
-		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		float maxVal = Float.MIN_VALUE;
+		Iterator<HashMap.Entry<Integer, Double>> it = weightedExpectedValuePerMove.entrySet().iterator();
+		double maxVal = Float.MIN_VALUE;
 		MoveInterface<TermType> bestMove = null;
 		while(it.hasNext()){
-			HashMap.Entry<Integer, Float> mapElement = (HashMap.Entry<Integer, Float>)it.next();
-			float val = mapElement.getValue();
+			HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
+			Double val = mapElement.getValue();
 			if(val > maxVal) {
 				bestMove = moveHashMap.get(mapElement.getKey());
 				maxVal = val;
@@ -436,9 +450,10 @@ public class XXXXPlayer<
 	 *
 	 * @param state - The current state of the game
 	 * @param move - The first move to be tried
+	 * @param role - The role of the player to check the goal value of and who is making the move
 	 * @return The statistical expected result of a move
 	 */
-	public float anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move) {
+	public float anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, RoleInterface<TermType> role) {
 		int expectedOutcome = 0;
 		// Repeatedly select random joint moves until a terminal state is reached
 		StateInterface<TermType, ?> currState = state;
@@ -447,7 +462,7 @@ public class XXXXPlayer<
 		while(!currState.isTerminal()) {
 			if(isFirstMove) {
 				try {
-					randJointMove = getRandomJointMove(currState, move);
+					randJointMove = getRandomJointMove(currState, move, role);
 				} catch(Exception e) {
 					return 0;
 				}
@@ -533,7 +548,7 @@ public class XXXXPlayer<
 		// Update the model using a random joint move
 			// Get all possible moves and remove the known bad moves
 		StateInterface<TermType, ?> state = model.getCurrentState(match);
-		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, actionTracker.get(step - 1)));
+		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, actionTracker.get(step - 1), role));
 		int numPossibleJointMoves = possibleJointMoves.size();
 		removeBadMoves(possibleJointMoves, model.getActionPathHash());
 
@@ -547,12 +562,49 @@ public class XXXXPlayer<
 //		System.out.println("Num possibilities: " + possibleJointMoves.size());
 //		System.out.println();
 
-		Node node = likelihoodTree.getNode(model.getActionPathHashPath());
-		node.setValue(Math.max(node.getValue(), possibleJointMoves.size()));
 //		System.out.println("Num possibilities: " + possibleJointMoves.size());
-//		System.out.println("Updated node: " + likelihoodTree.getNode(model.getActionPathHashPath()));
 
-//		System.exit(0);
+		// If the node has not been expanded yet, then expand it
+		if(!likelihoodTreeExpansionTracker.contains(model.getActionPathHash())) {
+			Node node = likelihoodTree.getNode(model.getActionPathHashPath());
+
+			// Run MCS simulations on each valid move to calculate its relative value
+			MoveInterface<TermType> move;
+			Node child;
+			float expectedValue;
+			int numProbes = 4;
+			float totalValue = 0;
+			for (JointMoveInterface<TermType> jointMove : possibleJointMoves) {
+				// Run the simulation
+				move = jointMove.get(opponentRole);
+				expectedValue = 0;
+				for(int i = 0 ; i < numProbes ; i++) {
+					expectedValue += anytimeSimulateMove(state, move, opponentRole);
+				}
+				expectedValue = expectedValue/numProbes;
+				totalValue += expectedValue;
+
+				// Expand the node
+				model.getActionPath().push((JointMove<TermType>)jointMove);
+				child = new Node(model.getActionPath().hashCode());
+				child.setValue(expectedValue);
+				node.addChild(child);
+				model.getActionPath().pop();
+
+			}
+			for(Node likelihoodChild : node.getChildren()) {
+				likelihoodChild.setRelLikelihood(((double)likelihoodChild.getValue()) / totalValue);
+			}
+
+			// @todo: Ensure that the opponent's moves are chosen based on the relative quality by addiing a priority queue
+
+//			System.out.println(likelihoodTree.toString());
+//			System.exit(0);
+
+			// Add node to set of explored nodes
+			likelihoodTreeExpansionTracker.add(model.getActionPathHash());
+
+		}
 
 		removeInUseMoves(possibleJointMoves, model.getActionPathHash());
 		JointMove<TermType> jointAction = null;
@@ -593,10 +645,6 @@ public class XXXXPlayer<
 				return step;
 			} else {
 				// Else this is a valid move
-
-				// Update the likelihood tree
-				node.addChild(new Node(model.getActionPathHash()));
-
 				return step + 1;
 			}
 		}
@@ -633,8 +681,8 @@ public class XXXXPlayer<
 	 * @param action - The action that the player will take
 	 * @return A random joint move
 	 */
-	public JointMoveInterface<TermType> getRandomJointMove(StateInterface<TermType, ?> state, MoveInterface<TermType> action) {
-		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, action));
+	public JointMoveInterface<TermType> getRandomJointMove(StateInterface<TermType, ?> state, MoveInterface<TermType> action, RoleInterface<TermType> role) {
+		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, action, role));
 		JointMoveInterface<TermType> jointMove = null;
 		if(possibleJointMoves.size() > 0) {
 			int i = random.nextInt(possibleJointMoves.size());
@@ -657,13 +705,14 @@ public class XXXXPlayer<
 	 *
 	 * @param state - The state to compute action from
 	 * @param action - The action to be taken by the player
+	 * @param positionedRole - The role taking the action
 	 * @return A set of all possible moves
 	 */
-	public Collection<JointMoveInterface<TermType>> computeJointMoves(StateType state, MoveInterface<TermType> action) {
+	public Collection<JointMoveInterface<TermType>> computeJointMoves(StateType state, MoveInterface<TermType> action, RoleInterface<TermType> positionedRole) {
 		// compute legal moves for all roles such that the action matches for the player's role
 		HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>> legalMovesMap = new HashMap<RoleInterface<TermType>, Collection<? extends MoveInterface<TermType>>>();
 		for(RoleInterface<TermType> role: match.getGame().getOrderedRoles()) {
-			if(role == this.role) {
+			if(role == positionedRole) {
 				Collection<MoveInterface<TermType>> lastMoveMap = new ArrayList<MoveInterface<TermType>>();
 				lastMoveMap.add(action);
 				legalMovesMap.put(role, lastMoveMap);

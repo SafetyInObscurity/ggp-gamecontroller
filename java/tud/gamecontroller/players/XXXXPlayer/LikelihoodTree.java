@@ -46,24 +46,24 @@ public class LikelihoodTree<TermType extends TermInterface> {
     }
 
     /**
-     * Returns the number of choices that could have been made to lead the path to this state
+     * Returns the relative likelihood of each path being chosen by an opponent that acts optimally
      *
      * @param actionPathHashPath The full path from initial state to current state from a hypergame model
      * @return The choice factor of a given action path
      */
-    public double getChoiceFactor(ArrayDeque<Integer> actionPathHashPath) {
+    public double getRelativeLikelihood(ArrayDeque<Integer> actionPathHashPath) {
         Node child = getRoot();
-        double value = child.getValue() == 0 ? 1 : child.getValue();
-//        System.out.println(value);
+        double likelihood = child.getRelLikelihood() == 0 ? 1 : child.getRelLikelihood();
+//        System.out.println(likelihood);
         for (Integer actionPathHash : actionPathHashPath) {
             if(actionPathHash == child.getActionPathHash()) continue;
             child = child.getChild(actionPathHash);
-//            System.out.println(child.getValue());
-            if(child.getValue() > 0) {
-                value *= child.getValue();
+//            System.out.println(child.getRelLikelihood());
+            if(child.getRelLikelihood() > 0) {
+                likelihood *= child.getRelLikelihood();
             }
         }
-        return value;
+        return likelihood;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
         while(!unvisited.isEmpty()) {
             node = unvisited.removeFirst();
             stringLine = new StringBuilder();
-            stringLine.append("\n").append(node.getActionPathHash()).append(" has ").append(node.getValue()).append(" children:");
+            stringLine.append("\nNode ").append(node.getActionPathHash()).append(" has a value of ").append(node.getValue()).append(" and a likelihood of ").append(node.getRelLikelihood());
             for (Node child : node.getChildren()) {
                 unvisited.addLast(child);
                 stringLine.append("\n\t").append(child.getActionPathHash());
