@@ -73,7 +73,10 @@ import java.util.*;
  * information representation. It then calculates the best move for each hypergame weighted against the likelihood of
  * it representing the true state of the game and returns the moves with the greatest weighted expected payoff.
  *
+ * This variant uses a central datastructure - LikelihoodTree - to track the likelihood of each state.
+ *
  * Implements the algorithm described in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
+ * with some alteration to the backtracking
  * @see "https://staff.cdms.westernsydney.edu.au/~dongmo/GTLW/Michael_Tim.pdf"
  *
  *
@@ -96,7 +99,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	private int numHyperBranches = 4; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 50; // @todo: probably remove later
+	private int maxNumProbes = 16; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -299,9 +302,9 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 		// Print all models
 //		printHypergames();
-		System.out.println();
-		System.out.println(likelihoodTree.toString());
-		System.out.println();
+//		System.out.println();
+//		System.out.println(likelihoodTree.toString());
+//		System.out.println();
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
@@ -549,7 +552,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 		Node node = likelihoodTree.getNode(model.getActionPathHashPath());
 		node.setValue(Math.max(node.getValue(), possibleJointMoves.size()));
-		System.out.println("Num possibilities: " + possibleJointMoves.size());
+//		System.out.println("Num possibilities: " + possibleJointMoves.size());
 //		System.out.println("Updated node: " + likelihoodTree.getNode(model.getActionPathHashPath()));
 
 //		System.exit(0);
@@ -581,10 +584,10 @@ public class AnytimeHyperPlayerLikelihoodTree<
 				// Backtrack
 				model.backtrack();
 
-				System.out.println();
-				System.out.println("Latest actionpath hash: " + model.getActionPathHash());
-				System.out.println("Actionpath hash path: " + model.getActionPathHashPath());
-				System.out.println();
+//				System.out.println();
+//				System.out.println("Latest actionpath hash: " + model.getActionPathHash());
+//				System.out.println("Actionpath hash path: " + model.getActionPathHashPath());
+//				System.out.println();
 
 				// Add move to bad move set
 				updateBadMoveTracker(model.getActionPathHash(), jointAction, model.getActionPathHashPath());

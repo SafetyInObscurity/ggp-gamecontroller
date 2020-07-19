@@ -74,6 +74,7 @@ import java.util.*;
  * it representing the true state of the game and returns the moves with the greatest weighted expected payoff.
  *
  * Implements the algorithm described in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
+ * with some alteration to the backtracking
  * @see "https://staff.cdms.westernsydney.edu.au/~dongmo/GTLW/Michael_Tim.pdf"
  *
  *

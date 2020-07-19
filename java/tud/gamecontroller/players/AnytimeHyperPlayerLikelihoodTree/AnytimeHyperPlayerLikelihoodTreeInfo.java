@@ -25,12 +25,12 @@ import tud.gamecontroller.players.LocalPlayerInfo;
 public class AnytimeHyperPlayerLikelihoodTreeInfo extends LocalPlayerInfo {
 
 	public AnytimeHyperPlayerLikelihoodTreeInfo(int roleindex, GDLVersion gdlVersion) {
-		super(roleindex, TYPE_XXXX, gdlVersion);
+		super(roleindex, TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE, gdlVersion);
 	}
 
 	@Override
 	public String getType() {
-		return TYPE_XXXX;
+		return TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE;
 	}
 
 }

@@ -72,7 +72,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public Stack<Collection<TermType>> getPerceptPath() { return this.perceptPath; }
     public ArrayDeque<Integer> getActionPathHashPath() { return this.actionPathHashPath; }
 //    public int getActionPathHash() { return this.actionPathHash; }
-    public int getActionPathHash() { return this.actionPathHashPath.peekLast(); }
+    public int getActionPathHash() { return this.actionPathHashPath.peekLast() == null ? -1 : this.actionPathHashPath.peekLast(); }
 //    public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public int getPreviousActionPathHash() {
         Integer last = this.actionPathHashPath.pollLast();

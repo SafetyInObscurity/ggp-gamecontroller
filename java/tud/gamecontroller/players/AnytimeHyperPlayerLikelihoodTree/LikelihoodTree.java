@@ -62,6 +62,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
                 value *= child.getValue();
             }
         }
+        System.out.println();
         return value;
     }
 

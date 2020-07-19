@@ -1,6 +1,5 @@
 package tud.gamecontroller.players.XXXXPlayer;
 
-import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.term.TermInterface;
 
 import java.util.*;
@@ -64,6 +63,20 @@ public class LikelihoodTree<TermType extends TermInterface> {
             }
         }
         return likelihood;
+    }
+
+    public void updateRelLikelihood(Node node) {
+        float totalValue = 0;
+        if(node != null && node.getChildren() != null && node.getChildren().size() > 0) {
+            for (Node child : node.getChildren()) {
+                totalValue += child.getValue();
+            }
+            if (totalValue > 0) {
+                for (Node child : node.getChildren()) {
+                    child.setRelLikelihood(((double) child.getValue()) / totalValue);
+                }
+            }
+        }
     }
 
     @Override

@@ -216,7 +216,7 @@ public class XXXXPlayer<
 				int step = model.getActionPath().size();
 				while(step < stepNum + 1) {
 					step = forwardHypergame(model, step);
-					if(step < stepNum - 1|| step == 0) break;
+					if(step < stepNum - 1 || step == 0) break;
 				}
 				// If the hypergame has gone through all possible updates from the current state, then remove it from the set of hypergames
 				/* This can be done without checking if future states are in use since this is updating the state, rather than branching
@@ -367,30 +367,34 @@ public class XXXXPlayer<
 		// Calculate inverse choice factor sum @todo: is this necessary to get the invChoiceFactorSum?
 		HashMap<Integer, Double> choiceFactors = new HashMap<Integer, Double>();
 		double choiceFactor;
+		double treecf;
+		double choiceFactorSum = 0;
 		double invChoiceFactorSum = 0;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = likelihoodTree.getRelativeLikelihood(model.getActionPathHashPath());
-
-//			double treecf = model.getNumberOfPossibleActions(); @todo: Use for comparison when using non-uniform opponent modelling
-//			if(choiceFactor != treecf) {
-//				System.out.println("NO MATCH");
-//				System.out.println("Current choice factor: " + choiceFactor);
-//				System.out.println("likelihoodTree choice factor: " + treecf);
-//				System.exit(0);
-//			}
+			treecf = model.getNumberOfPossibleActions(); // @todo: Use for comparison when using non-uniform opponent modelling
 			choiceFactors.put(model.getActionPathHash(), choiceFactor);
-			invChoiceFactorSum += (1.0/choiceFactor);
+			choiceFactorSum += choiceFactor;
+			invChoiceFactorSum += 1.0 / treecf;
 		}
-//		System.out.println("invChoiceFactorSum: " + invChoiceFactorSum);
+//		System.out.println("choiceFactorSum: " + choiceFactorSum);
 
 		// Calculate the probability of each hypergame
 		HashMap<Integer, Double> hyperProbs = new HashMap<Integer, Double>();
 		double prob;
+		double choiceProb;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ( ( 1.0 / choiceFactor ) / invChoiceFactorSum );
+			treecf = model.getNumberOfPossibleActions();
+			prob = ( choiceFactor / choiceFactorSum );
+			choiceProb = ( ( 1.0 / treecf ) / invChoiceFactorSum );
 //			System.out.println("Model " + model.getActionPathHash() + " has choiceFactor: " + choiceFactor);
 //			System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
+//			System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
+//			if(prob != choiceProb) {
+//				System.out.println("NO MATCH");
+//				System.exit(0);
+//			}
 			hyperProbs.put(model.getActionPathHash(), prob);
 		}
 
@@ -666,12 +670,13 @@ public class XXXXPlayer<
 			badMovesTracker.put(backtrackedModelHash, badJointActions);
 		}
 
-		// Decrement the value at the node
-//		Node node = likelihoodTree.getNode(actionPathHashPath);
-//		if(node != null) {
-//			System.out.println("DECREMENTED " + backtrackedModelHash + " for the move " + badMove + " with actionPathHashPath " + actionPathHashPath);
-//			node.setValue(Math.max(node.getValue() - 1, 0));
-//		}
+		// If it is a bad move, then weight it at 0 and update the likelihood tree
+		Node node = likelihoodTree.getNode(actionPathHashPath);
+		if(node != null && likelihoodTreeExpansionTracker.contains(actionPathHashPath.peekLast())) {
+			Node parent = node.getParent();
+			node.setValue(0.0);
+			likelihoodTree.updateRelLikelihood(parent);
+		}
 	}
 
 	/**

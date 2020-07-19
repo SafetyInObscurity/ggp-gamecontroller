@@ -23,12 +23,20 @@ package tud.gamecontroller.players;
 import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.players.AnytimeHyperPlayer.AnytimeHyperPlayer;
 import tud.gamecontroller.players.AnytimeHyperPlayer.AnytimeHyperPlayerInfo;
+import tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree.AnytimeHyperPlayerLikelihoodTree;
+import tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree.AnytimeHyperPlayerLikelihoodTreeInfo;
+import tud.gamecontroller.players.CheatHyperPlayer.CheatHyperPlayer;
+import tud.gamecontroller.players.CheatHyperPlayer.CheatHyperPlayerInfo;
 import tud.gamecontroller.players.HyperPlayer.HyperPlayer;
 import tud.gamecontroller.players.HyperPlayer.HyperPlayerInfo;
 import tud.gamecontroller.players.ImprovedRandomPlayer.ImprovedRandomPlayer;
 import tud.gamecontroller.players.ImprovedRandomPlayer.ImprovedRandomPlayerInfo;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayer;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayerInfo;
+import tud.gamecontroller.players.OPAnytimeHyperPlayer.OPAnytimeHyperPlayer;
+import tud.gamecontroller.players.OPAnytimeHyperPlayer.OPAnytimeHyperPlayerInfo;
+import tud.gamecontroller.players.OPBiasAnytimeHyperPlayer.OPBiasAnytimeHyperPlayer;
+import tud.gamecontroller.players.OPBiasAnytimeHyperPlayer.OPBiasAnytimeHyperPlayerInfo;
 import tud.gamecontroller.players.XXXXPlayer.XXXXPlayer;
 import tud.gamecontroller.players.XXXXPlayer.XXXXPlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
@@ -81,7 +89,27 @@ public class PlayerFactory {
 	Player<TermType, StateType> createImprovedRandomPlayer(ImprovedRandomPlayerInfo info) {
 		return new ImprovedRandomPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
 	}
-	
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createAnytimeHyperPlayerLikelihoodTree(AnytimeHyperPlayerLikelihoodTreeInfo info) {
+		return new AnytimeHyperPlayerLikelihoodTree<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createCheatPlayer(CheatHyperPlayerInfo info) {
+		return new CheatHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createOPAnytimeHyperPlayer(OPAnytimeHyperPlayerInfo info) {
+		return new OPAnytimeHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createOPBiasAnytimeHyperPlayer(OPBiasAnytimeHyperPlayerInfo info) {
+		return new OPBiasAnytimeHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createPlayer(PlayerInfo info, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
@@ -107,6 +135,18 @@ public class PlayerFactory {
 		}
 		else if(info instanceof ImprovedRandomPlayerInfo){
 			return PlayerFactory. <TermType, StateType> createImprovedRandomPlayer((ImprovedRandomPlayerInfo)info);
+		}
+		else if(info instanceof AnytimeHyperPlayerLikelihoodTreeInfo){
+			return PlayerFactory. <TermType, StateType> createAnytimeHyperPlayerLikelihoodTree((AnytimeHyperPlayerLikelihoodTreeInfo)info);
+		}
+		else if(info instanceof CheatHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createCheatPlayer((CheatHyperPlayerInfo)info);
+		}
+		else if(info instanceof OPAnytimeHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createOPAnytimeHyperPlayer((OPAnytimeHyperPlayerInfo)info);
+		}
+		else if(info instanceof OPBiasAnytimeHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createOPBiasAnytimeHyperPlayer((OPBiasAnytimeHyperPlayerInfo)info);
 		}
 		return null;
 	}

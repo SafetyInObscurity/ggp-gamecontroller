@@ -32,6 +32,10 @@ public abstract class PlayerInfo {
 	public static final String TYPE_HYPERPLAY = "hyper";
 	public static final String TYPE_ANYTIMEHYPERPLAY = "ahyper";
 	public static final String TYPE_IMPROVEDRANDOM = "imprandom";
+	public static final String TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE = "ahyperlt";
+	public static final String TYPE_CHEAT = "cheat";
+	public static final String TYPE_ANYTIMEHYPERPLAY_OP = "ophyper";
+	public static final String TYPE_ANYTIMEHYPERPLAY_OP_BIAS = "ophyperb";
 
 	private int roleindex;
 	private String name;
