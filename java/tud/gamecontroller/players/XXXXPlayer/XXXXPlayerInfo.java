@@ -25,12 +25,12 @@ import tud.gamecontroller.players.LocalPlayerInfo;
 public class XXXXPlayerInfo extends LocalPlayerInfo {
 
 	public XXXXPlayerInfo(int roleindex, GDLVersion gdlVersion) {
-		super(roleindex, TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE, gdlVersion);
+		super(roleindex, TYPE_XXXX, gdlVersion);
 	}
 
 	@Override
 	public String getType() {
-		return TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE;
+		return TYPE_XXXX;
 	}
 
 }

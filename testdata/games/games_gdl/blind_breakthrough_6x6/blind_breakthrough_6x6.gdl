@@ -11,9 +11,9 @@
 ;;;   (e.g., getting stuck or running out of pieces)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(width 5)
+(width 6)
 ; height needs to be at least 4
-(height 5)
+(height 6)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Static Relations

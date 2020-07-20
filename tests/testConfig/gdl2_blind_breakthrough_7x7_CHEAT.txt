@@ -1,0 +1,15 @@
+MATCH_ID="blind_breakthrough_7x7_CHEAT"
+GAMEFILE="testdata/games/games_gdl/blind_breakthrough_7x7_CHEAT/blind_breakthrough_7x7_CHEAT.gdl"
+GAMENAME="blind_breakthrough_7x7_CHEAT"
+START_CLOCK=10
+PLAY_CLOCK=300
+GDL_VERSION=2
+PLAYER_NAME_1="ahyperlt"
+ROLE_ID_1=1
+ROLE_NAME_1="white"
+PLAYER_NAME_2="cheat"
+ROLE_ID_2=2
+ROLE_NAME_2="black"
+OUTPUT_DIR="matches/"
+STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
+NUMTESTS=1

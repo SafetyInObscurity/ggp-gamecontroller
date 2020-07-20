@@ -109,7 +109,6 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
 	private LikelihoodTree<TermType> likelihoodTree;
 
-	private RoleInterface<TermType> opponentRole;
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
 
@@ -147,11 +146,6 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 		moveForStepBlacklist = new HashMap<Integer, MoveInterface<TermType>>();
 		moveForStepWhitelist = new HashMap<Integer, MoveInterface<TermType>>();
-		for(RoleInterface<TermType> currRole: match.getGame().getOrderedRoles()) {
-			if(currRole != this.role) {
-				opponentRole = currRole;
-			}
-		}
 
 		// Instantiate logging variables
 		matchID = match.getMatchID();
@@ -213,7 +207,6 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 			// Get legal moves from this model
 			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
-			System.out.println(model.getActionPathHash() + ": " + legalMoves);
 			model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMoves));
 		} else {
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);

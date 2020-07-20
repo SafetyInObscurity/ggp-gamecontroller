@@ -11,9 +11,9 @@
 ;;;   (e.g., getting stuck or running out of pieces)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(width 5)
+(width 6)
 ; height needs to be at least 4
-(height 5)
+(height 6)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Static Relations
@@ -230,3 +230,7 @@
 (<= (sees ?player (move ?x1 ?y1 ?x2 ?y2))
     (does ?p (move ?x1 ?y1 ?x2 ?y2))
     (distinct ?x1 ?x2))
+
+; Black can See all the moves that white makes
+(<= (sees black (move ?x1 ?y1 ?x2 ?y2))
+    (does white (move ?x1 ?y1 ?x2 ?y2)))

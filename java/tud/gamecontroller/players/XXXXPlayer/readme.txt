@@ -1,2 +1,2 @@
-This is a variant on AnytimeHyperPlayerLikelihoodTree that doesn't use any conditioning on the likelihood of the hypergames
-This was developed to test the importance of any type of modelling for the likelihood of the possible states
+This is a variant on AnytimeHyperPlayerLikelihoodTree with no biasing based on the likelihood of each hypergame
+Therefore it considers only the sum of expected value and weights all hypergames as equally representative
