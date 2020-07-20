@@ -96,7 +96,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	// Hyperplay variables
 	private Random random;
 	private int numHyperGames = 16; // The maximum number of hypergames allowable
-	private int numHyperBranches = 4; // The amount of branches allowed
+	private int numHyperBranches = 16; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
 	private int depth; // Tracks the number of simulations run @todo: name better
 	private int maxNumProbes = 16; // @todo: probably remove later
@@ -358,33 +358,43 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	public MoveInterface<TermType> anytimeMoveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
 		// Calculate P(HG)
 		// Calculate inverse choice factor sum @todo: is this necessary to get the invChoiceFactorSum?
-		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
+		HashMap<Integer, Double> choiceFactors = new HashMap<Integer, Double>();
 		double choiceFactor;
-		float invChoiceFactorSum = 0;
+		double invChoiceFactorSum = 0;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = likelihoodTree.getChoiceFactor(model.getActionPathHashPath());
 			double treecf = model.getNumberOfPossibleActions();
 			if(choiceFactor != treecf) {
 				System.out.println("NO MATCH");
-				System.out.println("Current choice factor: " + choiceFactor);
-				System.out.println("likelihoodTree choice factor: " + treecf);
+				System.out.println("likelihoodTree choice facto: " + choiceFactor);
+				System.out.println("Possible actions: " + treecf);
+				System.out.println();
+				System.out.println("model.getActionPathHashPath(): " + model.getActionPathHashPath());
+				System.out.println("Likelihood Tree Nodes: ");
+				ArrayDeque<Integer> incrementalPath = new ArrayDeque<Integer>();
+				for(Integer actionPathHash : model.getActionPathHashPath()) {
+					incrementalPath.addLast(actionPathHash);
+					System.out.println(likelihoodTree.getNode(incrementalPath));
+				}
+				System.out.println();
+				System.out.println("model.getNumberOfPossibleActionsPath()" + model.getNumberOfPossibleActionsPath());
 				System.exit(0);
 			}
-			choiceFactors.put(model.getActionPathHash(), (int) choiceFactor);
+			choiceFactors.put(model.getActionPathHash(), choiceFactor);
 			invChoiceFactorSum += (1.0/choiceFactor);
 		}
 
 		// Calculate the probability of each hypergame
-		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
-		float prob;
+		HashMap<Integer, Double> hyperProbs = new HashMap<Integer, Double>();
+		double prob;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
+			prob = ((1/(Double)choiceFactor)/invChoiceFactorSum);
 			hyperProbs.put(model.getActionPathHash(), prob);
 		}
 
 		// Calculate expected move value for each hypergame until almost out of time
-		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
+		HashMap<Integer, Double> weightedExpectedValuePerMove = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 1;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
@@ -393,16 +403,16 @@ public class AnytimeHyperPlayerLikelihoodTree<
 				for (MoveInterface<TermType> move : possibleMoves) {
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
-					float expectedValue = anytimeSimulateMove(currState, move);
+					double expectedValue = anytimeSimulateMove(currState, move);
 
 					// Calculate the weighted expected value for each move
-					float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
+					double weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
 						weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
 					} else {
-						float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
+						double prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
 						weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
 					}
 				}
@@ -415,12 +425,12 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		// Return the move with the greatest weighted expected value
 		long startFinalCalcTime =  System.currentTimeMillis();
 
-		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		float maxVal = Float.MIN_VALUE;
+		Iterator<HashMap.Entry<Integer, Double>> it = weightedExpectedValuePerMove.entrySet().iterator();
+		double maxVal = Float.MIN_VALUE;
 		MoveInterface<TermType> bestMove = null;
 		while(it.hasNext()){
-			HashMap.Entry<Integer, Float> mapElement = (HashMap.Entry<Integer, Float>)it.next();
-			float val = mapElement.getValue();
+			HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
+			Double val = mapElement.getValue();
 			if(val > maxVal) {
 				bestMove = moveHashMap.get(mapElement.getKey());
 				maxVal = val;
@@ -428,7 +438,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		}
 		long endFinalCalcTime =  System.currentTimeMillis();
 		long updateTime = endFinalCalcTime - startFinalCalcTime;
-		System.out.println("Took " + updateTime + " ms to run final calc");
+//		System.out.println("Took " + updateTime + " ms to run final calc");
 
 
 		return bestMove;

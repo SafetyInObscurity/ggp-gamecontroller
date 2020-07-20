@@ -25,12 +25,12 @@ import tud.gamecontroller.players.LocalPlayerInfo;
 public class CheatHyperPlayerInfo extends LocalPlayerInfo {
 
 	public CheatHyperPlayerInfo(int roleindex, GDLVersion gdlVersion) {
-		super(roleindex, TYPE_CHEAT, gdlVersion);
+		super(roleindex, TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE, gdlVersion);
 	}
 
 	@Override
 	public String getType() {
-		return TYPE_CHEAT;
+		return TYPE_ANYTIMEHYPERPLAY_LIKELIHOODTREE;
 	}
 
 }

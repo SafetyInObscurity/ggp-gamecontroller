@@ -53,15 +53,16 @@ public class LikelihoodTree<TermType extends TermInterface> {
     public double getChoiceFactor(ArrayDeque<Integer> actionPathHashPath) {
         Node child = getRoot();
         double value = child.getValue() == 0 ? 1 : child.getValue();
-        System.out.println(value);
+//        System.out.println(value);
         for (Integer actionPathHash : actionPathHashPath) {
             if(actionPathHash == child.getActionPathHash()) continue;
             child = child.getChild(actionPathHash);
-            System.out.println(child.getValue());
+//            System.out.println(child.getValue());
             if(child.getValue() > 0) {
                 value *= child.getValue();
             }
         }
+//        System.out.println();
         return value;
     }
 

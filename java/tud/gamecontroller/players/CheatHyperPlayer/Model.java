@@ -72,7 +72,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public Stack<Collection<TermType>> getPerceptPath() { return this.perceptPath; }
     public ArrayDeque<Integer> getActionPathHashPath() { return this.actionPathHashPath; }
 //    public int getActionPathHash() { return this.actionPathHash; }
-public int getActionPathHash() { return this.actionPathHashPath.peekLast() == null ? -1 : this.actionPathHashPath.peekLast(); }
+    public int getActionPathHash() { return this.actionPathHashPath.peekLast() == null ? -1 : this.actionPathHashPath.peekLast(); }
 //    public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public int getPreviousActionPathHash() {
         Integer last = this.actionPathHashPath.pollLast();
@@ -85,10 +85,10 @@ public int getActionPathHash() { return this.actionPathHashPath.peekLast() == nu
         return this.statePath.isEmpty() ? match.getGame().getInitialState() : this.statePath.peek();
     }
     public Collection<TermType> getLatestExpectedPercepts() { return this.perceptPath.peek(); }
-    public int getNumberOfPossibleActions() {
-        int total = 1;
+    public double getNumberOfPossibleActions() {
+        double total = 1.0;
         for(int num : this.numberOfPossibleActionsPath) {
-            total *= num;
+            total *= (double) num;
         }
         return total;
     }

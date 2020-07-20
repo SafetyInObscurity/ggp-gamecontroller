@@ -5,27 +5,21 @@ import java.util.ArrayList;
 public class Node {
 
     // Instance Variables
-    private double value; // The value of this node from the opponent's perspective
-    private int actionPathHash; // The action-path leading to this state
-    private double relLikelihood; // The relative quality of the node compared to the other options from the opponent's perspective
-    private ArrayList<Node> children; // The nodes below it
-    private Node parent; // The parent node
+    private int value;
+    private int actionPathHash;
+    private ArrayList<Node> children;
 
     /**
      * Instantiates a Node object with 0 children
      */
     public Node(int actionPathHash) {
-        this.value = 0.0;
-        this.relLikelihood = 0.0;
+        this.value = 0;
         this.actionPathHash = actionPathHash;
         this.children = new ArrayList<Node>();
-        this.parent = null;
     }
 
-    public double getValue() { return this.value; }
-    public double getRelLikelihood() { return this.relLikelihood; }
+    public int getValue() { return this.value; }
     public int getActionPathHash() { return this.actionPathHash; }
-    public Node getParent() { return (this.parent); }
     public ArrayList<Node> getChildren() { return this.children; }
     public Node getChild(int actionPathHash) {
         for (Node node : this.children) {
@@ -36,14 +30,8 @@ public class Node {
         return null;
     }
 
-    public void setValue(double value) {
+    public void setValue(int value) {
         this.value = value;
-    }
-    public void setRelLikelihood(double likelihood) {
-        this.relLikelihood = likelihood;
-    }
-    public void setParent(Node parent) {
-        this.parent = parent;
     }
 
     /**
@@ -59,7 +47,6 @@ public class Node {
             }
         }
         if(!contained) {
-            child.setParent(this);
             this.children.add(child);
         }
     }
@@ -69,10 +56,9 @@ public class Node {
      *
      * @param child A Node to remove from this Node's children
      */
-//    public void removeChild(Node child) {
-//        if(child.getParent().equals(this)) child.setParent(null);
-//        this.children.remove(child);
-//    }
+    public void removeChild(Node child) {
+        this.children.remove(child);
+    }
 
     @Override
     public String toString() {

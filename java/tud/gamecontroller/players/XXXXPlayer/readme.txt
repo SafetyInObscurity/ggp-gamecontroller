@@ -1,2 +1,2 @@
-Currently acting as OPAnytimeHyperPlayer, but has the additional effect of removing bad moves and recalculating the
-probabilities upon each bad move being discovered
+This is a variant on AnytimeHyperPlayerLikelihoodTree that doesn't use any conditioning on the likelihood of the hypergames
+This was developed to test the importance of any type of modelling for the likelihood of the possible states

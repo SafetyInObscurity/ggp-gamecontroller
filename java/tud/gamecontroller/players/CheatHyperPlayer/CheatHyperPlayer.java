@@ -68,11 +68,22 @@ import java.util.*;
  */
 
 /**
- * This uses a single hypergame and is indented to be used for a game where only it can see all of the opponent's moves
- * It uses this single TRUE game to run an MCS and act as a perfect information agent
+ * HyperPlayer is an agent that can play imperfect information and non-deterministic two player extensive-form games
+ * with perfect recall by holding many 'hypergames' as models that may represent the true state of the game in perfect
+ * information representation. It then calculates the best move for each hypergame weighted against the likelihood of
+ * it representing the true state of the game and returns the moves with the greatest weighted expected payoff.
  *
- * The benefit to this representation through game rules allows the introduction of randomness, but removes the
- * imperfect information about the opponent
+ * This variant uses a central datastructure - LikelihoodTree - to track the likelihood of each state.
+ *
+ * This cheat variant is intended to work only when the rules of the GDL game have been modified to allow this player
+ * full information of the game
+ * It uses 1 hypergame and runs 256 simulations per game when fully resourced
+ * 		Only 1 hypergame is required since this algorithm has information on the true state
+ * 		256 was the number determined in the Hyperplay paper for a fully resourced cheat player
+ *
+ * Implements the algorithm described in Michael Schofield, Timothy Cerexhe and Michael Thielscher's HyperPlay paper
+ * with some alteration to the backtracking
+ * @see "https://staff.cdms.westernsydney.edu.au/~dongmo/GTLW/Michael_Tim.pdf"
  *
  *
  * @author Michael Dorrell
@@ -90,11 +101,11 @@ public class CheatHyperPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 16; // The maximum number of hypergames allowable
-	private int numHyperBranches = 4; // The amount of branches allowed
+	private int numHyperGames = 1; // The maximum number of hypergames allowable
+	private int numHyperBranches = 1; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 50; // @todo: probably remove later
+	private int maxNumProbes = 16; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action taken at each step by the player (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -296,10 +307,11 @@ public class CheatHyperPlayer<
 		long updateTime = endTime - startTime;
 
 		// Print all models
-//		printHypergames();
 		System.out.println();
-		System.out.println(likelihoodTree.toString());
+		printHypergames();
 		System.out.println();
+//		System.out.println(likelihoodTree.toString());
+//		System.out.println();
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
@@ -353,33 +365,43 @@ public class CheatHyperPlayer<
 	public MoveInterface<TermType> anytimeMoveSelection(HashSet<MoveInterface<TermType>> possibleMoves) {
 		// Calculate P(HG)
 		// Calculate inverse choice factor sum @todo: is this necessary to get the invChoiceFactorSum?
-		HashMap<Integer, Integer> choiceFactors = new HashMap<Integer, Integer>();
+		HashMap<Integer, Double> choiceFactors = new HashMap<Integer, Double>();
 		double choiceFactor;
-		float invChoiceFactorSum = 0;
+		double invChoiceFactorSum = 0;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = likelihoodTree.getChoiceFactor(model.getActionPathHashPath());
 			double treecf = model.getNumberOfPossibleActions();
 			if(choiceFactor != treecf) {
 				System.out.println("NO MATCH");
-				System.out.println("Current choice factor: " + choiceFactor);
-				System.out.println("likelihoodTree choice factor: " + treecf);
+				System.out.println("likelihoodTree choice facto: " + choiceFactor);
+				System.out.println("Possible actions: " + treecf);
+				System.out.println();
+				System.out.println("model.getActionPathHashPath(): " + model.getActionPathHashPath());
+				System.out.println("Likelihood Tree Nodes: ");
+				ArrayDeque<Integer> incrementalPath = new ArrayDeque<Integer>();
+				for(Integer actionPathHash : model.getActionPathHashPath()) {
+					incrementalPath.addLast(actionPathHash);
+					System.out.println(likelihoodTree.getNode(incrementalPath));
+				}
+				System.out.println();
+				System.out.println("model.getNumberOfPossibleActionsPath()" + model.getNumberOfPossibleActionsPath());
 				System.exit(0);
 			}
-			choiceFactors.put(model.getActionPathHash(), (int) choiceFactor);
+			choiceFactors.put(model.getActionPathHash(), choiceFactor);
 			invChoiceFactorSum += (1.0/choiceFactor);
 		}
 
 		// Calculate the probability of each hypergame
-		HashMap<Integer, Float> hyperProbs = new HashMap<Integer, Float>();
-		float prob;
+		HashMap<Integer, Double> hyperProbs = new HashMap<Integer, Double>();
+		double prob;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((1/(float)choiceFactor)/invChoiceFactorSum);
+			prob = ((1/(Double)choiceFactor)/invChoiceFactorSum);
 			hyperProbs.put(model.getActionPathHash(), prob);
 		}
 
 		// Calculate expected move value for each hypergame until almost out of time
-		HashMap<Integer, Float> weightedExpectedValuePerMove = new HashMap<Integer, Float>();
+		HashMap<Integer, Double> weightedExpectedValuePerMove = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 1;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
@@ -388,16 +410,16 @@ public class CheatHyperPlayer<
 				for (MoveInterface<TermType> move : possibleMoves) {
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
-					float expectedValue = anytimeSimulateMove(currState, move);
+					double expectedValue = anytimeSimulateMove(currState, move);
 
 					// Calculate the weighted expected value for each move
-					float weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
+					double weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
 						weightedExpectedValuePerMove.put(move.hashCode(), weightedExpectedValue);
 					} else {
-						float prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
+						double prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
 						weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
 					}
 				}
@@ -410,12 +432,12 @@ public class CheatHyperPlayer<
 		// Return the move with the greatest weighted expected value
 		long startFinalCalcTime =  System.currentTimeMillis();
 
-		Iterator<HashMap.Entry<Integer, Float>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		float maxVal = Float.MIN_VALUE;
+		Iterator<HashMap.Entry<Integer, Double>> it = weightedExpectedValuePerMove.entrySet().iterator();
+		double maxVal = Float.MIN_VALUE;
 		MoveInterface<TermType> bestMove = null;
 		while(it.hasNext()){
-			HashMap.Entry<Integer, Float> mapElement = (HashMap.Entry<Integer, Float>)it.next();
-			float val = mapElement.getValue();
+			HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
+			Double val = mapElement.getValue();
 			if(val > maxVal) {
 				bestMove = moveHashMap.get(mapElement.getKey());
 				maxVal = val;
@@ -423,7 +445,7 @@ public class CheatHyperPlayer<
 		}
 		long endFinalCalcTime =  System.currentTimeMillis();
 		long updateTime = endFinalCalcTime - startFinalCalcTime;
-		System.out.println("Took " + updateTime + " ms to run final calc");
+//		System.out.println("Took " + updateTime + " ms to run final calc");
 
 
 		return bestMove;
@@ -547,7 +569,7 @@ public class CheatHyperPlayer<
 
 		Node node = likelihoodTree.getNode(model.getActionPathHashPath());
 		node.setValue(Math.max(node.getValue(), possibleJointMoves.size()));
-		System.out.println("Num possibilities: " + possibleJointMoves.size());
+//		System.out.println("Num possibilities: " + possibleJointMoves.size());
 //		System.out.println("Updated node: " + likelihoodTree.getNode(model.getActionPathHashPath()));
 
 //		System.exit(0);
@@ -579,10 +601,10 @@ public class CheatHyperPlayer<
 				// Backtrack
 				model.backtrack();
 
-				System.out.println();
-				System.out.println("Latest actionpath hash: " + model.getActionPathHash());
-				System.out.println("Actionpath hash path: " + model.getActionPathHashPath());
-				System.out.println();
+//				System.out.println();
+//				System.out.println("Latest actionpath hash: " + model.getActionPathHash());
+//				System.out.println("Actionpath hash path: " + model.getActionPathHashPath());
+//				System.out.println();
 
 				// Add move to bad move set
 				updateBadMoveTracker(model.getActionPathHash(), jointAction, model.getActionPathHashPath());

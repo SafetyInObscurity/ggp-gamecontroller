@@ -85,10 +85,10 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         return this.statePath.isEmpty() ? match.getGame().getInitialState() : this.statePath.peek();
     }
     public Collection<TermType> getLatestExpectedPercepts() { return this.perceptPath.peek(); }
-    public int getNumberOfPossibleActions() {
-        int total = 1;
+    public double getNumberOfPossibleActions() {
+        double total = 1.0;
         for(int num : this.numberOfPossibleActionsPath) {
-            total *= num;
+            total *= (double) num;
         }
         return total;
     }

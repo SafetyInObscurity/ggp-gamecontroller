@@ -2,7 +2,7 @@ package tud.gamecontroller.players.XXXXPlayer;
 
 import tud.gamecontroller.term.TermInterface;
 
-import java.util.*;
+import java.util.ArrayDeque;
 
 /**
  *  LikelihoodTree holds the likelihood of each state ocurring in a game tree assuming the opponent chooses moves
@@ -45,38 +45,25 @@ public class LikelihoodTree<TermType extends TermInterface> {
     }
 
     /**
-     * Returns the relative likelihood of each path being chosen by an opponent that acts optimally
+     * Returns the number of choices that could have been made to lead the path to this state
      *
      * @param actionPathHashPath The full path from initial state to current state from a hypergame model
      * @return The choice factor of a given action path
      */
-    public double getRelativeLikelihood(ArrayDeque<Integer> actionPathHashPath) {
+    public double getChoiceFactor(ArrayDeque<Integer> actionPathHashPath) {
         Node child = getRoot();
-        double likelihood = child.getRelLikelihood() == 0 ? 1 : child.getRelLikelihood();
-//        System.out.println(likelihood);
+        double value = child.getValue() == 0 ? 1 : child.getValue();
+//        System.out.println(value);
         for (Integer actionPathHash : actionPathHashPath) {
             if(actionPathHash == child.getActionPathHash()) continue;
             child = child.getChild(actionPathHash);
-//            System.out.println(child.getRelLikelihood());
-            if(child.getRelLikelihood() > 0) {
-                likelihood *= child.getRelLikelihood();
+//            System.out.println(child.getValue());
+            if(child.getValue() > 0) {
+                value *= child.getValue();
             }
         }
-        return likelihood;
-    }
-
-    public void updateRelLikelihood(Node node) {
-        float totalValue = 0;
-        if(node != null && node.getChildren() != null && node.getChildren().size() > 0) {
-            for (Node child : node.getChildren()) {
-                totalValue += child.getValue();
-            }
-            if (totalValue > 0) {
-                for (Node child : node.getChildren()) {
-                    child.setRelLikelihood(((double) child.getValue()) / totalValue);
-                }
-            }
-        }
+//        System.out.println();
+        return value;
     }
 
     @Override
@@ -90,7 +77,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
         while(!unvisited.isEmpty()) {
             node = unvisited.removeFirst();
             stringLine = new StringBuilder();
-            stringLine.append("\nNode ").append(node.getActionPathHash()).append(" has a value of ").append(node.getValue()).append(" and a likelihood of ").append(node.getRelLikelihood());
+            stringLine.append("\n").append(node.getActionPathHash()).append(" has ").append(node.getValue()).append(" children:");
             for (Node child : node.getChildren()) {
                 unvisited.addLast(child);
                 stringLine.append("\n\t").append(child.getActionPathHash());
