@@ -307,9 +307,9 @@ public class CheatHyperPlayer<
 		long updateTime = endTime - startTime;
 
 		// Print all models
-		System.out.println();
-		printHypergames();
-		System.out.println();
+//		System.out.println();
+//		printHypergames();
+//		System.out.println();
 //		System.out.println(likelihoodTree.toString());
 //		System.out.println();
 
