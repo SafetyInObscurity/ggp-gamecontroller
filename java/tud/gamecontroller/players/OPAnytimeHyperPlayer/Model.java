@@ -139,12 +139,22 @@ public int getActionPathHash() { return this.actionPathHashPath.peekLast() == nu
      *
      */
     public void backtrack() {
-        this.actionPath.pop();
-        this.numberOfPossibleActionsPath.pop();
-        this.statePath.pop();
-        this.perceptPath.pop();
+        if(this.actionPath.size() > 1) {
+            this.actionPath.pop();
+        }
+        if(this.numberOfPossibleActionsPath.size() > 1) {
+            this.numberOfPossibleActionsPath.pop();
+        }
+        if(this.statePath.size() > 1) {
+            this.statePath.pop();
+        }
+        if(this.perceptPath.size() > 1) {
+            this.perceptPath.pop();
+        }
 //        this.actionPathHash = this.actionPath.hashCode();
-        this.actionPathHashPath.pollLast();
+        if(this.actionPathHashPath.size() > 1) {
+            this.actionPathHashPath.pollLast();
+        }
 //        if(!this.actionPath.isEmpty()) {
 //            this.previousActionPathHash = this.actionPath.subList(0, this.actionPath.size() - 1).hashCode();
 //        }

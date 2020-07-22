@@ -1,4 +1,4 @@
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.NoBiasPlayer;
 
 import java.util.ArrayList;
 

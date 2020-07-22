@@ -17,7 +17,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.players.ImprovedRandomPlayer;
+package tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTreeNOBACKTRACKING_WORKS;
 
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -45,6 +45,18 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     private HashMap<Integer, HashSet<MoveInterface<TermType>>> possibleMovesAtStep;
 //    private int actionPathHash = -1; // Hashes the action path to give a unique identifier to the path taken @todo: remove these two since actionPathHashPath subsumes role
 //    private int previousActionPathHash = -1; // Hashes the previous action path to assist with backtracking
+
+    @Override
+    public String toString() {
+        return  "\n" +
+                "actionPath: " + this.actionPath.toString() + "\n" +
+                "numberOfPossibleActionsPath: " + this.numberOfPossibleActionsPath.toString() + "\n" +
+                "statePath: " + this.statePath.toString() + "\n" +
+                "perceptPath: " + this.perceptPath.toString() + "\n" +
+                "actionPathHashPath: " + this.actionPathHashPath.toString() + "\n" +
+                "possibleMovesAtStep: " + this.possibleMovesAtStep.toString() + "\n" +
+                "\n";
+    }
 
     public Model() {
         this.actionPath = new Stack<JointMove<TermType>>();
@@ -114,7 +126,12 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role, int numPossibleJointMoves) {
         if(this.actionPath.size() > stepNum) {
             System.err.println("Key already contained");
-            System.err.println("Actions Path: " + this.actionPath);
+            System.err.println(this.toString());
+            System.err.println("stepNum: " + stepNum);
+            System.err.println("initialPercepts: " + initialPercepts);
+            System.err.println("jointAction: " + jointAction);
+            System.err.println("role: " + role);
+            System.err.println("numPossibleJointMoves: " + numPossibleJointMoves);
             System.exit(0);
         }
         else {

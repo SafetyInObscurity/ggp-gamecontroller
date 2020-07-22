@@ -1,4 +1,4 @@
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.NoBiasPlayer;
 
 import tud.gamecontroller.term.TermInterface;
 

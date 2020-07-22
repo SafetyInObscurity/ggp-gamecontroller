@@ -46,6 +46,18 @@ public class Model<TermType extends TermInterface> implements Cloneable{
 //    private int actionPathHash = -1; // Hashes the action path to give a unique identifier to the path taken @todo: remove these two since actionPathHashPath subsumes role
 //    private int previousActionPathHash = -1; // Hashes the previous action path to assist with backtracking
 
+    @Override
+    public String toString() {
+        return  "\n" +
+                "actionPath: " + this.actionPath.toString() + "\n" +
+                "numberOfPossibleActionsPath: " + this.numberOfPossibleActionsPath.toString() + "\n" +
+                "statePath: " + this.statePath.toString() + "\n" +
+                "perceptPath: " + this.perceptPath.toString() + "\n" +
+                "actionPathHashPath: " + this.actionPathHashPath.toString() + "\n" +
+                "possibleMovesAtStep: " + this.possibleMovesAtStep.toString() + "\n" +
+                "\n";
+    }
+
     public Model() {
         this.actionPath = new Stack<JointMove<TermType>>();
         this.numberOfPossibleActionsPath = new Stack<Integer>();
@@ -114,7 +126,12 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role, int numPossibleJointMoves) {
         if(this.actionPath.size() > stepNum) {
             System.err.println("Key already contained");
-            System.err.println("Actions Path: " + this.actionPath);
+            System.err.println(this.toString());
+            System.err.println("stepNum: " + stepNum);
+            System.err.println("initialPercepts: " + initialPercepts);
+            System.err.println("jointAction: " + jointAction);
+            System.err.println("role: " + role);
+            System.err.println("numPossibleJointMoves: " + numPossibleJointMoves);
             System.exit(0);
         }
         else {
@@ -145,12 +162,22 @@ public class Model<TermType extends TermInterface> implements Cloneable{
      *
      */
     public void backtrack() {
-        this.actionPath.pop();
-        this.numberOfPossibleActionsPath.pop();
-        this.statePath.pop();
-        this.perceptPath.pop();
+        if(this.actionPath.size() > 1) {
+            this.actionPath.pop();
+        }
+        if(this.numberOfPossibleActionsPath.size() > 1) {
+            this.numberOfPossibleActionsPath.pop();
+        }
+        if(this.statePath.size() > 1) {
+            this.statePath.pop();
+        }
+        if(this.perceptPath.size() > 1) {
+            this.perceptPath.pop();
+        }
 //        this.actionPathHash = this.actionPath.hashCode();
-        this.actionPathHashPath.pollLast();
+        if(this.actionPathHashPath.size() > 1) {
+            this.actionPathHashPath.pollLast();
+        }
 //        if(!this.actionPath.isEmpty()) {
 //            this.previousActionPathHash = this.actionPath.subList(0, this.actionPath.size() - 1).hashCode();
 //        }

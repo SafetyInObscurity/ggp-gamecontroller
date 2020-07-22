@@ -17,7 +17,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.NoBiasPlayer;
 
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.players.LocalPlayerInfo;

@@ -45,7 +45,7 @@ import tud.gamecontroller.players.OPBiasAnytimeHyperPlayer.OPBiasAnytimeHyperPla
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
-import tud.gamecontroller.players.XXXXPlayer.XXXXPlayerInfo;
+import tud.gamecontroller.players.NoBiasPlayer.XXXXPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
 
 

@@ -17,7 +17,7 @@
     along with GameController.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tud.gamecontroller.players.XXXXPlayer;
+package tud.gamecontroller.players.NoBiasPlayer;
 
 import tud.gamecontroller.game.MoveInterface;
 import tud.gamecontroller.game.RoleInterface;
@@ -145,12 +145,22 @@ public class Model<TermType extends TermInterface> implements Cloneable{
      *
      */
     public void backtrack() {
-        this.actionPath.pop();
-        this.numberOfPossibleActionsPath.pop();
-        this.statePath.pop();
-        this.perceptPath.pop();
+        if(this.actionPath.size() > 1) {
+            this.actionPath.pop();
+        }
+        if(this.numberOfPossibleActionsPath.size() > 1) {
+            this.numberOfPossibleActionsPath.pop();
+        }
+        if(this.statePath.size() > 1) {
+            this.statePath.pop();
+        }
+        if(this.perceptPath.size() > 1) {
+            this.perceptPath.pop();
+        }
 //        this.actionPathHash = this.actionPath.hashCode();
-        this.actionPathHashPath.pollLast();
+        if(this.actionPathHashPath.size() > 1) {
+            this.actionPathHashPath.pollLast();
+        }
 //        if(!this.actionPath.isEmpty()) {
 //            this.previousActionPathHash = this.actionPath.subList(0, this.actionPath.size() - 1).hashCode();
 //        }
