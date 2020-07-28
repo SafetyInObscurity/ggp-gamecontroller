@@ -28,6 +28,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
      */
     public LikelihoodTree(int initialActionPathHash) {
         this.root = new Node(initialActionPathHash);
+        this.root.setRelLikelihood(1.0);
     }
 
     public Node getRoot() { return this.root; }
@@ -36,7 +37,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
             return null;
         }
 
-        Node child = getRoot();
+        Node child = this.root;
         for (Integer actionPathHash : actionPathHashPath) {
             if(actionPathHash == child.getActionPathHash()) continue;
             child = child.getChild(actionPathHash);
@@ -60,9 +61,23 @@ public class LikelihoodTree<TermType extends TermInterface> {
 //            System.out.println(child.getRelLikelihood());
             if(child.getRelLikelihood() > 0) {
                 likelihood *= child.getRelLikelihood();
-            }
+            } else if (child.getRelLikelihood() == 0) return 0.0;
         }
         return likelihood;
+    }
+
+    public void updateRelLikelihood(Node node) {
+        float totalValue = 0;
+        if(node != null && node.getChildren() != null && node.getChildren().size() > 0) {
+            for (Node child : node.getChildren()) {
+                totalValue += child.getValue();
+            }
+            if (totalValue > 0) {
+                for (Node child : node.getChildren()) {
+                    child.setRelLikelihood(((double) child.getValue()) / totalValue);
+                }
+            }
+        }
     }
 
     @Override

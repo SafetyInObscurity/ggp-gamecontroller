@@ -26,10 +26,7 @@ import tud.gamecontroller.game.StateInterface;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.term.TermInterface;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Holds a model of how the true state of the game may look given the percepts seen so far
@@ -45,8 +42,21 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     private Stack<StateInterface<TermType, ?>> statePath; // Contains the state at each step
     private Stack<Collection<TermType>> perceptPath; // Contains the percepts that would be seen at each step
     private ArrayDeque<Integer> actionPathHashPath; // Contains
+    private HashMap<Integer, HashSet<MoveInterface<TermType>>> possibleMovesAtStep;
 //    private int actionPathHash = -1; // Hashes the action path to give a unique identifier to the path taken @todo: remove these two since actionPathHashPath subsumes role
 //    private int previousActionPathHash = -1; // Hashes the previous action path to assist with backtracking
+
+    @Override
+    public String toString() {
+        return  "\n" +
+                "actionPath: " + this.actionPath.toString() + "\n" +
+                "numberOfPossibleActionsPath: " + this.numberOfPossibleActionsPath.toString() + "\n" +
+                "statePath: " + this.statePath.toString() + "\n" +
+                "perceptPath: " + this.perceptPath.toString() + "\n" +
+                "actionPathHashPath: " + this.actionPathHashPath.toString() + "\n" +
+                "possibleMovesAtStep: " + this.possibleMovesAtStep.toString() + "\n" +
+                "\n";
+    }
 
     public Model() {
         this.actionPath = new Stack<JointMove<TermType>>();
@@ -54,6 +64,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.statePath = new Stack<StateInterface<TermType, ?>>();
         this.perceptPath = new Stack<Collection<TermType>>();
         this.actionPathHashPath = new ArrayDeque<Integer>();
+        this.possibleMovesAtStep = new HashMap<Integer, HashSet<MoveInterface<TermType>>>();
     }
     public Model(Model<TermType> model) {
         this.actionPath = (Stack<JointMove<TermType>>)model.getActionPath().clone();
@@ -61,6 +72,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
         this.statePath = (Stack<StateInterface<TermType, ?>>)model.getStatePath().clone();
         this.perceptPath = (Stack<Collection<TermType>>)model.getPerceptPath().clone();
         this.actionPathHashPath = (ArrayDeque<Integer>)model.getActionPathHashPath().clone();
+        this.possibleMovesAtStep = (HashMap<Integer, HashSet<MoveInterface<TermType>>>)model.getPossibleMovesAtStep().clone();
 //        this.actionPathHash = model.getActionPathHash();
 //        this.previousActionPathHash = model.getPreviousActionPathHash();
     }
@@ -71,8 +83,10 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     public Stack<StateInterface<TermType, ?>> getStatePath() { return this.statePath; }
     public Stack<Collection<TermType>> getPerceptPath() { return this.perceptPath; }
     public ArrayDeque<Integer> getActionPathHashPath() { return this.actionPathHashPath; }
+    public HashMap<Integer, HashSet<MoveInterface<TermType>>> getPossibleMovesAtStep() { return this.possibleMovesAtStep; }
+    public HashSet<MoveInterface<TermType>> getPossibleMovesAtStep(int step) { return this.possibleMovesAtStep.getOrDefault(step, null); }
 //    public int getActionPathHash() { return this.actionPathHash; }
-public int getActionPathHash() { return this.actionPathHashPath.peekLast() == null ? -1 : this.actionPathHashPath.peekLast(); }
+    public int getActionPathHash() { return this.actionPathHashPath.peekLast() == null ? -1 : this.actionPathHashPath.peekLast(); }
 //    public int getPreviousActionPathHash() { return this.previousActionPathHash; }
     public int getPreviousActionPathHash() {
         Integer last = this.actionPathHashPath.pollLast();
@@ -85,12 +99,16 @@ public int getActionPathHash() { return this.actionPathHashPath.peekLast() == nu
         return this.statePath.isEmpty() ? match.getGame().getInitialState() : this.statePath.peek();
     }
     public Collection<TermType> getLatestExpectedPercepts() { return this.perceptPath.peek(); }
-    public int getNumberOfPossibleActions() {
-        int total = 1;
+    public double getNumberOfPossibleActions() {
+        double total = 1.0;
         for(int num : this.numberOfPossibleActionsPath) {
-            total *= num;
+            total *= (double) num;
         }
         return total;
+    }
+
+    public void addLegalMoves(int step, HashSet<MoveInterface<TermType>> legalMoves) {
+        this.possibleMovesAtStep.put(step, legalMoves);
     }
 
     /**
@@ -108,7 +126,12 @@ public int getActionPathHash() { return this.actionPathHashPath.peekLast() == nu
     public void updateGameplayTracker(int stepNum, Collection<TermType> initialPercepts, JointMove<TermType> jointAction, StateInterface<TermType, ?> currState, RoleInterface<TermType> role, int numPossibleJointMoves) {
         if(this.actionPath.size() > stepNum) {
             System.err.println("Key already contained");
-            System.err.println("Actions Path: " + this.actionPath);
+            System.err.println(this.toString());
+            System.err.println("stepNum: " + stepNum);
+            System.err.println("initialPercepts: " + initialPercepts);
+            System.err.println("jointAction: " + jointAction);
+            System.err.println("role: " + role);
+            System.err.println("numPossibleJointMoves: " + numPossibleJointMoves);
             System.exit(0);
         }
         else {

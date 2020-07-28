@@ -27,6 +27,7 @@ import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.*;
 import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
+import tud.gamecontroller.players.OPAnytimeHyperPlayer.Node;
 import tud.gamecontroller.term.TermInterface;
 
 import java.io.FileWriter;

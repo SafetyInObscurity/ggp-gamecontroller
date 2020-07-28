@@ -26,7 +26,7 @@ import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.players.HyperPlayer.HyperPlayerInfo;
 import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayerInfo;
-import tud.gamecontroller.players.NoBiasPlayer.XXXXPlayerInfo;
+import tud.gamecontroller.players.XXXXPlayer.XXXXPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;

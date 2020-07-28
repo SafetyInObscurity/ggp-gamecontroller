@@ -37,8 +37,8 @@ import tud.gamecontroller.players.OPAnytimeHyperPlayer.OPAnytimeHyperPlayer;
 import tud.gamecontroller.players.OPAnytimeHyperPlayer.OPAnytimeHyperPlayerInfo;
 import tud.gamecontroller.players.OPBiasAnytimeHyperPlayer.OPBiasAnytimeHyperPlayer;
 import tud.gamecontroller.players.OPBiasAnytimeHyperPlayer.OPBiasAnytimeHyperPlayerInfo;
-import tud.gamecontroller.players.NoBiasPlayer.XXXXPlayer;
-import tud.gamecontroller.players.NoBiasPlayer.XXXXPlayerInfo;
+import tud.gamecontroller.players.XXXXPlayer.XXXXPlayer;
+import tud.gamecontroller.players.XXXXPlayer.XXXXPlayerInfo;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 

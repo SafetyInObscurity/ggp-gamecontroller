@@ -1,5 +1,6 @@
 package tud.gamecontroller.players.OPBiasAnytimeHyperPlayer;
 
+import tud.gamecontroller.players.OPAnytimeHyperPlayer.Node;
 import tud.gamecontroller.term.TermInterface;
 
 import java.util.ArrayDeque;

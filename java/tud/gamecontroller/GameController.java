@@ -183,7 +183,7 @@ public class GameController<
 			if(match.getPlayer(role).getName().equals(PlayerInfo.TYPE_HYPERPLAY) || match.getPlayer(role).getName().equals(PlayerInfo.TYPE_IMPROVEDRANDOM) || match.getPlayer(role).getName().equals(PlayerInfo.TYPE_ANYTIMEHYPERPLAY)) {
 				try {
 					FileWriter myWriter = new FileWriter("matches/" + match.getMatchID() + ".csv");
-					myWriter.write("match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen\n");
+					myWriter.write("match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen\n"); // @todo: remove later
 					myWriter.close();
 				} catch (IOException e) {
 					System.err.println("An error occurred.");

@@ -1,10 +1,10 @@
-MATCH_ID="blind_breakthrough_7x7_CHEAT"
+MATCH_ID="blind_breakthrough_7x7_CHEAT_8x8ophyper_16CHEAT_2backtrackDepth_32OPprobes"
 GAMEFILE="testdata/games/games_gdl/blind_breakthrough_7x7_CHEAT/blind_breakthrough_7x7_CHEAT.gdl"
 GAMENAME="blind_breakthrough_7x7_CHEAT"
 START_CLOCK=10
 PLAY_CLOCK=300
 GDL_VERSION=2
-PLAYER_NAME_1="ahyperlt"
+PLAYER_NAME_1="ophyper"
 ROLE_ID_1=1
 ROLE_NAME_1="white"
 PLAYER_NAME_2="cheat"

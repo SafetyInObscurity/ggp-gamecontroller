@@ -1,4 +1,4 @@
-MATCH_ID="blind_breakthrough_5x5_CHEAT_2x2ahyperlt_16Cheat"
+MATCH_ID="blind_breakthrough_5x5_CHEAT_8x8ahyperlt_16CHEAT_2backtrackDepth"
 GAMEFILE="testdata/games/games_gdl/blind_breakthrough_5x5_CHEAT/blind_breakthrough_5x5_CHEAT.gdl"
 GAMENAME="blind_breakthrough_5x5_CHEAT"
 START_CLOCK=10
@@ -12,4 +12,4 @@ ROLE_ID_2=2
 ROLE_NAME_2="black"
 OUTPUT_DIR="matches/"
 STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
-NUMTESTS=10
+NUMTESTS=50
