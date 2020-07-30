@@ -1,6 +1,5 @@
 package tud.gamecontroller.players.OPBiasAnytimeHyperPlayer;
 
-import tud.gamecontroller.players.OPAnytimeHyperPlayer.Node;
 import tud.gamecontroller.term.TermInterface;
 
 import java.util.ArrayDeque;
@@ -68,14 +67,14 @@ public class LikelihoodTree<TermType extends TermInterface> {
     }
 
     public void updateRelLikelihood(Node node) {
-        float totalValue = 0;
+        double totalValue = 0.0;
         if(node != null && node.getChildren() != null && node.getChildren().size() > 0) {
             for (Node child : node.getChildren()) {
                 totalValue += child.getValue();
             }
             if (totalValue > 0) {
                 for (Node child : node.getChildren()) {
-                    child.setRelLikelihood(((double) child.getValue()) / totalValue);
+                    child.setRelLikelihood(child.getValue() > 0.0 ? (((double) child.getValue()) / totalValue) : 0.0);
                 }
             }
         }

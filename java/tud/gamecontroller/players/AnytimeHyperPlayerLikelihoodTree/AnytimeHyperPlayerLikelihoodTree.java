@@ -95,11 +95,11 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 32; // The maximum number of hypergames allowable
-	private int numHyperBranches = 32; // The amount of branches allowed
+	private int numHyperGames = 4; // The maximum number of hypergames allowable
+	private int numHyperBranches = 4; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use from each state
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 8; // @todo: probably remove later
+	private int maxNumProbes = 4; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action actually taken at each step by the player (from 0)
 	private HashMap<Integer, MoveInterface<TermType>> expectedActionTracker; // Tracks the move taken by the player at each step (from 0)
@@ -108,12 +108,13 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
 	private LikelihoodTree<TermType> likelihoodTree;
-	private int backtrackingDepth = 999;
+	private int backtrackingDepth = 1;
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
 
 	private long timeLimit; // The total amount of time that can be
+	private long stateUpdateTimeLimit; // The total amount of time that can be used to update the state
 	private long startTime;
 	private long timeexpired;
 	private static final long PREFERRED_PLAY_BUFFER = 1000; // 1 second buffer before end of game to select optimal move
@@ -144,6 +145,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		likelihoodTree = new LikelihoodTree<TermType>(0);
 		stepNum = 0;
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
+		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/10; // Can use 10% of the playclock to update the state
 
 		moveForStepBlacklist = new HashMap<Integer, MoveInterface<TermType>>();
 		moveForStepWhitelist = new HashMap<Integer, MoveInterface<TermType>>();
@@ -258,18 +260,10 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 				int step = 1;
 				int maxStep = step;
-				int i = 0;
-				int j = 1;
 //			System.out.println("stepNum: " + stepNum);
 				while(step < stepNum + 1) {
-//				System.out.println("\tRan " + i + " times on step " + j);
-					i++;
 					step = forwardHypergame(model, step , true);
 					if(step < maxStep) break;
-					if(step > maxStep) {
-						i = 0;
-						j++;
-					}
 					maxStep = Math.max(step, maxStep);
 				}
 				if(step < maxStep - 1) continue;
@@ -387,44 +381,43 @@ public class AnytimeHyperPlayerLikelihoodTree<
 //		System.out.println();
 //		System.out.println("currentlyInUseMoves before clearing: " + currentlyInUseMoves);
 //		System.out.println();
-		currentlyInUseMoves.clear();
 
 //		System.out.println("FINISHED UPDATING/BRANCHING STATE");
 
 		// If no hypergames left, then run until one exists
 		System.out.println(this.getName() + ": Number of hypergames after updating: " + hypergames.size());
-		while(hypergames.size() == 0) {
-			System.out.println(this.getName() + ": Trying to find another path");
-			// Create first model to represent the empty state
-			Model<TermType> model = new Model<TermType>();
-			Collection<TermType> initialPercepts = perceptTracker.get(0);
-			model.updateGameplayTracker(0, initialPercepts, null, initialState, role, 1);
+//		System.exit(0);
+//		while(hypergames.size() == 0) {
+		if(stepNum > 0) {
+			while (canSearchMore()) {
+				System.out.println(this.getName() + ": Trying to find another path since can search more");
+				// Create first model to represent the empty state
+				Model<TermType> model = new Model<TermType>();
+				Collection<TermType> initialPercepts = perceptTracker.get(0);
+				model.updateGameplayTracker(0, initialPercepts, null, initialState, role, 1);
 
-			int step = 1;
-			int maxStep = step;
-			int i = 0;
-			int j = 1;
+				int step = 1;
+				int maxStep = step;
 //			System.out.println("stepNum: " + stepNum);
-			while(step < stepNum + 1) {
+				while (step < stepNum + 1) {
 //				System.out.println("\tRan " + i + " times on step " + j);
-				i++;
-				step = forwardHypergame(model, step , true);
-				if(step < maxStep) break;
-				if(step > maxStep) {
-					i = 0;
-					j++;
+					step = forwardHypergame(model, step, true);
+					if (step < maxStep - backtrackingDepth || step == 0) break;
+					maxStep = Math.max(step, maxStep);
 				}
-				maxStep = Math.max(step, maxStep);
+				if (step < maxStep - backtrackingDepth) continue;
+				else if (step == 0) break;
+
+				hypergames.add(model);
+
+				// Get legal moves from this model
+				legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
+				model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMoves));
 			}
-			if(step < maxStep - 1) continue;
-
-			hypergames.add(model);
-
-			// Get legal moves from this model
-			legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
-			model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMoves));
 		}
-		System.out.println(this.getName() + ": Number of hypergames after >=1 found: " + hypergames.size());
+		System.out.println(this.getName() + ": Number of hypergames after searching more: " + hypergames.size());
+
+		currentlyInUseMoves.clear();
 
 		//Calculate how long the update took
 		long endTime =  System.currentTimeMillis();
@@ -469,6 +462,33 @@ public class AnytimeHyperPlayerLikelihoodTree<
 //		System.out.println();
 
 		return bestMove;
+	}
+
+	public boolean canSearchMore() {
+		// NOT if already at maximum number of hypergames
+		if(hypergames.size() == 0) return true;
+		if(hypergames.size() >= numHyperGames) {
+			System.out.println("REACHED MAX");
+			return false;
+		}
+		// NOT if tree has been fully searched
+		// If tree has been fully searched, then the inital state will have 0 valid actions
+		else {
+			ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) initialState, actionTracker.get(0)));
+			removeBadMoves(possibleJointMoves, 31); // @todo: Fix this with a reasonable value
+			removeInUseMoves(possibleJointMoves, 31);
+			int numCleanJointMoves = possibleJointMoves.size();
+			if(numCleanJointMoves <= 0) return false;
+			else {
+				// NOT if searched enough
+				if(System.currentTimeMillis() - startTime > stateUpdateTimeLimit) {
+					System.out.println("STATE UPDATE TIMEOUT");
+					return false;
+				}
+				// Else return true
+				else return true;
+			}
+		}
 	}
 
 	/**
@@ -542,17 +562,24 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		// Calculate expected move value for each hypergame until almost out of time
 		HashMap<Integer, Double> weightedExpectedValuePerMove = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
-		depth = 1;
+		depth = 0;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
 			for (Model<TermType> model : hypergames) {
 				StateInterface<TermType, ?> currState = model.getCurrentState(match);
 				for (MoveInterface<TermType> move : possibleMoves) {
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
-					double expectedValue = anytimeSimulateMove(currState, move);
+					double expectedValue = 0.0;
+					if(model.getPossibleMovesAtStep(stepNum).contains(move)) {
+						expectedValue = anytimeSimulateMove(currState, move);
+						System.out.println("model: " + model.getActionPathHash() + " does contain move " + move + " with expected value " + expectedValue);
+					} else {
+						System.out.println("model: " + model.getActionPathHash() + " does NOT!!! contain move " + move + " with expected value " + expectedValue);
+					}
 
 					// Calculate the weighted expected value for each move
-					double weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
+					double likelihood = hyperProbs.get(model.getActionPathHash());
+					double weightedExpectedValue = expectedValue * Math.pow(likelihood, 2); // @todo: This is squared
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {

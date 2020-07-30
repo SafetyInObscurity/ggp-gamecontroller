@@ -29,6 +29,7 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -315,18 +316,14 @@ public class CheatHyperPlayer<
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
-		Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
-		MoveInterface<TermType> bestMove = iter.next();
-		if(legalMoves.size() > 1) {
-			bestMove = anytimeMoveSelection(legalMoves);
-		}
+		MoveInterface<TermType> bestMove = anytimeMoveSelection(legalMoves);
 		long selectEndTime =  System.currentTimeMillis();
 		long selectTime = selectEndTime - selectStartTime;
 
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + false + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
@@ -433,16 +430,34 @@ public class CheatHyperPlayer<
 		long startFinalCalcTime =  System.currentTimeMillis();
 
 		Iterator<HashMap.Entry<Integer, Double>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		double maxVal = Float.MIN_VALUE;
+		double maxVal = -(Double.MAX_VALUE);
 		MoveInterface<TermType> bestMove = null;
-		while(it.hasNext()){
-			HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
-			Double val = mapElement.getValue();
-			if(val > maxVal) {
-				bestMove = moveHashMap.get(mapElement.getKey());
-				maxVal = val;
+
+		// Write the moveset to a file
+		try {
+			// Create the file
+			new File("matches/cheat_move_distribution/" + matchID).mkdirs();
+			FileWriter myWriter = new FileWriter("matches/cheat_move_distribution/" + matchID + "/" + stepNum +  ".csv", false);
+
+			// Iterate through moves
+			while(it.hasNext()){
+				HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
+				Double val = mapElement.getValue();
+				if(val > maxVal) {
+					bestMove = moveHashMap.get(mapElement.getKey());
+					maxVal = val;
+				}
+
+				myWriter.write(moveHashMap.get(mapElement.getKey()) + "," + (val/maxNumProbes) + "\n");
+
 			}
+
+			myWriter.close();
+		} catch (IOException e) {
+			System.err.println("An error occurred.");
+			e.printStackTrace();
 		}
+
 		long endFinalCalcTime =  System.currentTimeMillis();
 		long updateTime = endFinalCalcTime - startFinalCalcTime;
 //		System.out.println("Took " + updateTime + " ms to run final calc");

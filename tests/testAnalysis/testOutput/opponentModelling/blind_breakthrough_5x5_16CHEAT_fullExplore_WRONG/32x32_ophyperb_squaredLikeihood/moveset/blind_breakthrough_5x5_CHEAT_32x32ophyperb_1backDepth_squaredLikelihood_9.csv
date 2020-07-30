@@ -1,0 +1,27 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen,last_move_illegal
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,0,BLACK,cheat,1,16,8,475,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,0,WHITE,ophyperb,1,32,10,2766,(MOVE 1 2 1 3 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,1,WHITE,ophyperb,1,32,15,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,1,BLACK,cheat,1,16,4,1113,(MOVE 2 4 2 3 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,2,BLACK,cheat,1,16,7,234,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,2,WHITE,ophyperb,4,32,17,19077,(MOVE 1 3 2 4 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,3,WHITE,ophyperb,1,32,21,0,NOOP,true
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,3,BLACK,cheat,1,16,7,941,(MOVE 4 4 4 3 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,4,BLACK,cheat,1,16,8,212,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,4,WHITE,ophyperb,4,32,19,15390,(MOVE 1 3 2 4 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,5,WHITE,ophyperb,2,32,33,0,NOOP,true
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,5,BLACK,cheat,1,16,9,735,(MOVE 2 3 1 2 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,6,BLACK,cheat,1,16,8,102,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,6,WHITE,ophyperb,2,32,31,3287,(MOVE 2 1 1 2 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,7,WHITE,ophyperb,2,32,32,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,7,BLACK,cheat,1,16,8,585,(MOVE 2 5 2 4 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,8,BLACK,cheat,1,16,11,149,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,8,WHITE,ophyperb,6,32,33,15050,(MOVE 3 3 2 4 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,9,WHITE,ophyperb,2,32,46,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,9,BLACK,cheat,1,16,17,530,(MOVE 3 5 2 4 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,10,BLACK,cheat,1,16,5,175,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,10,WHITE,ophyperb,2,32,41,3603,(MOVE 1 3 2 4 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,11,WHITE,ophyperb,2,32,44,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,11,BLACK,cheat,1,16,6,526,(MOVE 3 4 3 3 ),false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,12,BLACK,cheat,1,16,6,63,NOOP,false
+blind_breakthrough_5x5_CHEAT_32x32ophyperb_1backDepth_squaredLikelihood_9,blind_breakthrough_5x5_CHEAT,12,WHITE,ophyperb,8,32,58,14155,(MOVE 2 4 1 5 ),false

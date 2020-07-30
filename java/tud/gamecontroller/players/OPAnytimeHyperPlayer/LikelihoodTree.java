@@ -74,7 +74,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
             }
             if (totalValue > 0) {
                 for (Node child : node.getChildren()) {
-                    child.setRelLikelihood(((double) child.getValue()) / totalValue);
+                    child.setRelLikelihood(child.getValue() > 0.0 ? (((double) child.getValue()) / totalValue) : 0.0);
                 }
             }
         }
