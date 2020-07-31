@@ -1,0 +1,14 @@
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,0,BLACK,cheat,1,16,0,437,NOOP,false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,0,WHITE,ahyperlt,1,16,0,1343,(MOVE 4 2 4 3 )
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,1,WHITE,ahyperlt,1,16,0,0,NOOP
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,1,BLACK,cheat,1,16,0,1343,(MOVE 5 4 4 3 ),false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,2,BLACK,cheat,1,16,0,219,NOOP,false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,2,WHITE,ahyperlt,1,16,0,1359,(MOVE 5 2 5 3 )
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,3,WHITE,ahyperlt,1,16,0,0,NOOP
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,3,BLACK,cheat,1,16,0,1142,(MOVE 5 5 5 4 ),false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,4,BLACK,cheat,1,16,0,219,NOOP,false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,4,WHITE,ahyperlt,5,16,16,6671,(MOVE 5 3 4 4 )
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,5,WHITE,ahyperlt,5,16,16,0,NOOP
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,5,BLACK,cheat,1,16,0,953,(MOVE 5 4 5 3 ),false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,6,BLACK,cheat,1,16,0,187,NOOP,false
+blind_breakthrough_5x5_CHEAT_16x16ahyperlt_16CHEAT_1backtrackDepth_linear_23,blind_breakthrough_5x5_CHEAT,6,WHITE,ahyperlt,16,16,31,12931,(MOVE 4 4 3 5 )

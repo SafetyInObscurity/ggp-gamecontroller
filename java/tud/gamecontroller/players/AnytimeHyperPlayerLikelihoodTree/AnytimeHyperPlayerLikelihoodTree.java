@@ -95,11 +95,11 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 4; // The maximum number of hypergames allowable
-	private int numHyperBranches = 4; // The amount of branches allowed
+	private int numHyperGames = 8; // The maximum number of hypergames allowable
+	private int numHyperBranches = 8; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use from each state
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 4; // @todo: probably remove later
+	private int maxNumProbes = 8; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action actually taken at each step by the player (from 0)
 	private HashMap<Integer, MoveInterface<TermType>> expectedActionTracker; // Tracks the move taken by the player at each step (from 0)
@@ -572,14 +572,15 @@ public class AnytimeHyperPlayerLikelihoodTree<
 					double expectedValue = 0.0;
 					if(model.getPossibleMovesAtStep(stepNum).contains(move)) {
 						expectedValue = anytimeSimulateMove(currState, move);
-						System.out.println("model: " + model.getActionPathHash() + " does contain move " + move + " with expected value " + expectedValue);
-					} else {
-						System.out.println("model: " + model.getActionPathHash() + " does NOT!!! contain move " + move + " with expected value " + expectedValue);
+//						System.out.println("model: " + model.getActionPathHash() + " does contain move " + move + " with expected value " + expectedValue);
 					}
+//					else {
+//						System.out.println("model: " + model.getActionPathHash() + " does NOT!!! contain move " + move + " with expected value " + expectedValue);
+//					}
 
 					// Calculate the weighted expected value for each move
 					double likelihood = hyperProbs.get(model.getActionPathHash());
-					double weightedExpectedValue = expectedValue * Math.pow(likelihood, 2); // @todo: This is squared
+					double weightedExpectedValue = expectedValue * likelihood;
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {

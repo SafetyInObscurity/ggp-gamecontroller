@@ -96,11 +96,11 @@ public class OPBiasAnytimeHyperPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 4; // The maximum number of hypergames allowable
-	private int numHyperBranches = 4; // The amount of branches allowed
+	private int numHyperGames = 8; // The maximum number of hypergames allowable
+	private int numHyperBranches = 8; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use from each state
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 4; // @todo: probably remove later
+	private int maxNumProbes = 8; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action actually taken at each step by the player (from 0)
 	private HashMap<Integer, MoveInterface<TermType>> expectedActionTracker; // Tracks the move taken by the player at each step (from 0)
@@ -535,10 +535,10 @@ public class OPBiasAnytimeHyperPlayer<
 		// Print all models
 //		System.out.println();
 //		printHypergames();
-		System.out.println();
-		for(Model<TermType> model: hypergames) {
-			System.out.println(model.toString());
-		}
+//		System.out.println();
+//		for(Model<TermType> model: hypergames) {
+//			System.out.println(model.toString());
+//		}
 //		System.out.println("Likelihood Tree: " + likelihoodTree.toString());
 //		System.out.println();
 //		System.out.println("badMovesTracker: " + badMovesTracker);
@@ -673,8 +673,8 @@ public class OPBiasAnytimeHyperPlayer<
 			prob = choiceFactorSum > 0.0 ? ( choiceFactor / choiceFactorSum ) : 1.0;
 			choiceProb = ( ( 1.0 / treecf ) / invChoiceFactorSum );
 //				System.out.println("Model " + model.getActionPathHash() + " has choiceFactor: " + choiceFactor);
-				System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
-				System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
+//				System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
+//				System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
 	//			if(prob != choiceProb) {
 	//				System.out.println("NO MATCH");
 	//				System.exit(0);
@@ -690,25 +690,26 @@ public class OPBiasAnytimeHyperPlayer<
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 0;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
-			System.out.println("Depth: " + depth);
+//			System.out.println("Depth: " + depth);
 			for (Model<TermType> model : hypergames) {
 				StateInterface<TermType, ?> currState = model.getCurrentState(match);
-				System.out.println("\tModel: " + model.getActionPathHash());
+//				System.out.println("\tModel: " + model.getActionPathHash());
 				for (MoveInterface<TermType> move : possibleMoves) {
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
 					double expectedValue = 0.0;
 					if(model.getPossibleMovesAtStep(stepNum).contains(move)) {
 						expectedValue = anytimeSimulateMove(currState, move, role);
-						System.out.println("model: " + model.getActionPathHash() + " does contain move " + move + " with expected value " + expectedValue);
-					} else {
-						System.out.println("model: " + model.getActionPathHash() + " does NOT!!! contain move " + move + " with expected value " + expectedValue);
+//						System.out.println("model: " + model.getActionPathHash() + " does contain move " + move + " with expected value " + expectedValue);
 					}
+//					else {
+//						System.out.println("model: " + model.getActionPathHash() + " does NOT!!! contain move " + move + " with expected value " + expectedValue);
+//					}
 
 					// Calculate the weighted expected value for each move
 					double likelihood = hyperProbs.get(model.getActionPathHash());
 					double likelihoodOrig = hyperProbsOrig.get(model.getActionPathHash());
-					double weightedExpectedValue = expectedValue * Math.pow(likelihood, 2); // @todo: Remember this is squared
+					double weightedExpectedValue = expectedValue * likelihood;
 					double weightedExpectedValueOrig = expectedValue * Math.pow(likelihoodOrig, 2); // @todo: Remember this is squared
 
 					// Add expected value to hashmap

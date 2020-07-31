@@ -1,4 +1,4 @@
-MATCH_ID="blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_4power_long"
+MATCH_ID="blind_breakthrough_5x5_CHEAT_8x8ahyperlt_16CHEAT_1backtrackDepth_linear"
 GAMEFILE="testdata/games/games_gdl/blind_breakthrough_5x5_CHEAT/blind_breakthrough_5x5_CHEAT.gdl"
 GAMENAME="blind_breakthrough_5x5_CHEAT"
 START_CLOCK=10

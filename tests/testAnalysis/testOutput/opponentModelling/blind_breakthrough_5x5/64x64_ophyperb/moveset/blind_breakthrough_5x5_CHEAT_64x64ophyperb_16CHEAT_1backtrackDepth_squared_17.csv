@@ -1,0 +1,29 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen,last_move_illegal
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,0,BLACK,cheat,1,16,0,484,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,0,WHITE,ophyperb,1,64,0,5094,(MOVE 2 2 2 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,1,WHITE,ophyperb,1,64,0,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,1,BLACK,cheat,1,16,0,1156,(MOVE 3 4 3 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,2,BLACK,cheat,1,16,0,219,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,2,WHITE,ophyperb,4,64,15,20067,(MOVE 2 1 2 2 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,3,WHITE,ophyperb,4,64,16,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,3,BLACK,cheat,1,16,0,1234,(MOVE 3 3 2 2 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,4,BLACK,cheat,1,16,0,172,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,4,WHITE,ophyperb,1,64,31,3609,(MOVE 3 1 2 2 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,5,WHITE,ophyperb,1,64,0,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,5,BLACK,cheat,1,16,0,755,(MOVE 1 4 2 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,6,BLACK,cheat,1,16,0,172,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,6,WHITE,ophyperb,1,64,15,4072,(MOVE 1 2 2 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,7,WHITE,ophyperb,1,64,0,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,7,BLACK,cheat,1,16,0,609,(MOVE 4 4 4 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,8,BLACK,cheat,1,16,0,171,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,8,WHITE,ophyperb,4,64,15,11565,(MOVE 3 2 3 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,9,WHITE,ophyperb,4,64,31,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,9,BLACK,cheat,1,16,0,749,(MOVE 2 4 3 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,10,BLACK,cheat,1,16,0,124,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,10,WHITE,ophyperb,4,64,46,12627,(MOVE 4 2 3 3 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,11,WHITE,ophyperb,4,64,31,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,11,BLACK,cheat,1,16,0,799,(MOVE 4 3 4 2 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,12,BLACK,cheat,1,16,0,140,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,12,WHITE,ophyperb,20,64,77,52058,(MOVE 1 1 1 2 ),false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,13,WHITE,ophyperb,20,64,110,0,NOOP,false
+blind_breakthrough_5x5_CHEAT_64x64ophyperb_16CHEAT_1backtrackDepth_squared_17,blind_breakthrough_5x5_CHEAT,13,BLACK,cheat,1,16,0,469,(MOVE 4 2 5 1 ),false
