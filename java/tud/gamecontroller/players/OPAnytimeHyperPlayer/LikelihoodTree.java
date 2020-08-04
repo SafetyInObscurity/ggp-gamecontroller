@@ -67,7 +67,7 @@ public class LikelihoodTree<TermType extends TermInterface> {
     }
 
     public void updateRelLikelihood(Node node) {
-        float totalValue = 0;
+        double totalValue = 0.0;
         if(node != null && node.getChildren() != null && node.getChildren().size() > 0) {
             for (Node child : node.getChildren()) {
                 totalValue += child.getValue();

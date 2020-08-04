@@ -1,2 +1,5 @@
-This is a variant on AnytimeHyperPlayerLikelihoodTree with no biasing based on the likelihood of each hypergame
-Therefore it considers only the sum of expected value and weights all hypergames as equally representative
+NO BIAS
+
+NO Branching
+backtrackingDepth =1
+Keep searching until 1/10th of time has passed

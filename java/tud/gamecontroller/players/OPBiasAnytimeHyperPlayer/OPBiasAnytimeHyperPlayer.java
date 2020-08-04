@@ -420,7 +420,8 @@ public class OPBiasAnytimeHyperPlayer<
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
-				boolean keepBranching = true;
+//				boolean keepBranching = true;
+				boolean keepBranching = false;
 				for(int i = 0 ; i < numHyperBranches - 1; i++) {
 					if(hypergames.size() < numHyperGames && keepBranching) {
 //						System.out.println("BRANCHING");
@@ -689,12 +690,15 @@ public class OPBiasAnytimeHyperPlayer<
 		HashMap<Integer, Double> weightedExpectedValuePerMoveOrig = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 0;
+		Model<TermType> tempModel;
+		StateInterface<TermType, ?> currState;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
 //			System.out.println("Depth: " + depth);
 			for (Model<TermType> model : hypergames) {
-				StateInterface<TermType, ?> currState = model.getCurrentState(match);
 //				System.out.println("\tModel: " + model.getActionPathHash());
 				for (MoveInterface<TermType> move : possibleMoves) {
+					tempModel = new Model<TermType>(model);
+					currState = tempModel.getCurrentState(match);
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
 					double expectedValue = 0.0;
@@ -792,28 +796,26 @@ public class OPBiasAnytimeHyperPlayer<
 	 * @param move - The first move to be tried
 	 * @return The statistical expected result of a move
 	 */
-	public float anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, RoleInterface<TermType> role) {
-		int expectedOutcome = 0;
+	public double anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, RoleInterface<TermType> role) {
+		double expectedOutcome = 0;
 		// Repeatedly select random joint moves until a terminal state is reached
 		StateInterface<TermType, ?> currState = state;
 		JointMoveInterface<TermType> randJointMove;
 		boolean isFirstMove = true;
 		while(!currState.isTerminal()) {
 			if(isFirstMove) {
-				try { // @todo: this doesn't seem to work
-					randJointMove = getRandomJointMove(currState, move, role);
-				} catch(Exception e) {
-					return 0;
-				}
+				randJointMove = getRandomJointMove(currState, move, role);
+				if (randJointMove == null) System.exit(0);
 				isFirstMove = false;
 			} else {
 				randJointMove = getRandomJointMove(currState);
 			}
 			currState = currState.getSuccessor(randJointMove);
 		}
-		expectedOutcome += currState.getGoalValue(role);
-		return (float)expectedOutcome;
+		expectedOutcome = currState.getGoalValue(role);
+		return expectedOutcome;
 	}
+
 
 	/**
 	 * Prints the details about each hypergame in the set of hypergames

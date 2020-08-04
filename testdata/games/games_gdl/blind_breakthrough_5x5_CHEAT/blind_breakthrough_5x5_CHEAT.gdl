@@ -231,6 +231,15 @@
     (does ?p (move ?x1 ?y1 ?x2 ?y2))
     (distinct ?x1 ?x2))
 
+; Sees capturing moves available
+(<= (sees ?p (legal ?p (move ?x1 ?y1 ?x2 ?y2)))
+    (true (control ?p2))
+    (true (cell ?x1 ?y1 ?p))
+	(forward ?p ?y1 ?y2)
+	(neighbor ?x1 ?x2)
+	(opponent ?p ?p2)
+    (next (cell ?x2 ?y2 ?p2)))
+
 ; Black can See all the moves that white makes
 (<= (sees black (move ?x1 ?y1 ?x2 ?y2))
     (does white (move ?x1 ?y1 ?x2 ?y2)))

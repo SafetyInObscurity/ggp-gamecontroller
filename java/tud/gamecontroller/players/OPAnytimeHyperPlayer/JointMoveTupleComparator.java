@@ -1,7 +1,6 @@
 package tud.gamecontroller.players.OPAnytimeHyperPlayer;
 
 import tud.gamecontroller.game.JointMoveInterface;
-import tud.gamecontroller.players.OPAnytimeHyperPlayer.Tuple;
 import tud.gamecontroller.term.TermInterface;
 
 import java.util.Comparator;

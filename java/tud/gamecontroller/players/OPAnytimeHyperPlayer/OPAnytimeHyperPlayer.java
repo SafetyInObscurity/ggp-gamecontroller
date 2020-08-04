@@ -29,8 +29,7 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /*
@@ -114,7 +113,7 @@ public class OPAnytimeHyperPlayer<
 	private RoleInterface<TermType> opponentRole;
 	private HashSet<Integer> likelihoodTreeExpansionTracker;
 	private HashMap<Integer, PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>> moveSelectOrderMap;
-	private int numOPProbes = 8; // The number of probes used for opponent modelling
+	private int numOPProbes = 8; // The number of probes used for opponent modelling -> NOT USED FOR THIS VARIANT SINCE IT HAS ACCESS TO THE TRUE DISTRIBUTION
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
@@ -207,6 +206,7 @@ public class OPAnytimeHyperPlayer<
 	public MoveInterface<TermType> getNextMove() {
 		startTime =  System.currentTimeMillis();
 		timeexpired = 0;
+		boolean wasIllegal = false;
 
 		HashSet<MoveInterface<TermType>> legalMoves = new HashSet<MoveInterface<TermType>>();
 		HashSet<MoveInterface<TermType>> legalMovesInState = null;
@@ -231,6 +231,7 @@ public class OPAnytimeHyperPlayer<
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
 			// Check if the move made last round actually matches the move made
 			if(!expectedActionTracker.get(stepNum - 1).equals(actionTracker.get(stepNum - 1))) {
+				wasIllegal = true;
 //				System.out.println("Expected to take action " + expectedActionTracker.get(stepNum - 1) + " but actually took action " + actionTracker.get(stepNum - 1));
 				moveForStepBlacklist.put(stepNum - 1, expectedActionTracker.get(stepNum - 1));
 			}
@@ -284,7 +285,7 @@ public class OPAnytimeHyperPlayer<
 						hypergames.remove(model);
 					}
 					// Find all hypergames that didn't allow the true move used and remove them
-					if(!possibleMoves.contains(moveForStepWhitelist.get(stepNum - 1))) {
+					 else if(!possibleMoves.contains(moveForStepWhitelist.get(stepNum - 1))) {
 						System.out.println("Removed model " + model.getActionPathHash() + " because did not contain whitelisted move");
 						// Update path
 						Node node = likelihoodTree.getNode(model.getActionPathHashPath());
@@ -419,7 +420,8 @@ public class OPAnytimeHyperPlayer<
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
-				boolean keepBranching = true;
+//				boolean keepBranching = true;
+				boolean keepBranching = false;
 				for(int i = 0 ; i < numHyperBranches - 1; i++) {
 					if(hypergames.size() < numHyperGames && keepBranching) {
 //						System.out.println("BRANCHING");
@@ -532,17 +534,18 @@ public class OPAnytimeHyperPlayer<
 		long updateTime = endTime - startTime;
 
 		// Print all models
-		System.out.println();
-		printHypergames();
-		System.out.println();
-		System.out.println("Likelihood Tree: " + likelihoodTree.toString());
-		System.out.println();
-		System.out.println("badMovesTracker: " + badMovesTracker);
-		System.out.println();
-		System.out.println("currentlyInUseMoves: " + currentlyInUseMoves);
-		System.out.println();
-		System.out.println("stepNum: " + stepNum);
-		System.out.println();
+//		System.out.println();
+//		printHypergames();
+//		System.out.println();
+//		for(Model<TermType> model: hypergames) {
+//			System.out.println(model.toString());
+//		}
+//		System.out.println("Likelihood Tree: " + likelihoodTree.toString());
+//		System.out.println();
+//		System.out.println("badMovesTracker: " + badMovesTracker);
+//		System.out.println();
+//		System.out.println("stepNum: " + stepNum);
+//		System.out.println();
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
@@ -557,7 +560,7 @@ public class OPAnytimeHyperPlayer<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + wasIllegal + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
@@ -659,6 +662,7 @@ public class OPAnytimeHyperPlayer<
 
 		// Calculate the probability of each hypergame
 		HashMap<Integer, Double> hyperProbs = new HashMap<Integer, Double>();
+		HashMap<Integer, Double> hyperProbsOrig = new HashMap<Integer, Double>();
 		double prob;
 		double choiceProb;
 	//		System.out.println();
@@ -671,29 +675,46 @@ public class OPAnytimeHyperPlayer<
 			choiceProb = ( ( 1.0 / treecf ) / invChoiceFactorSum );
 //				System.out.println("Model " + model.getActionPathHash() + " has choiceFactor: " + choiceFactor);
 //				System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
-	//			System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
+//				System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
 	//			if(prob != choiceProb) {
 	//				System.out.println("NO MATCH");
 	//				System.exit(0);
 	//			}
 			hyperProbs.put(model.getActionPathHash(), prob);
+			hyperProbsOrig.put(model.getActionPathHash(), choiceProb);
 		}
-//			System.out.println();
+			System.out.println();
 
 		// Calculate expected move value for each hypergame until almost out of time
 		HashMap<Integer, Double> weightedExpectedValuePerMove = new HashMap<Integer, Double>();
+		HashMap<Integer, Double> weightedExpectedValuePerMoveOrig = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
 		depth = 0;
+		Model<TermType> tempModel;
+		StateInterface<TermType, ?> currState;
 		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
+//			System.out.println("Depth: " + depth);
 			for (Model<TermType> model : hypergames) {
-				StateInterface<TermType, ?> currState = model.getCurrentState(match);
+//				System.out.println("\tModel: " + model.getActionPathHash());
 				for (MoveInterface<TermType> move : possibleMoves) {
+					tempModel = new Model<TermType>(model);
+					currState = tempModel.getCurrentState(match);
 					moveHashMap.put(move.hashCode(), move);
 					// Calculate the the expected value for each move using monte carlo simulation
-					float expectedValue = anytimeSimulateMove(currState, move, role);
+					double expectedValue = 0.0;
+					if(model.getPossibleMovesAtStep(stepNum).contains(move)) {
+						expectedValue = anytimeSimulateMove(currState, move, role);
+//						System.out.println("model: " + model.getActionPathHash() + " does contain move " + move + " with expected value " + expectedValue);
+					}
+//					else {
+//						System.out.println("model: " + model.getActionPathHash() + " does NOT!!! contain move " + move + " with expected value " + expectedValue);
+//					}
 
 					// Calculate the weighted expected value for each move
-					double weightedExpectedValue = expectedValue * hyperProbs.get(model.getActionPathHash());
+					double likelihood = hyperProbs.get(model.getActionPathHash());
+					double likelihoodOrig = hyperProbsOrig.get(model.getActionPathHash());
+					double weightedExpectedValue = expectedValue * likelihood;
+					double weightedExpectedValueOrig = expectedValue * Math.pow(likelihoodOrig, 2); // @todo: Remember this is squared
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
@@ -701,6 +722,12 @@ public class OPAnytimeHyperPlayer<
 					} else {
 						double prevWeightedExpectedValue = weightedExpectedValuePerMove.get(move.hashCode());
 						weightedExpectedValuePerMove.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValue);
+					}
+					if (!weightedExpectedValuePerMoveOrig.containsKey(move.hashCode())) {
+						weightedExpectedValuePerMoveOrig.put(move.hashCode(), weightedExpectedValueOrig);
+					} else {
+						double prevWeightedExpectedValue = weightedExpectedValuePerMoveOrig.get(move.hashCode());
+						weightedExpectedValuePerMoveOrig.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValueOrig);
 					}
 				}
 			}
@@ -712,18 +739,47 @@ public class OPAnytimeHyperPlayer<
 		// Return the move with the greatest weighted expected value
 		long startFinalCalcTime =  System.currentTimeMillis();
 
-		Iterator<HashMap.Entry<Integer, Double>> it = weightedExpectedValuePerMove.entrySet().iterator();
-		double maxVal = -(Double.MAX_VALUE);
+		// Write the moveset to a file
 		MoveInterface<TermType> bestMove = null;
-		while(it.hasNext()){
-			HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
-			Double val = mapElement.getValue();
-//			System.out.println("value of move " + moveHashMap.get(mapElement.getKey()) + " is " + val);
-			if(val > maxVal) {
-				bestMove = moveHashMap.get(mapElement.getKey());
-				maxVal = val;
+		try {
+			// Create the file
+			new File("matches/op_move_distribution/" + matchID).mkdirs();
+			FileWriter myWriter = new FileWriter("matches/op_move_distribution/" + matchID + "/" + stepNum +  ".csv", false);
+
+			Iterator<HashMap.Entry<Integer, Double>> it = weightedExpectedValuePerMove.entrySet().iterator();
+			double maxVal = -(Double.MAX_VALUE);
+			System.out.println("Opponent Modelling:");
+			while(it.hasNext()){
+				HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
+				Double val = mapElement.getValue();
+				System.out.println("value of move " + moveHashMap.get(mapElement.getKey()) + " is " + val);
+				if(val > maxVal) {
+					bestMove = moveHashMap.get(mapElement.getKey());
+					maxVal = val;
+				}
+				myWriter.write(moveHashMap.get(mapElement.getKey()) + "," + (val/maxNumProbes) + "\n");
 			}
+			myWriter.close();
+
+			new File("matches/orig_move_distribution/" + matchID).mkdirs();
+			myWriter = new FileWriter("matches/orig_move_distribution/" + matchID + "/" + stepNum +  ".csv", false);
+			System.out.println();
+			System.out.println("Original Values:");
+			it = weightedExpectedValuePerMoveOrig.entrySet().iterator();
+			while(it.hasNext()){
+				HashMap.Entry<Integer, Double> mapElement = (HashMap.Entry<Integer, Double>)it.next();
+				Double val = mapElement.getValue();
+				System.out.println("value of move " + moveHashMap.get(mapElement.getKey()) + " is " + val);
+				myWriter.write(moveHashMap.get(mapElement.getKey()) + "," + (val/maxNumProbes) + "\n");
+			}
+
+			myWriter.close();
+		} catch (IOException e) {
+			System.err.println("An error occurred.");
+			e.printStackTrace();
 		}
+
+
 //		System.out.println("bestMove " + bestMove);
 		long endFinalCalcTime =  System.currentTimeMillis();
 		long updateTime = endFinalCalcTime - startFinalCalcTime;
@@ -740,28 +796,26 @@ public class OPAnytimeHyperPlayer<
 	 * @param move - The first move to be tried
 	 * @return The statistical expected result of a move
 	 */
-	public float anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, RoleInterface<TermType> role) {
-		int expectedOutcome = 0;
+	public double anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, RoleInterface<TermType> role) {
+		double expectedOutcome = 0;
 		// Repeatedly select random joint moves until a terminal state is reached
 		StateInterface<TermType, ?> currState = state;
 		JointMoveInterface<TermType> randJointMove;
 		boolean isFirstMove = true;
 		while(!currState.isTerminal()) {
 			if(isFirstMove) {
-				try {
-					randJointMove = getRandomJointMove(currState, move, role);
-				} catch(Exception e) {
-					return 0;
-				}
+				randJointMove = getRandomJointMove(currState, move, role);
+				if (randJointMove == null) System.exit(0);
 				isFirstMove = false;
 			} else {
 				randJointMove = getRandomJointMove(currState);
 			}
 			currState = currState.getSuccessor(randJointMove);
 		}
-		expectedOutcome += currState.getGoalValue(role);
-		return (float)expectedOutcome;
+		expectedOutcome = currState.getGoalValue(role);
+		return expectedOutcome;
 	}
+
 
 	/**
 	 * Prints the details about each hypergame in the set of hypergames
@@ -846,9 +900,10 @@ public class OPAnytimeHyperPlayer<
 			MoveInterface<TermType> move;
 			Node child;
 			double expectedValue;
-			float totalValue = 0;
+			double totalValue = 0.0;
 			PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>> moveQueue = new PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>(possibleJointMoves.size(), new JointMoveTupleComparator());
 			for (JointMoveInterface<TermType> jointMove : possibleJointMoves) {
+				// Use this move
 				// Run the simulation
 				move = jointMove.get(opponentRole);
 				expectedValue = 0;

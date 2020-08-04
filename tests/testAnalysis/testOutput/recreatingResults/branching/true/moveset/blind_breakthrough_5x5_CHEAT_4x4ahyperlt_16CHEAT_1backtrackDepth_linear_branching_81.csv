@@ -1,0 +1,14 @@
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,0,BLACK,cheat,1,16,0,548,NOOP,false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,0,WHITE,ahyperlt,1,4,9,720,(MOVE 2 2 2 3 )
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,1,WHITE,ahyperlt,1,4,0,0,NOOP
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,1,BLACK,cheat,1,16,9,1566,(MOVE 3 4 2 3 ),false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,2,BLACK,cheat,1,16,0,279,NOOP,false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,2,WHITE,ahyperlt,1,4,10,467,(MOVE 3 2 2 3 )
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,3,WHITE,ahyperlt,1,4,9,0,NOOP
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,3,BLACK,cheat,1,16,10,1030,(MOVE 5 4 5 3 ),false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,4,BLACK,cheat,1,16,0,233,NOOP,false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,4,WHITE,ahyperlt,4,4,8,1371,(MOVE 2 3 1 4 )
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,5,WHITE,ahyperlt,3,4,9,0,NOOP
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,5,BLACK,cheat,1,16,0,924,(MOVE 5 3 4 2 ),false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,6,BLACK,cheat,1,16,0,130,NOOP,false
+blind_breakthrough_5x5_CHEAT_4x4ahyperlt_16CHEAT_1backtrackDepth_linear_branching_81,blind_breakthrough_5x5_CHEAT,6,WHITE,ahyperlt,1,4,29,290,(MOVE 1 4 2 5 )
