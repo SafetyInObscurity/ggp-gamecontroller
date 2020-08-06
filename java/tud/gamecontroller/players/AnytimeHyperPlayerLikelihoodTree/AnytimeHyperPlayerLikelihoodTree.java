@@ -29,6 +29,8 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -109,6 +111,8 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
 	private LikelihoodTree<TermType> likelihoodTree;
 	private int backtrackingDepth = 1;
+	private double likelihoodPowerFactor = 1.0;
+	private boolean shouldBranch = false;
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
@@ -122,6 +126,24 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	public AnytimeHyperPlayerLikelihoodTree(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
 		random = new Random();
+
+		// Override settings with config file
+		try {
+			BufferedReader csvReader = new BufferedReader(new FileReader("java/tud/gamecontroller/players/agentConfig/" + this.getName() + ".config"));
+			String row;
+			while ((row = csvReader.readLine()) != null) {
+				String[] data = row.split(":");
+				if(data[0].equals("numHyperGames")) numHyperGames = Integer.parseInt(data[1]);
+				else if(data[0].equals("numHyperBranches")) numHyperBranches = Integer.parseInt(data[1]);
+				else if(data[0].equals("maxNumProbes")) maxNumProbes = Integer.parseInt(data[1]);
+				else if(data[0].equals("backtrackingDepth")) backtrackingDepth = Integer.parseInt(data[1]);
+				else if(data[0].equals("likelihoodPowerFactor")) likelihoodPowerFactor = Double.parseDouble(data[1]);
+				else if(data[0].equals("shouldBranch")) shouldBranch = Boolean.parseBoolean(data[1]);
+			}
+			csvReader.close();
+		}  catch (IOException e) {
+			System.out.println(this.getName() + ": NO CONFIG FILE FOUND");
+		}
 	}
 
 	/**
@@ -328,8 +350,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
-//				boolean keepBranching = true;
-				boolean keepBranching = false;
+				boolean keepBranching = shouldBranch;
 				for(int i = 0 ; i < numHyperBranches - 1; i++) {
 					if(hypergames.size() < numHyperGames && keepBranching) {
 //						System.out.println("BRANCHING");
@@ -601,7 +622,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 					double likelihood = hyperProbs.get(model.getActionPathHash());
 //					System.out.println("model " + model.getActionPathHash() + " has prob " + likelihood);
 //					System.out.println("move " + move + " has expected value " + expectedValue);
-					double weightedExpectedValue = expectedValue * likelihood;
+					double weightedExpectedValue = expectedValue * Math.pow(likelihood, likelihoodPowerFactor);
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {

@@ -127,6 +127,24 @@ public class OPAnytimeHyperPlayer<
 	public OPAnytimeHyperPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
 		random = new Random();
+
+		// Override settings with config file
+		try {
+			BufferedReader csvReader = new BufferedReader(new FileReader("tests/tud.gamecontroller.players.agentConfig/" + this.getName() + ".config"));
+			String row;
+			while ((row = csvReader.readLine()) != null) {
+				String[] data = row.split(":");
+				if(data[0].equals("numHyperGames")) numHyperGames = Integer.parseInt(data[1]);
+				else if(data[0].equals("numHyperBranches")) numHyperBranches = Integer.parseInt(data[1]);
+				else if(data[0].equals("maxNumProbes")) maxNumProbes = Integer.parseInt(data[1]);
+				else if(data[0].equals("backtrackingDepth")) backtrackingDepth = Integer.parseInt(data[1]);
+				else if(data[0].equals("numOPProbes")) numOPProbes = Integer.parseInt(data[1]);
+//				else if(data[0].equals("likelihoodPowerFactor")) likelihoodPowerFactor = Double.parseDouble(data[1]);
+			}
+			csvReader.close();
+		}  catch (IOException e) {
+			System.out.println(this.getName() + ": NO CONFIG FILE FOUND");
+		}
 	}
 
 	/**

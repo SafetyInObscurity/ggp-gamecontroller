@@ -29,9 +29,7 @@ import tud.gamecontroller.game.impl.JointMove;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /*
@@ -123,6 +121,19 @@ public class CheatHyperPlayer<
 	public CheatHyperPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
 		random = new Random();
+
+		// Override settings with config file
+		try {
+			BufferedReader csvReader = new BufferedReader(new FileReader("java/tud/gamecontroller/players/agentConfig/" + this.getName() + ".config"));
+			String row;
+			while ((row = csvReader.readLine()) != null) {
+				String[] data = row.split(":");
+				if(data[0].equals("maxNumProbes")) maxNumProbes = Integer.parseInt(data[1]);
+			}
+			csvReader.close();
+		}  catch (IOException e) {
+			System.out.println(this.getName() + ": NO CONFIG FILE FOUND");
+		}
 	}
 
 	/**

@@ -30,6 +30,7 @@ import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 /*
@@ -113,6 +114,8 @@ public class OPBiasAnytimeHyperPlayer<
 	private RoleInterface<TermType> opponentRole;
 	private HashSet<Integer> likelihoodTreeExpansionTracker;
 	private HashMap<Integer, PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>> moveSelectOrderMap;
+	private double likelihoodPowerFactor = 1.0;
+	private boolean shouldBranch = false;
 //	private int numOPProbes = 8; // The number of probes used for opponent modelling -> NOT USED FOR THIS VARIANT SINCE IT HAS ACCESS TO THE TRUE DISTRIBUTION
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
@@ -127,6 +130,24 @@ public class OPBiasAnytimeHyperPlayer<
 	public OPBiasAnytimeHyperPlayer(String name, GDLVersion gdlVersion) {
 		super(name, gdlVersion);
 		random = new Random();
+
+		// Override settings with config file
+		try {
+			BufferedReader csvReader = new BufferedReader(new FileReader("java/tud/gamecontroller/players/agentConfig/" + this.getName() + ".config"));
+			String row;
+			while ((row = csvReader.readLine()) != null) {
+				String[] data = row.split(":");
+				if(data[0].equals("numHyperGames")) numHyperGames = Integer.parseInt(data[1]);
+				else if(data[0].equals("numHyperBranches")) numHyperBranches = Integer.parseInt(data[1]);
+				else if(data[0].equals("maxNumProbes")) maxNumProbes = Integer.parseInt(data[1]);
+				else if(data[0].equals("backtrackingDepth")) backtrackingDepth = Integer.parseInt(data[1]);
+				else if(data[0].equals("likelihoodPowerFactor")) likelihoodPowerFactor = Double.parseDouble(data[1]);
+				else if(data[0].equals("shouldBranch")) shouldBranch = Boolean.parseBoolean(data[1]);
+			}
+			csvReader.close();
+		}  catch (IOException e) {
+			System.out.println(this.getName() + ": NO CONFIG FILE FOUND");
+		}
 	}
 
 	/**
@@ -420,8 +441,7 @@ public class OPBiasAnytimeHyperPlayer<
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
-//				boolean keepBranching = true;
-				boolean keepBranching = false;
+				boolean keepBranching = shouldBranch;
 				for(int i = 0 ; i < numHyperBranches - 1; i++) {
 					if(hypergames.size() < numHyperGames && keepBranching) {
 //						System.out.println("BRANCHING");
@@ -723,8 +743,8 @@ public class OPBiasAnytimeHyperPlayer<
 					// Calculate the weighted expected value for each move
 					double likelihood = hyperProbs.get(model.getActionPathHash());
 					double likelihoodOrig = hyperProbsOrig.get(model.getActionPathHash());
-					double weightedExpectedValue = expectedValue * Math.pow(likelihood, 2);
-					double weightedExpectedValueOrig = expectedValue * Math.pow(likelihoodOrig, 2);
+					double weightedExpectedValue = expectedValue * Math.pow(likelihood, likelihoodPowerFactor);
+					double weightedExpectedValueOrig = expectedValue * Math.pow(likelihoodOrig, likelihoodPowerFactor);
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {

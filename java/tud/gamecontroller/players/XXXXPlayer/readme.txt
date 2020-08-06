@@ -1,2 +1,5 @@
-Has not been updated to handle illegal moves, but it should not make any illegal moves since it should have perfect information about the state at all times
-If this is not the case, I expect it to be due to poorly defined GDL games
+NO BIAS
+
+NO Branching
+backtrackingDepth =1
+Keep searching until 1/10th of time has passed
