@@ -1,0 +1,13 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,0,WHITE,imprandom,1,0,10,0,(MOVE 2 2 2 3 ),true
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,0,BLACK,cheat,1,16,7,390,NOOP,false
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,1,WHITE,imprandom,1,0,10,0,NOOP,true
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,1,BLACK,cheat,1,16,7,1423,(MOVE 3 4 3 3 ),false
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,2,WHITE,imprandom,1,0,36,0,(MOVE 2 3 1 4 ),true
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,2,BLACK,cheat,1,16,15,237,NOOP,false
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,3,WHITE,imprandom,1,0,21,0,NOOP,true
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,3,BLACK,cheat,1,16,11,914,(MOVE 3 3 4 2 ),false
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,4,WHITE,imprandom,1,0,37,0,(MOVE 3 2 3 3 ),true
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,4,BLACK,cheat,1,16,14,128,NOOP,false
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,5,WHITE,imprandom,1,0,39,0,NOOP,true
+blind_breakthrough_5x5_CHEAT_64random_16cheat_6,blind_breakthrough_5x5_CHEAT,5,BLACK,cheat,1,16,24,971,(MOVE 4 2 5 1 ),false

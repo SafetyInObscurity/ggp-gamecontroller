@@ -96,11 +96,11 @@ public class OPBiasAnytimeHyperPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 8; // The maximum number of hypergames allowable
-	private int numHyperBranches = 8; // The amount of branches allowed
+	private int numHyperGames = 4; // The maximum number of hypergames allowable
+	private int numHyperBranches = 4; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use from each state
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 8; // @todo: probably remove later
+	private int maxNumProbes = 4; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action actually taken at each step by the player (from 0)
 	private HashMap<Integer, MoveInterface<TermType>> expectedActionTracker; // Tracks the move taken by the player at each step (from 0)
@@ -257,27 +257,27 @@ public class OPBiasAnytimeHyperPlayer<
 					if(possibleMoves.contains(moveForStepBlacklist.get(stepNum - 1))) {
 						System.out.println("Removed model " + model.getActionPathHash() + " because contained blacklisted move");
 						// Update path
-						Node node = likelihoodTree.getNode(model.getActionPathHashPath());
-						if(node != null) {
-							Node parent = node.getParent();
-							node.setValue(0.0);
-
-//							System.out.println("before");
-//							System.out.println(likelihoodTree.toString());
-
-							likelihoodTree.updateRelLikelihood(parent);
-
-//							System.out.println("after");
-//							System.out.println(likelihoodTree.toString());
-
-						}
-						// Backtrack & add to bad move tracker
-						model.backtrack();
-
-//						System.out.println("before");
-//						System.out.println(badMovesTracker);
-
-						updateBadMoveTracker(model.getActionPathHash(), model.getLastAction(), model.getActionPathHashPath());
+//						Node node = likelihoodTree.getNode(model.getActionPathHashPath());
+//						if(node != null) {
+//							Node parent = node.getParent();
+//							node.setValue(0.0);
+//
+////							System.out.println("before");
+////							System.out.println(likelihoodTree.toString());
+//
+//							likelihoodTree.updateRelLikelihood(parent);
+//
+////							System.out.println("after");
+////							System.out.println(likelihoodTree.toString());
+//
+//						}
+//						// Backtrack & add to bad move tracker
+//						model.backtrack();
+//
+////						System.out.println("before");
+////						System.out.println(badMovesTracker);
+//
+//						updateBadMoveTracker(model.getActionPathHash(), model.getLastAction(), model.getActionPathHashPath());
 
 //						System.out.println("after");
 //						System.out.println(badMovesTracker);
@@ -288,27 +288,27 @@ public class OPBiasAnytimeHyperPlayer<
 					 else if(!possibleMoves.contains(moveForStepWhitelist.get(stepNum - 1))) {
 						System.out.println("Removed model " + model.getActionPathHash() + " because did not contain whitelisted move");
 						// Update path
-						Node node = likelihoodTree.getNode(model.getActionPathHashPath());
-						if(node != null) {
-							Node parent = node.getParent();
-							node.setValue(0.0);
-
-//							System.out.println("before");
-//							System.out.println(likelihoodTree.toString());
-
-							likelihoodTree.updateRelLikelihood(parent);
-
-//							System.out.println("after");
-//							System.out.println(likelihoodTree.toString());
-
-						}
-						// Backtrack & add to bad move tracker
-						model.backtrack();
-
-//						System.out.println("before");
-//						System.out.println(badMovesTracker);
-
-						updateBadMoveTracker(model.getActionPathHash(), model.getLastAction(), model.getActionPathHashPath());
+//						Node node = likelihoodTree.getNode(model.getActionPathHashPath());
+//						if(node != null) {
+//							Node parent = node.getParent();
+//							node.setValue(0.0);
+//
+////							System.out.println("before");
+////							System.out.println(likelihoodTree.toString());
+//
+//							likelihoodTree.updateRelLikelihood(parent);
+//
+////							System.out.println("after");
+////							System.out.println(likelihoodTree.toString());
+//
+//						}
+//						// Backtrack & add to bad move tracker
+//						model.backtrack();
+//
+////						System.out.println("before");
+////						System.out.println(badMovesTracker);
+//
+//						updateBadMoveTracker(model.getActionPathHash(), model.getLastAction(), model.getActionPathHashPath());
 
 //						System.out.println("after");
 //						System.out.println(badMovesTracker);
@@ -520,6 +520,15 @@ public class OPBiasAnytimeHyperPlayer<
 
 				hypergames.add(model);
 
+				if(currentlyInUseMoves.containsKey(model.getPreviousActionPathHash())) {
+					Collection<JointMove<TermType>> inUseMoveSet = currentlyInUseMoves.get(model.getPreviousActionPathHash());
+					inUseMoveSet.add(model.getLastAction());
+				} else {
+					Collection<JointMove<TermType>> inUseMoveSet = new HashSet<JointMove<TermType>>();
+					inUseMoveSet.add(model.getLastAction());
+					currentlyInUseMoves.put(model.getPreviousActionPathHash(), inUseMoveSet);
+				}
+
 				// Get legal moves from this model
 				legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMoves));
@@ -699,7 +708,8 @@ public class OPBiasAnytimeHyperPlayer<
 				for (MoveInterface<TermType> move : possibleMoves) {
 					tempModel = new Model<TermType>(model);
 					currState = tempModel.getCurrentState(match);
-					moveHashMap.put(move.hashCode(), move);
+					if(!moveHashMap.containsKey(move.hashCode())) moveHashMap.put(move.hashCode(), move);
+
 					// Calculate the the expected value for each move using monte carlo simulation
 					double expectedValue = 0.0;
 					if(model.getPossibleMovesAtStep(stepNum).contains(move)) {
@@ -713,8 +723,8 @@ public class OPBiasAnytimeHyperPlayer<
 					// Calculate the weighted expected value for each move
 					double likelihood = hyperProbs.get(model.getActionPathHash());
 					double likelihoodOrig = hyperProbsOrig.get(model.getActionPathHash());
-					double weightedExpectedValue = expectedValue * likelihood;
-					double weightedExpectedValueOrig = expectedValue * Math.pow(likelihoodOrig, 2); // @todo: Remember this is squared
+					double weightedExpectedValue = expectedValue * Math.pow(likelihood, 2);
+					double weightedExpectedValueOrig = expectedValue * Math.pow(likelihoodOrig, 2);
 
 					// Add expected value to hashmap
 					if (!weightedExpectedValuePerMove.containsKey(move.hashCode())) {
@@ -726,8 +736,8 @@ public class OPBiasAnytimeHyperPlayer<
 					if (!weightedExpectedValuePerMoveOrig.containsKey(move.hashCode())) {
 						weightedExpectedValuePerMoveOrig.put(move.hashCode(), weightedExpectedValueOrig);
 					} else {
-						double prevWeightedExpectedValue = weightedExpectedValuePerMoveOrig.get(move.hashCode());
-						weightedExpectedValuePerMoveOrig.replace(move.hashCode(), prevWeightedExpectedValue + weightedExpectedValueOrig);
+						double prevWeightedExpectedValueOrig = weightedExpectedValuePerMoveOrig.get(move.hashCode());
+						weightedExpectedValuePerMoveOrig.replace(move.hashCode(), prevWeightedExpectedValueOrig + weightedExpectedValueOrig);
 					}
 				}
 			}
@@ -797,7 +807,7 @@ public class OPBiasAnytimeHyperPlayer<
 	 * @return The statistical expected result of a move
 	 */
 	public double anytimeSimulateMove(StateInterface<TermType, ?> state, MoveInterface<TermType> move, RoleInterface<TermType> role) {
-		double expectedOutcome = 0;
+		double expectedOutcome;
 		// Repeatedly select random joint moves until a terminal state is reached
 		StateInterface<TermType, ?> currState = state;
 		JointMoveInterface<TermType> randJointMove;
@@ -1005,14 +1015,14 @@ public class OPBiasAnytimeHyperPlayer<
 			// Check if new model does not match expected percepts
 			if (!model.getLatestExpectedPercepts().equals(perceptTracker.get(step))) {
 				// Update path
-				Node node = likelihoodTree.getNode(model.getActionPathHashPath());
-				if(node != null) {
-					Node parent = node.getParent();
-					//					System.out.println("parent.getActionPathHash(): " + parent.getActionPathHash());
-					node.setValue(0.0);
-					//					System.out.println("node after: " + node);
-					likelihoodTree.updateRelLikelihood(parent);
-				}
+//				Node node = likelihoodTree.getNode(model.getActionPathHashPath()); //@todo: does this help?? IT DOES NOT!!!
+//				if(node != null) {
+//					Node parent = node.getParent();
+//					//					System.out.println("parent.getActionPathHash(): " + parent.getActionPathHash());
+//					node.setValue(0.0);
+//					//					System.out.println("node after: " + node);
+//					likelihoodTree.updateRelLikelihood(parent);
+//				}
 
 				// Backtrack
 				model.backtrack();

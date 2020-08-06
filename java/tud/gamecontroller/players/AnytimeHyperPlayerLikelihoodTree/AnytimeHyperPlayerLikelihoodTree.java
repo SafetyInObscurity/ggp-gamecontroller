@@ -193,6 +193,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	public MoveInterface<TermType> getNextMove() {
 		startTime =  System.currentTimeMillis();
 		timeexpired = 0;
+		boolean wasIllegal = false;
 
 		HashSet<MoveInterface<TermType>> legalMoves = new HashSet<MoveInterface<TermType>>();
 		HashSet<MoveInterface<TermType>> legalMovesInState = null;
@@ -216,6 +217,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 			// Check if the move made last round actually matches the move made
 			if(!expectedActionTracker.get(stepNum - 1).equals(actionTracker.get(stepNum - 1))) {
 //				System.out.println("Expected to take action " + expectedActionTracker.get(stepNum - 1) + " but actually took action " + actionTracker.get(stepNum - 1));
+				wasIllegal = true;
 				moveForStepBlacklist.put(stepNum - 1, expectedActionTracker.get(stepNum - 1));
 			}
 
@@ -458,7 +460,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + wasIllegal + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
