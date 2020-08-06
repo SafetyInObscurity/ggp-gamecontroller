@@ -96,7 +96,7 @@ with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w')
         if gdl_version == 1:
             fname = output_dir + file_prefex + str(i) + '/finalstate.xml'
         else:
-            player_perspective_name = sys.argv[7]
+            player_perspective_name = sys.argv[7].upper()
             fname = output_dir + file_prefex + str(i) + '-' + player_perspective_name + '/finalstate.xml'
         if os.path.isfile(fname):
             parse_file_csv(fname, csv_file)
