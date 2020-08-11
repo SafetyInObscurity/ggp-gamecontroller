@@ -3,7 +3,7 @@
 source tests/testConfig/gdl2_blind_breakthrough_6x6_CHEAT.txt
 PARSERESULTS=true
 
-for ((i=0 ; i < NUMTESTS ; i++));
+for ((i=$TESTSTARTNUM ; i < $TESTENDNUM ; i++));
 do
     match_id_temp="${MATCH_ID}_${i}"
     if [ "$NUM_ROLES" == 3 ]; then

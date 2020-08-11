@@ -12,4 +12,5 @@ ROLE_ID_2=2
 ROLE_NAME_2="OPLAYER"
 OUTPUT_DIR="matches/"
 STYLESHEET="../../stylesheets/2player_normal_form/2player_normal_form.xsl"
-NUMTESTS=100
+TESTSTARTNUM=0
+TESTENDNUM=10
