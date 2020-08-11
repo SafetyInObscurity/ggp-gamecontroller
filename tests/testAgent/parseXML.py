@@ -69,10 +69,11 @@ def parse_file_csv(filename, csv):
 # Read in from bash
 output_dir = sys.argv[1]
 file_prefex = sys.argv[2]
-num_tests = int(sys.argv[3])
-game_name = sys.argv[4]
-gdl_version = sys.argv[5]
-play_clock = sys.argv[6]
+test_start_num = int(sys.argv[3])
+test_end_num = int(sys.argv[4])
+game_name = sys.argv[5]
+gdl_version = sys.argv[6]
+play_clock = sys.argv[7]
 
 with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w') as csv_file:
     fieldnames = ['match_id',
@@ -92,11 +93,11 @@ with open(output_dir + 'testOutput_' + str(int(time.time())) + '.csv', mode='w')
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     writer.writeheader()
 
-    for i in range(0, num_tests):
+    for i in range(test_start_num, test_end_num):
         if gdl_version == 1:
             fname = output_dir + file_prefex + str(i) + '/finalstate.xml'
         else:
-            player_perspective_name = sys.argv[7].upper()
+            player_perspective_name = sys.argv[8].upper()
             fname = output_dir + file_prefex + str(i) + '-' + player_perspective_name + '/finalstate.xml'
         if os.path.isfile(fname):
             parse_file_csv(fname, csv_file)
