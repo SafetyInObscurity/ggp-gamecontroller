@@ -66,9 +66,12 @@ public class GameController<
 	private Map<RoleInterface<TermType>, Integer> goalValues=null;
 	private Logger logger;
 	private Collection<GameControllerListener> listeners;
+
+	private boolean didTimeout;
 	
 	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match) {
 		this(match, Logger.getLogger(GameController.class.getName()));
+		didTimeout = false;
 	}
 
 	public GameController(RunnableMatchInterface<TermType, State<TermType, ReasonerStateInfoType>> match, Logger logger) {
@@ -81,6 +84,7 @@ public class GameController<
 		if(this.game.getGdlVersion() == GDLVersion.v2) {
 			logger.info("gdlVersion = II");
 		}
+		didTimeout = false;
 	}
 
 	public void addListener(GameControllerListener l){
@@ -163,7 +167,7 @@ public class GameController<
 					GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
 					match.notifyErrorMessage(errorMessage);
 					logger.log(loglevel, message, errorMessage);
-					t.getPlayer().setLastMoveTimeout();
+					didTimeout = true;
 				}
 			}
 		} finally {
@@ -225,6 +229,12 @@ public class GameController<
 		for(PlayerThreadPlay<TermType, State<TermType, ReasonerStateInfoType>> pt:playerthreads){
 			RoleInterface<TermType> role=pt.getRole();
 			MoveInterface<TermType> move=pt.getMove();
+
+			// Set timeout if last move was null
+			boolean wasTimeout = ((move==null || move.toString().equals("null")) || didTimeout);
+			match.getPlayer(role).setLastMoveTimeout(wasTimeout);
+			didTimeout = false;
+
 			if(move==null || !currentState.isLegal(role, move)){
 				Player<TermType, State<TermType, ReasonerStateInfoType>> player = match.getPlayer(role);
 				String message = "Illegal move \""+move+"\" from "+player+ " in step "+step;

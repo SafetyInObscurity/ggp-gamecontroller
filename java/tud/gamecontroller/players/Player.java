@@ -50,6 +50,6 @@ public interface Player<TermType, StateType extends StateInterface<TermType, ? e
 	
 	public GDLVersion getGdlVersion();
 
-	public void setLastMoveTimeout();
+	public void setLastMoveTimeout(boolean set);
 	
 }

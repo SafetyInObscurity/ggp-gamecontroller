@@ -103,8 +103,8 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	}
 
 	@Override
-	public void setLastMoveTimeout() {
-		lastMoveTimeout = true;
+	public void setLastMoveTimeout(boolean set) {
+		lastMoveTimeout = set;
 	}
 
 }

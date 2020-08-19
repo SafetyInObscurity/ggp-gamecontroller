@@ -202,11 +202,11 @@ public class AnytimeHyperPlayerLikelihoodTree<
 				}
 				currentlyInUseMoves.clear();
 				expectedActionTracker.put(stepNum - 1, null);
-//				System.out.println("*************************************************************************");
-//				System.out.println("*************************************************************************");
-//				System.out.println("*********************** TIMED OUT! LAST TURN ****************************");
-//				System.out.println("*************************************************************************");
-//				System.out.println("*************************************************************************");
+				System.out.println("*************************************************************************");
+				System.out.println("*************************************************************************");
+				System.out.println("*********************** TIMED OUT! LAST TURN ****************************");
+				System.out.println("*************************************************************************");
+				System.out.println("*************************************************************************");
 			}
 			perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
 			actionTracker.put(stepNum - 1, (MoveInterface<TermType>) priorMove); // Note: This won't get the final move made
@@ -300,7 +300,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 					System.out.println("Removed model " + model.getActionPathHash() + " because did not contain whitelisted move");
 					hypergames.remove(model);
 				}
-				System.out.println("Hypergame: " + model.getActionPathHash());
+//				System.out.println("Hypergame: " + model.getActionPathHash());
 			}
 			// @todo: Shouldn't I also add these as bad moves?
 			System.out.println("Removed " + (currentHypergames.size() - hypergames.size()) + " out of " + currentHypergames.size() + " hypergames");
@@ -668,7 +668,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 			for (Model<TermType> model : hypergames) {
 				for (MoveInterface<TermType> move : possibleMoves) {
 					if(System.currentTimeMillis() - startTime > timeLimit) {
-						System.out.println("Had to Break 1");
+//						System.out.println("Had to Break 1");
 						break;
 					}
 					tempModel = new Model<TermType>(model);
@@ -726,9 +726,19 @@ public class AnytimeHyperPlayerLikelihoodTree<
 //					}
 				}
 				if(System.currentTimeMillis() - startTime > timeLimit) { // @todo: make look better
-					System.out.println("Had to Break 2");
+//					System.out.println("Had to Break 2");
 					break;
 				}
+//				if(stepNum > 6){
+//					try
+//					{
+//						Thread.sleep(4000);
+//					}
+//					catch(InterruptedException ex)
+//					{
+//						Thread.currentThread().interrupt();
+//					}
+//				}
 			}
 			depth++;
 		}

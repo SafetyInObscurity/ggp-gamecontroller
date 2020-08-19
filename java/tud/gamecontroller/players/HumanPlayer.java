@@ -90,9 +90,9 @@ public class HumanPlayer<TermType extends TermInterface, StateType extends State
 	}
 
 	@Override
-	public MoveInterface<TermType> gamePlay(Object seesTerms, ConnectionEstablishedNotifier notifier) {
+	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
 		messageReceiveTime = System.currentTimeMillis();
-		return super.gamePlay(seesTerms, notifier);
+		return super.gamePlay(seesTerms, priorMove, notifier);
 	}
 
 	@Override
