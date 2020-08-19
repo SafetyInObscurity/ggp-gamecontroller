@@ -114,6 +114,7 @@ public class OPBiasAnytimeHyperPlayer<
 	private RoleInterface<TermType> opponentRole;
 	private HashSet<Integer> likelihoodTreeExpansionTracker;
 	private HashMap<Integer, PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>> moveSelectOrderMap;
+	private HashMap<Integer, ArrayList<Tuple<Double, JointMoveInterface<TermType>>>> moveSelectMap;
 	private double likelihoodPowerFactor = 1.0;
 	private boolean shouldBranch = false;
 //	private int numOPProbes = 8; // The number of probes used for opponent modelling -> NOT USED FOR THIS VARIANT SINCE IT HAS ACCESS TO THE TRUE DISTRIBUTION
@@ -173,6 +174,7 @@ public class OPBiasAnytimeHyperPlayer<
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
 		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/10; // Can use 10% of the playclock to update the state
 		moveSelectOrderMap = new HashMap<Integer, PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>>();
+		moveSelectMap = new HashMap<Integer, ArrayList<Tuple<Double, JointMoveInterface<TermType>>>>();
 
 		moveForStepBlacklist = new HashMap<Integer, MoveInterface<TermType>>();
 		moveForStepWhitelist = new HashMap<Integer, MoveInterface<TermType>>();
@@ -948,6 +950,7 @@ public class OPBiasAnytimeHyperPlayer<
 			double expectedValue;
 			double totalValue = 0.0;
 			PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>> moveQueue = new PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>(possibleJointMoves.size(), new JointMoveTupleComparator());
+			ArrayList<Tuple<Double, JointMoveInterface<TermType>>> moveList = new ArrayList<Tuple<Double, JointMoveInterface<TermType>>>();
 			for (JointMoveInterface<TermType> jointMove : possibleJointMoves) {
 				// Use this move
 				expectedValue = cheatProbDist.getOrDefault(jointMove.get(opponentRole).toString(), 0.0);
@@ -963,6 +966,7 @@ public class OPBiasAnytimeHyperPlayer<
 				// Add the move to the map
 				Tuple<Double, JointMoveInterface<TermType>> tuple = new Tuple<Double, JointMoveInterface<TermType>>(expectedValue, jointMove);
 				moveQueue.add(tuple);
+				moveList.add(tuple);
 			}
 			for(Node likelihoodChild : node.getChildren()) {
 				likelihoodChild.setRelLikelihood(((double)likelihoodChild.getValue()) / totalValue);
@@ -971,22 +975,64 @@ public class OPBiasAnytimeHyperPlayer<
 			// Add node to set of explored nodes AND add priority queue to map
 			likelihoodTreeExpansionTracker.add(model.getActionPathHash());
 			moveSelectOrderMap.put(model.getActionPathHash(), moveQueue);
+			moveSelectMap.put(model.getActionPathHash(), moveList);
 		}
 
-		// Select an action
+//		// Select an action - THIS USES THE DETERMINISTIC METHOD
+//		JointMove<TermType> jointAction = null;
+//		PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>> jointMoveQueue = new PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>(moveSelectOrderMap.get(model.getActionPathHash()));
+//		Collection<JointMove<TermType>> inUse  = currentlyInUseMoves.get(model.getActionPathHash());
+////		System.out.println();
+////		System.out.println(jointMoveQueue);
+//		while(!jointMoveQueue.isEmpty()) {
+//			JointMoveInterface<TermType> jointMove =  jointMoveQueue.poll().getB();
+////			System.out.println("POLLED");
+//			if(inUse == null || !inUse.contains(jointMove)) {
+//				jointAction = (JointMove<TermType>)jointMove;
+//				break;
+//			}
+//		}
+		// Select an action - THIS USES THE PROBABILISTIC METHOD
 		JointMove<TermType> jointAction = null;
-		PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>> jointMoveQueue = new PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>(moveSelectOrderMap.get(model.getActionPathHash())); //@todo: Does this work for researching through the tree? It should but need to verify
-		Collection<JointMove<TermType>> inUse  = currentlyInUseMoves.get(model.getActionPathHash());
-//		System.out.println();
-//		System.out.println(jointMoveQueue);
-		while(!jointMoveQueue.isEmpty()) {
-			JointMoveInterface<TermType> jointMove =  jointMoveQueue.poll().getB();
-//			System.out.println("POLLED");
-			if(inUse == null || !inUse.contains(jointMove)) {
-				jointAction = (JointMove<TermType>)jointMove;
+		ArrayList<Tuple<Double, JointMoveInterface<TermType>>> jointMoveList = new ArrayList<Tuple<Double, JointMoveInterface<TermType>>>(moveSelectMap.get(model.getActionPathHash()));
+		// Only consider valid moves
+		ArrayList<Tuple<Double, JointMoveInterface<TermType>>> disallowedItems = new ArrayList<Tuple<Double, JointMoveInterface<TermType>>>();
+		for(Tuple<Double, JointMoveInterface<TermType>> tup : jointMoveList) {
+			if(!possibleJointMoves.contains((JointMove<TermType>)tup.getB())) disallowedItems.add(tup);
+		}
+		jointMoveList.removeAll(disallowedItems);
+//		System.out.println("jointMoveList: " + jointMoveList);
+//		System.out.println("possibleJointMoves" + possibleJointMoves);
+		// Select based on the relative probability of each move
+			// Get the sum of probabilities
+		double sumWeight = 0;
+		for (Tuple<Double, JointMoveInterface<TermType>> tup : jointMoveList){
+			sumWeight += tup.getA();
+		}
+			// Choose a random item
+		int randIndex = -1;
+		double rand = random.nextDouble() * sumWeight;
+			// Cycle through the list until you the random number is < 0
+		Tuple<Double, JointMoveInterface<TermType>> tup;
+		for (int i = 0 ; i < jointMoveList.size() ; i++) {
+			tup = jointMoveList.get(i);
+			rand -= tup.getA();
+			if(rand <= 0.0) {
+				randIndex = i;
 				break;
 			}
 		}
+		if(randIndex != -1) jointAction = (JointMove<TermType>)jointMoveList.get(randIndex).getB();
+//		System.out.println("Chose to expand move: " + jointAction);
+
+//		while(!jointMoveQueue.isEmpty()) {
+//			JointMoveInterface<TermType> jointMove =  jointMoveQueue.poll().getB();
+////			System.out.println("POLLED");
+//			if(inUse == null || !inUse.contains(jointMove)) {
+//				jointAction = (JointMove<TermType>)jointMove;
+//				break;
+//			}
+//		}
 //		System.out.println();
 //		System.out.println(moveSelectOrderMap.get(model.getActionPathHash()));
 

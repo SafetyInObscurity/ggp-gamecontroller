@@ -103,6 +103,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	private int depth; // Tracks the number of simulations run @todo: name better
 	private int maxNumProbes = 4; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
+	private int nextStepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action actually taken at each step by the player (from 0)
 	private HashMap<Integer, MoveInterface<TermType>> expectedActionTracker; // Tracks the move taken by the player at each step (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -166,6 +167,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		hypergames = new ArrayList<Model<TermType>>();
 		likelihoodTree = new LikelihoodTree<TermType>(0);
 		stepNum = 0;
+		nextStepNum = 0;
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
 		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/10; // Can use 10% of the playclock to update the state
 
@@ -189,10 +191,16 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	@SuppressWarnings("unchecked")
 	@Override
 	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
+		nextStepNum++;
 		notifyStartRunning();
 		notifier.connectionEstablished();
 		perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
-		if(stepNum >= 0) {
+		if(stepNum > 0) {
+			if(stepNum + 1 < nextStepNum) { // If the player timed out last turn, update the stepnum and clear currentlyInUseMoves
+				stepNum++;
+				currentlyInUseMoves.clear();
+				expectedActionTracker.put(stepNum - 1, null);
+			}
 			actionTracker.put(stepNum - 1, (MoveInterface<TermType>) priorMove); // Note: This won't get the final move made
 			moveForStepWhitelist.put(stepNum - 1, (MoveInterface<TermType>) priorMove);
 		}
@@ -237,7 +245,7 @@ public class AnytimeHyperPlayerLikelihoodTree<
 		} else {
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
 			// Check if the move made last round actually matches the move made
-			if(!expectedActionTracker.get(stepNum - 1).equals(actionTracker.get(stepNum - 1))) {
+			if(expectedActionTracker.get(stepNum - 1) != null && !expectedActionTracker.get(stepNum - 1).equals(actionTracker.get(stepNum - 1))) {
 //				System.out.println("Expected to take action " + expectedActionTracker.get(stepNum - 1) + " but actually took action " + actionTracker.get(stepNum - 1));
 				wasIllegal = true;
 				moveForStepBlacklist.put(stepNum - 1, expectedActionTracker.get(stepNum - 1));
@@ -470,10 +478,13 @@ public class AnytimeHyperPlayerLikelihoodTree<
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
-		Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
-		MoveInterface<TermType> bestMove = iter.next();
-		if(legalMoves.size() > 1) {
-			bestMove = anytimeMoveSelection(legalMoves);
+		MoveInterface<TermType> bestMove = null;
+		if(!legalMoves.isEmpty()) {
+			Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
+			bestMove = iter.next();
+			if (legalMoves.size() > 1) {
+				bestMove = anytimeMoveSelection(legalMoves);
+			}
 		}
 		long selectEndTime =  System.currentTimeMillis();
 		long selectTime = selectEndTime - selectStartTime;
@@ -497,9 +508,13 @@ public class AnytimeHyperPlayerLikelihoodTree<
 	}
 
 	public boolean canSearchMore() {
-		// NOT if already at maximum number of hypergames
-		if(hypergames.size() == 0) return true;
-		if(hypergames.size() >= numHyperGames) {
+		// If at time limit, then timeout
+		if(System.currentTimeMillis() - startTime > (this.match.getPlayclock()*1000)) {
+			System.out.println("TOTAL TIMEOUT");
+			return false;
+		}
+		if(hypergames.size() == 0) return true; // If no games, search until 1
+		if(hypergames.size() >= numHyperGames) { // If already at max then stop searching
 			System.out.println("REACHED MAX");
 			return false;
 		}
@@ -512,12 +527,12 @@ public class AnytimeHyperPlayerLikelihoodTree<
 			int numCleanJointMoves = possibleJointMoves.size();
 			if(numCleanJointMoves <= 0) return false;
 			else {
-				// NOT if searched enough
+//				 NOT if searched enough
 				if(System.currentTimeMillis() - startTime > stateUpdateTimeLimit) {
 					System.out.println("STATE UPDATE TIMEOUT");
 					return false;
 				}
-				// Else return true
+//				 Else return true
 				else return true;
 			}
 		}
