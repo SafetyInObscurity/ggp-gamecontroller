@@ -84,6 +84,7 @@ public abstract class LocalPlayer<TermType extends TermInterface, StateType exte
 			}
 		}
 		MoveInterface<TermType> move = getNextMove();
+		lastMoveTimeout = false;
 		notifyStopRunning();
 		return move;
 	}

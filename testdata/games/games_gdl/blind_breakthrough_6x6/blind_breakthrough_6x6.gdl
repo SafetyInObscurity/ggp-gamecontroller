@@ -223,8 +223,8 @@
     (true (control ?player)))
 
 ; Sees their own move (but this happens automatically so doesn't matter
-(<= (sees ?p (move ?x1 ?y1 ?x2 ?y2))
-    (does ?p (move ?x1 ?y1 ?x2 ?y2)))
+;(<= (sees ?p (move ?x1 ?y1 ?x2 ?y2))
+;    (does ?p (move ?x1 ?y1 ?x2 ?y2)))
 
 ; Sees capturing moves available
 (<= (sees ?p (legal ?p (move ?x1 ?y1 ?x2 ?y2)))

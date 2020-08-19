@@ -29,7 +29,7 @@ import tud.gamecontroller.game.RunnableMatchInterface;
 import tud.gamecontroller.game.StateInterface;
 
 public interface Player<TermType, StateType extends StateInterface<TermType, ? extends StateType>> extends NamedObject{
-	
+
 	public void gameStart(RunnableMatchInterface<TermType, StateType> match, RoleInterface<TermType> role, ConnectionEstablishedNotifier notifier);
 	
 	/* MODIFIED: we don't use a jointMove any more, rather the seesTerms
@@ -49,5 +49,7 @@ public interface Player<TermType, StateType extends StateInterface<TermType, ? e
 	public long getTotalRuntime();
 	
 	public GDLVersion getGdlVersion();
+
+	public void setLastMoveTimeout();
 	
 }

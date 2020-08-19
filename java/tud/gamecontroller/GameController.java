@@ -163,6 +163,7 @@ public class GameController<
 					GameControllerErrorMessage errorMessage = new GameControllerErrorMessage(GameControllerErrorMessage.TIMEOUT, message, t.getPlayer().getName());
 					match.notifyErrorMessage(errorMessage);
 					logger.log(loglevel, message, errorMessage);
+					t.getPlayer().setLastMoveTimeout();
 				}
 			}
 		} finally {

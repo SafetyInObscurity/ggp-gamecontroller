@@ -36,6 +36,7 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 	protected RunnableMatchInterface<TermType, ?> match=null;
 	protected RoleInterface<TermType> role=null;
 	protected String name;
+	protected boolean lastMoveTimeout;
 	private long runtime;
 	private long startRunningTime;
 	private long lastMessageRuntime;
@@ -99,6 +100,11 @@ public abstract class AbstractPlayer<TermType extends TermInterface, StateType e
 
 	public String toString() {
 		return "player("+name+")";
+	}
+
+	@Override
+	public void setLastMoveTimeout() {
+		lastMoveTimeout = true;
 	}
 
 }
