@@ -26,6 +26,7 @@ import tud.gamecontroller.ConnectionEstablishedNotifier;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.game.*;
 import tud.gamecontroller.game.impl.JointMove;
+import tud.gamecontroller.game.impl.Move;
 import tud.gamecontroller.players.LocalPlayer;
 import tud.gamecontroller.term.TermInterface;
 
@@ -87,8 +88,8 @@ import java.util.*;
  * @since 1.0
  */
 public class XXXXPlayer<
-	TermType extends TermInterface,
-	StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
+		TermType extends TermInterface,
+		StateType extends StateInterface<TermType, ? extends StateType>> extends LocalPlayer<TermType, StateType>  {
 
 	// Logging variables
 	private String matchID;
@@ -97,12 +98,13 @@ public class XXXXPlayer<
 
 	// Hyperplay variables
 	private Random random;
-	private int numHyperGames = 8; // The maximum number of hypergames allowable
-	private int numHyperBranches = 8; // The amount of branches allowed
+	private int numHyperGames = 4; // The maximum number of hypergames allowable
+	private int numHyperBranches = 4; // The amount of branches allowed
 	private HashMap<Integer, Collection<JointMove<TermType>>> currentlyInUseMoves; // Tracks all of the moves that are currently in use from each state
 	private int depth; // Tracks the number of simulations run @todo: name better
-	private int maxNumProbes = 8; // @todo: probably remove later
+	private int maxNumProbes = 4; // @todo: probably remove later
 	private int stepNum; // Tracks the steps taken
+	private int nextStepNum; // Tracks the steps taken
 	private HashMap<Integer, MoveInterface<TermType>> actionTracker; // Tracks the action actually taken at each step by the player (from 0)
 	private HashMap<Integer, MoveInterface<TermType>> expectedActionTracker; // Tracks the move taken by the player at each step (from 0)
 	private HashMap<Integer, Collection<TermType>> perceptTracker; // Tracks the percepts seen at each step by the player (from 0)
@@ -111,6 +113,7 @@ public class XXXXPlayer<
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
 	private LikelihoodTree<TermType> likelihoodTree;
 	private int backtrackingDepth = 1;
+	private double likelihoodPowerFactor = 1.0;
 	private boolean shouldBranch = false;
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
@@ -136,6 +139,7 @@ public class XXXXPlayer<
 				else if(data[0].equals("numHyperBranches")) numHyperBranches = Integer.parseInt(data[1]);
 				else if(data[0].equals("maxNumProbes")) maxNumProbes = Integer.parseInt(data[1]);
 				else if(data[0].equals("backtrackingDepth")) backtrackingDepth = Integer.parseInt(data[1]);
+				else if(data[0].equals("likelihoodPowerFactor")) likelihoodPowerFactor = Double.parseDouble(data[1]);
 				else if(data[0].equals("shouldBranch")) shouldBranch = Boolean.parseBoolean(data[1]);
 			}
 			csvReader.close();
@@ -164,6 +168,7 @@ public class XXXXPlayer<
 		hypergames = new ArrayList<Model<TermType>>();
 		likelihoodTree = new LikelihoodTree<TermType>(0);
 		stepNum = 0;
+		nextStepNum = 0;
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
 		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/10; // Can use 10% of the playclock to update the state
 
@@ -187,10 +192,23 @@ public class XXXXPlayer<
 	@SuppressWarnings("unchecked")
 	@Override
 	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
+		nextStepNum++;
 		notifyStartRunning();
 		notifier.connectionEstablished();
-		perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
-		if(stepNum >= 0) {
+		if(stepNum > 0) {
+			if(lastMoveTimeout) { // If the player timed out last turn, update the stepnum and clear currentlyInUseMoves
+				if(stepNum + 1 < nextStepNum) {
+					stepNum++;
+				}
+				currentlyInUseMoves.clear();
+				expectedActionTracker.put(stepNum - 1, null);
+				System.out.println("*************************************************************************");
+				System.out.println("*************************************************************************");
+				System.out.println("*********************** TIMED OUT! LAST TURN ****************************");
+				System.out.println("*************************************************************************");
+				System.out.println("*************************************************************************");
+			}
+			perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
 			actionTracker.put(stepNum - 1, (MoveInterface<TermType>) priorMove); // Note: This won't get the final move made
 			moveForStepWhitelist.put(stepNum - 1, (MoveInterface<TermType>) priorMove);
 		}
@@ -201,6 +219,7 @@ public class XXXXPlayer<
 
 		notifyStopRunning();
 		stepNum++;
+		lastMoveTimeout = false;
 		return move;
 	}
 
@@ -213,11 +232,13 @@ public class XXXXPlayer<
 	public MoveInterface<TermType> getNextMove() {
 		startTime =  System.currentTimeMillis();
 		timeexpired = 0;
+		boolean wasIllegal = false;
 
 		HashSet<MoveInterface<TermType>> legalMoves = new HashSet<MoveInterface<TermType>>();
 		HashSet<MoveInterface<TermType>> legalMovesInState = null;
 
 		// If it is the first step, then create the first hypergame with the initial state
+//		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		if(stepNum == 0) {
 			// Create first model to represent the empty state
 			Model<TermType> model = new Model<TermType>();
@@ -234,12 +255,26 @@ public class XXXXPlayer<
 		} else {
 			ArrayList<Model<TermType>> currentHypergames = new ArrayList<Model<TermType>>(hypergames);
 			// Check if the move made last round actually matches the move made
-			if(!expectedActionTracker.get(stepNum - 1).equals(actionTracker.get(stepNum - 1))) {
+			if(expectedActionTracker.get(stepNum - 1) != null && !expectedActionTracker.get(stepNum - 1).equals(actionTracker.get(stepNum - 1))) {
 //				System.out.println("Expected to take action " + expectedActionTracker.get(stepNum - 1) + " but actually took action " + actionTracker.get(stepNum - 1));
+				wasIllegal = true;
 				moveForStepBlacklist.put(stepNum - 1, expectedActionTracker.get(stepNum - 1));
 			}
 
-				// Print to verify
+//			System.out.println("##################################");
+//			System.out.println("moveForStepWhitelist: " + moveForStepWhitelist);
+//			System.out.println();
+//			System.out.println("moveForStepBlacklist: " + moveForStepBlacklist);
+//			System.out.println();
+//			System.out.println("expectedActionTracker: " + expectedActionTracker);
+//			System.out.println();
+//			System.out.println("actionTracker: " + actionTracker);
+//			System.out.println();
+//			System.out.println("perceptTracker: "+ perceptTracker);
+//			System.out.println();
+//			System.out.println("##################################");
+
+			// Print to verify
 //				System.out.println();
 //				System.out.println("moveForStepBlacklist.get(stepNum - 1): " + (moveForStepBlacklist.get(stepNum - 1)));
 //				System.out.println("moveForStepBlacklist: " + (moveForStepBlacklist));
@@ -254,7 +289,6 @@ public class XXXXPlayer<
 //					System.out.println("model.getActionPathHash(): " + model.getActionPathHash());
 //					System.out.println("model.getPossibleMovesAtStep(): " + model.getPossibleMovesAtStep());
 //					System.out.println("model.getPossibleMovesAtStep(stepNum - 1): " + possibleMoves);
-//					System.out.println();
 
 				// Find all hypergames that allowed that move and remove them
 				if(possibleMoves.contains(moveForStepBlacklist.get(stepNum - 1))) {
@@ -263,9 +297,10 @@ public class XXXXPlayer<
 				}
 				// Find all hypergames that didn't allow the true move used and remove them
 				if(!possibleMoves.contains(moveForStepWhitelist.get(stepNum - 1))) {
-//					System.out.println("Removed model " + model.getActionPathHash() + " because did not contain whitelisted move");
+					System.out.println("Removed model " + model.getActionPathHash() + " because did not contain whitelisted move");
 					hypergames.remove(model);
 				}
+//				System.out.println("Hypergame: " + model.getActionPathHash());
 			}
 			// @todo: Shouldn't I also add these as bad moves?
 			System.out.println("Removed " + (currentHypergames.size() - hypergames.size()) + " out of " + currentHypergames.size() + " hypergames");
@@ -293,6 +328,7 @@ public class XXXXPlayer<
 				// Get legal moves from this model
 				legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMoves));
+//				System.out.println("model " + model.getActionPathHash() + " legal moves: " + model.getPossibleMovesAtStep(stepNum));
 			}
 
 			// For each model in the the current hypergames set, update it with a random joint action that matches player's last action and branch by the branching factor
@@ -343,6 +379,7 @@ public class XXXXPlayer<
 				// Get legal moves
 				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMovesInState));
+//				System.out.println("model " + model.getActionPathHash() + " legal moves: " + model.getPossibleMovesAtStep(stepNum));
 				legalMoves.addAll(legalMovesInState);
 
 				// Branch the clone of the model
@@ -390,6 +427,7 @@ public class XXXXPlayer<
 						// Get legal moves
 						legalMovesInState = new HashSet<MoveInterface<TermType>>(newModel.computeLegalMoves(role, match));
 						newModel.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMovesInState));
+//						System.out.println("model " + newModel.getActionPathHash() + " legal moves: " + newModel.getPossibleMovesAtStep(stepNum));
 						legalMoves.addAll(legalMovesInState);
 					} else break;
 				}
@@ -406,7 +444,7 @@ public class XXXXPlayer<
 		// If no hypergames left, then run until one exists
 		System.out.println(this.getName() + ": Number of hypergames after updating: " + hypergames.size());
 //		System.exit(0);
-//		while(hypergames.size() == 0) {
+
 		if(stepNum > 0) {
 			while (canSearchMore()) {
 				System.out.println(this.getName() + ": Trying to find another path since can search more");
@@ -425,7 +463,10 @@ public class XXXXPlayer<
 					maxStep = Math.max(step, maxStep);
 				}
 				if (step < maxStep - backtrackingDepth) continue;
-				else if (step == 0) break;
+				else if (step == 0) {
+//					System.out.println("Back at ROOT");
+					break;
+				}
 
 				hypergames.add(model);
 
@@ -439,8 +480,10 @@ public class XXXXPlayer<
 				}
 
 				// Get legal moves from this model
-				legalMoves = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
+				legalMovesInState = new HashSet<MoveInterface<TermType>>(model.computeLegalMoves(role, match));
 				model.addLegalMoves(stepNum, new HashSet<MoveInterface<TermType>>(legalMoves));
+//				System.out.println("model " + model.getActionPathHash() + " legal moves: " + model.getPossibleMovesAtStep(stepNum));
+				legalMoves.addAll(legalMovesInState);
 			}
 		}
 		System.out.println(this.getName() + ": Number of hypergames after searching more: " + hypergames.size());
@@ -466,10 +509,22 @@ public class XXXXPlayer<
 
 		// Select a move
 		long selectStartTime =  System.currentTimeMillis();
-		Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
-		MoveInterface<TermType> bestMove = iter.next();
-		if(legalMoves.size() > 1) {
-			bestMove = anytimeMoveSelection(legalMoves);
+		MoveInterface<TermType> bestMove = null;
+		if(!legalMoves.isEmpty()) {
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+//			for (Model<TermType> model : hypergames) {
+//				System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%");
+//				System.out.println(model.toString());
+//				System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%");
+//			}
+//			System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+//			System.out.println("legalMoves: " + legalMoves);
+
+			Iterator<MoveInterface<TermType>> iter = legalMoves.iterator();
+			bestMove = iter.next();
+			if (legalMoves.size() > 1) {
+				bestMove = anytimeMoveSelection(legalMoves);
+			}
 		}
 		long selectEndTime =  System.currentTimeMillis();
 		long selectTime = selectEndTime - selectStartTime;
@@ -477,7 +532,7 @@ public class XXXXPlayer<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + wasIllegal + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
@@ -493,10 +548,17 @@ public class XXXXPlayer<
 	}
 
 	public boolean canSearchMore() {
-		// NOT if already at maximum number of hypergames
-		if(hypergames.size() == 0) return true;
-		if(hypergames.size() >= numHyperGames) {
-			System.out.println("REACHED MAX");
+		// If at time limit, then timeout
+		if(System.currentTimeMillis() - startTime > (this.match.getPlayclock()*1000)) {
+//			System.out.println("TOTAL TIMEOUT");
+			return false;
+		}
+		if(hypergames.size() == 0) {
+//			System.out.println("NO GAMES, MUST SEARCH MORE");
+			return true; // If no games, search until 1
+		}
+		if(hypergames.size() >= numHyperGames) { // If already at max then stop searching
+//			System.out.println("REACHED MAX");
 			return false;
 		}
 		// NOT if tree has been fully searched
@@ -506,15 +568,21 @@ public class XXXXPlayer<
 			removeBadMoves(possibleJointMoves, 31); // @todo: Fix this with a reasonable value
 			removeInUseMoves(possibleJointMoves, 31);
 			int numCleanJointMoves = possibleJointMoves.size();
-			if(numCleanJointMoves <= 0) return false;
+			if(numCleanJointMoves <= 0) {
+//				System.out.println("Tried all moves from root");
+				return false;
+			}
 			else {
-				// NOT if searched enough
+//				 NOT if searched enough
 				if(System.currentTimeMillis() - startTime > stateUpdateTimeLimit) {
-					System.out.println("STATE UPDATE TIMEOUT");
+//					System.out.println("STATE UPDATE TIMEOUT");
 					return false;
 				}
-				// Else return true
-				else return true;
+//				 Else return true
+				else {
+//					System.out.println("Can search more");
+					return true;
+				}
 			}
 		}
 	}
@@ -549,13 +617,17 @@ public class XXXXPlayer<
 		// Calculate expected move value for each hypergame until almost out of time
 		HashMap<Integer, Double> expectedValuePerMove = new HashMap<Integer, Double>();
 		HashMap<Integer, MoveInterface<TermType>> moveHashMap = new HashMap<Integer, MoveInterface<TermType>>();
+		HashMap<Integer, Double> moveCountMap = new HashMap<Integer, Double>();
 		depth = 0;
 		Model<TermType> tempModel;
 		StateInterface<TermType, ?> currState;
-		while(timeexpired < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
-		int countModels = 1;
+		while(System.currentTimeMillis() - startTime < timeLimit && depth < maxNumProbes) { // @todo: May need to add break points at the end of each move calc and each hypergame calc
 			for (Model<TermType> model : hypergames) {
 				for (MoveInterface<TermType> move : possibleMoves) {
+					if(System.currentTimeMillis() - startTime > timeLimit) {
+//						System.out.println("Had to Break 1");
+						break;
+					}
 					tempModel = new Model<TermType>(model);
 					currState = tempModel.getCurrentState(match);
 					if(!moveHashMap.containsKey(move.hashCode())) moveHashMap.put(move.hashCode(), move);
@@ -563,25 +635,23 @@ public class XXXXPlayer<
 					// Calculate the the expected value for each move using monte carlo simulation
 					double expectedValue = 0.0;
 					boolean doesContain = true;
-					if(model.getPossibleMovesAtStep(stepNum).contains(move)) {
+
+					if (model.getPossibleMovesAtStep(stepNum).contains(move)) {
 //						System.out.println("model " + model.getActionPathHash() + " + move " + move);
 						expectedValue = anytimeSimulateMove(currState, move);
-					}
-					else {
+					} else {
 						doesContain = false;
 					}
 
-					// Calculate the weighted expected value for each move
-//					System.out.println("model " + model.getActionPathHash() + " has prob " + likelihood);
-//					System.out.println("move " + move + " has expected value " + expectedValue);
-
-					// Add expected value to hashmap
 					// Add expected value to hashmap
 					if (!expectedValuePerMove.containsKey(move.hashCode())) {
 						expectedValuePerMove.put(move.hashCode(), expectedValue);
+						moveCountMap.put(move.hashCode(), 1.0);
 					} else {
 						double prevExpectedValue = expectedValuePerMove.get(move.hashCode());
-						expectedValuePerMove.replace(move.hashCode(), prevExpectedValue + expectedValue);
+						double count = moveCountMap.get(move.hashCode());
+						moveCountMap.replace(move.hashCode(), count + 1.0);
+						expectedValuePerMove.replace(move.hashCode(), ((count * prevExpectedValue) + expectedValue) / (count + 1.0));
 					}
 
 //					if(doesContain) {
@@ -591,9 +661,11 @@ public class XXXXPlayer<
 //						System.out.println("model: " + model.getActionPathHash() + " does NOT contain move " + move + " with expected value " + expectedValuePerMove.get(move.hashCode())/countModels);
 //					}
 				}
-				countModels++;
+				if(System.currentTimeMillis() - startTime > timeLimit) { // @todo: make look better
+//					System.out.println("Had to Break 2");
+					break;
+				}
 			}
-			timeexpired = System.currentTimeMillis() - startTime;
 			depth++;
 		}
 		System.out.println("Ran " + depth + " simulations TOTAL");
@@ -696,7 +768,7 @@ public class XXXXPlayer<
 	 */
 	public int forwardHypergame(Model<TermType> model, int step, boolean flag) {
 		// Update the model using a random joint move
-			// Get all possible moves and remove the known bad moves
+		// Get all possible moves and remove the known bad moves
 		StateInterface<TermType, ?> state = model.getCurrentState(match);
 		ArrayList<JointMoveInterface<TermType>> possibleJointMoves = new ArrayList<JointMoveInterface<TermType>>(computeJointMoves((StateType) state, actionTracker.get(step - 1)));
 //		System.out.println("possibleJointMoves: " + possibleJointMoves);
