@@ -43,6 +43,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     private Stack<Collection<TermType>> perceptPath; // Contains the percepts that would be seen at each step
     private ArrayDeque<Integer> actionPathHashPath; // Contains
     private HashMap<Integer, HashSet<MoveInterface<TermType>>> possibleMovesAtStep;
+    private double lastProb = 1.0;
 //    private int actionPathHash = -1; // Hashes the action path to give a unique identifier to the path taken @todo: remove these two since actionPathHashPath subsumes role
 //    private int previousActionPathHash = -1; // Hashes the previous action path to assist with backtracking
 
@@ -78,6 +79,7 @@ public class Model<TermType extends TermInterface> implements Cloneable{
     }
 
     // Getters for the state of the model
+    public double getLastProb() { return this.lastProb; }
     public Stack<JointMove<TermType>> getActionPath() { return this.actionPath; }
     public Stack<Integer> getNumberOfPossibleActionsPath() { return this.numberOfPossibleActionsPath; }
     public Stack<StateInterface<TermType, ?>> getStatePath() { return this.statePath; }
@@ -109,6 +111,9 @@ public class Model<TermType extends TermInterface> implements Cloneable{
 
     public void addLegalMoves(int step, HashSet<MoveInterface<TermType>> legalMoves) {
         this.possibleMovesAtStep.put(step, legalMoves);
+    }
+    public void setLastProb(double lastProb) {
+        this.lastProb = lastProb;
     }
 
     /**

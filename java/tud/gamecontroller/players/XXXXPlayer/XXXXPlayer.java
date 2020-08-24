@@ -115,6 +115,8 @@ public class XXXXPlayer<
 	private int backtrackingDepth = 1;
 	private double likelihoodPowerFactor = 1.0;
 	private boolean shouldBranch = false;
+	private int numTimesMovesSimulated = 0;
+	private int numTimesHypergameForward = 0;
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
@@ -195,6 +197,8 @@ public class XXXXPlayer<
 		nextStepNum++;
 		notifyStartRunning();
 		notifier.connectionEstablished();
+		numTimesMovesSimulated = 0;
+		numTimesHypergameForward = 0;
 		if(stepNum > 0) {
 			if(lastMoveTimeout) { // If the player timed out last turn, update the stepnum and clear currentlyInUseMoves
 				if(stepNum + 1 < nextStepNum) {
@@ -532,7 +536,7 @@ public class XXXXPlayer<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + wasIllegal + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + wasIllegal + "," + numTimesMovesSimulated + "," + numTimesHypergameForward + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
@@ -721,6 +725,7 @@ public class XXXXPlayer<
 		}
 //			System.out.println("\tGoal: " + currState.getGoalValue(role));
 		expectedOutcome = currState.getGoalValue(role);
+		numTimesMovesSimulated++;
 		return expectedOutcome;
 	}
 
@@ -767,6 +772,7 @@ public class XXXXPlayer<
 	 * @return The step of the model
 	 */
 	public int forwardHypergame(Model<TermType> model, int step, boolean flag) {
+		numTimesHypergameForward++;
 		// Update the model using a random joint move
 		// Get all possible moves and remove the known bad moves
 		StateInterface<TermType, ?> state = model.getCurrentState(match);

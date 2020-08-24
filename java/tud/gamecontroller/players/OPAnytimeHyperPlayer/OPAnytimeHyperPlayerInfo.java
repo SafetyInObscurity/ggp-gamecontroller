@@ -25,12 +25,12 @@ import tud.gamecontroller.players.LocalPlayerInfo;
 public class OPAnytimeHyperPlayerInfo extends LocalPlayerInfo {
 
 	public OPAnytimeHyperPlayerInfo(int roleindex, GDLVersion gdlVersion) {
-		super(roleindex, TYPE_ANYTIMEHYPERPLAY_OP_BIAS, gdlVersion);
+		super(roleindex, TYPE_ANYTIMEHYPERPLAY_OP, gdlVersion);
 	}
 
 	@Override
 	public String getType() {
-		return TYPE_ANYTIMEHYPERPLAY_OP_BIAS;
+		return TYPE_ANYTIMEHYPERPLAY_OP;
 	}
 
 }

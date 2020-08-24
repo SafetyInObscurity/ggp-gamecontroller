@@ -112,6 +112,8 @@ public class CheatHyperPlayer<
 	private ArrayList<Model<TermType>> hypergames; // Holds a set of possible models for the hypergame
 	private StateInterface<TermType, ?> initialState; // Holds the initial state
 	private LikelihoodTree<TermType> likelihoodTree;
+	private int numTimesMovesSimulated = 0;
+	private int numTimesHypergameForward = 0;
 
 	private long timeLimit; // The total amount of time that can be
 	private long startTime;
@@ -176,6 +178,8 @@ public class CheatHyperPlayer<
 	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
 		notifier.connectionEstablished();
+		numTimesMovesSimulated = 0;
+		numTimesHypergameForward = 0;
 		perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
 		if(stepNum >= 0) {
 			actionTracker.put(stepNum - 1, (MoveInterface<TermType>) priorMove); // Note: This won't get the final move made
@@ -334,7 +338,7 @@ public class CheatHyperPlayer<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + false + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + false + "," + numTimesMovesSimulated + "," + numTimesHypergameForward + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
@@ -504,6 +508,7 @@ public class CheatHyperPlayer<
 			currState = currState.getSuccessor(randJointMove);
 		}
 		expectedOutcome += currState.getGoalValue(role);
+		numTimesMovesSimulated++;
 		return (float)expectedOutcome;
 	}
 
@@ -576,6 +581,7 @@ public class CheatHyperPlayer<
 	 * @return The step of the model
 	 */
 	public int forwardHypergame(Model<TermType> model, int step) {
+		numTimesHypergameForward++;
 		// Update the model using a random joint move
 			// Get all possible moves and remove the known bad moves
 		StateInterface<TermType, ?> state = model.getCurrentState(match);

@@ -13,4 +13,9 @@ public class Tuple<A, B> {
 
     public A getA() { return this.a; }
     public B getB() { return this.b; }
+
+    @Override
+    public String toString(){
+        return "A: " + a + "\tB: " + b + "\n";
+    }
 }

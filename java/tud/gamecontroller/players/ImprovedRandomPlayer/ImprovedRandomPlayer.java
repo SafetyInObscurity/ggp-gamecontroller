@@ -115,6 +115,8 @@ public class ImprovedRandomPlayer<
 	private LikelihoodTree<TermType> likelihoodTree;
 	private int backtrackingDepth = 1;
 	private boolean shouldBranch = false;
+	private int numTimesMovesSimulated = 0;
+	private int numTimesHypergameForward = 0;
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
@@ -192,6 +194,8 @@ public class ImprovedRandomPlayer<
 	public MoveInterface<TermType> gamePlay(Object seesTerms, Object priorMove, ConnectionEstablishedNotifier notifier) {
 		notifyStartRunning();
 		notifier.connectionEstablished();
+		numTimesMovesSimulated = 0;
+		numTimesHypergameForward = 0;
 		perceptTracker.put(stepNum, (Collection<TermType>) seesTerms); // Puts the percepts in the map at the current step
 		if(stepNum >= 0) {
 			actionTracker.put(stepNum - 1, (MoveInterface<TermType>) priorMove); // Note: This won't get the final move made
@@ -480,7 +484,7 @@ public class ImprovedRandomPlayer<
 		// Print move to file
 		try {
 			FileWriter myWriter = new FileWriter("matches/" + matchID + ".csv", true);
-			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + true + "\n");
+			myWriter.write(matchID + "," + gameName + "," + stepNum + "," + roleName + "," + name + "," + hypergames.size() + "," + depth + "," + updateTime + "," + selectTime + "," + bestMove + "," + true + "," + numTimesMovesSimulated + "," + numTimesHypergameForward + "\n");
 			myWriter.close();
 		} catch (IOException e) {
 			System.err.println("An error occurred.");
