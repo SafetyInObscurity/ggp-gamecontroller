@@ -751,13 +751,13 @@ public class OPBiasAnytimeHyperPlayer<
 			prob = choiceFactorSum > 0.0 ? ( choiceFactor / choiceFactorSum ) : 1.0;
 			choiceProb = ( ( 1.0 / treecf ) / invChoiceFactorSum );
 //				System.out.println("Model " + model.getActionPathHash() + " has choiceFactor: " + choiceFactor);
-				System.out.println("Model " + model.getActionPathHash() + " has prob: " + (prob * choiceProb));
+				System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
 //				System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
 	//			if(prob != choiceProb) {
 	//				System.out.println("NO MATCH");
 	//				System.exit(0);
 	//			}
-			hyperProbs.put(model.getActionPathHash(), prob * choiceProb);
+			hyperProbs.put(model.getActionPathHash(), prob);
 			model.setLastProb(prob);
 			hyperProbsOrig.put(model.getActionPathHash(), choiceProb);
 		}

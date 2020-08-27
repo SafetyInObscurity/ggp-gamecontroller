@@ -1,0 +1,53 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen,last_move_illegal
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,0,BLACK,cheat,1,16,0,947,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,0,WHITE,ophyperb,1,4,0,1412,(MOVE 1 2 1 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,1,WHITE,ophyperb,1,4,0,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,1,BLACK,cheat,1,16,15,3288,(MOVE 5 5 5 4 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,2,BLACK,cheat,1,16,0,537,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,2,WHITE,ophyperb,4,4,16,3873,(MOVE 5 2 5 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,3,WHITE,ophyperb,4,4,15,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,3,BLACK,cheat,1,16,15,2728,(MOVE 4 5 4 4 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,4,BLACK,cheat,1,16,0,481,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,4,WHITE,ophyperb,4,4,16,3980,(MOVE 4 2 4 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,5,WHITE,ophyperb,4,4,15,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,5,BLACK,cheat,1,16,15,3225,(MOVE 4 6 4 5 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,6,BLACK,cheat,1,16,0,470,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,6,WHITE,ophyperb,4,4,85,3526,(MOVE 1 1 1 2 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,7,WHITE,ophyperb,4,4,32,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,7,BLACK,cheat,1,16,32,2560,(MOVE 5 4 4 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,8,BLACK,cheat,1,16,0,363,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,8,WHITE,ophyperb,4,4,15,3069,(MOVE 3 2 3 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,9,WHITE,ophyperb,4,4,0,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,9,BLACK,cheat,1,16,0,2590,(MOVE 4 4 5 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,10,BLACK,cheat,1,16,0,464,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,10,WHITE,ophyperb,4,4,16,2740,(MOVE 2 2 2 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,11,WHITE,ophyperb,4,4,0,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,11,BLACK,cheat,1,16,16,2654,(MOVE 4 5 4 4 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,12,BLACK,cheat,1,16,0,301,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,12,WHITE,ophyperb,3,4,802,2289,(MOVE 3 1 3 2 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,13,WHITE,ophyperb,3,4,217,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,13,BLACK,cheat,1,16,16,2628,(MOVE 4 3 3 2 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,14,BLACK,cheat,1,16,22,278,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,14,WHITE,ophyperb,3,4,338,1607,(MOVE 2 1 3 2 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,15,WHITE,ophyperb,3,4,285,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,15,BLACK,cheat,1,16,15,2475,(MOVE 4 4 3 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,16,BLACK,cheat,1,16,0,332,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,16,WHITE,ophyperb,3,4,338,1261,(MOVE 6 2 5 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,17,WHITE,ophyperb,3,4,348,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,17,BLACK,cheat,1,16,0,1404,(MOVE 3 5 3 4 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,18,BLACK,cheat,1,16,0,301,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,18,WHITE,ophyperb,3,4,385,1554,(MOVE 5 3 5 4 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,19,WHITE,ophyperb,3,4,401,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,19,BLACK,cheat,1,16,0,1582,(MOVE 3 4 2 3 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,20,BLACK,cheat,1,16,0,181,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,20,WHITE,ophyperb,3,4,419,1047,(MOVE 5 4 5 5 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,21,WHITE,ophyperb,3,4,470,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,21,BLACK,cheat,1,16,16,1118,(MOVE 6 6 5 5 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,22,BLACK,cheat,1,16,0,216,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,22,WHITE,ophyperb,3,4,501,764,(MOVE 5 1 5 2 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,23,WHITE,ophyperb,3,4,586,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,23,BLACK,cheat,1,16,16,1482,(MOVE 2 3 2 2 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,24,BLACK,cheat,1,16,0,153,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,24,WHITE,ophyperb,3,4,639,379,(MOVE 1 3 1 4 ),false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,25,WHITE,ophyperb,3,4,849,0,NOOP,false
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_cube_3,blind_breakthrough_6x6_CHEAT,25,BLACK,cheat,1,16,16,833,(MOVE 2 2 2 1 ),false
