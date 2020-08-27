@@ -1,0 +1,79 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen,last_move_illegal,num_sims,num_forward_calls
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,0,BLACK,cheat,1,16,23,3139,NOOP,false,15,0
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,0,WHITE,ophyperb,1,4,47,3708,(MOVE 1 2 1 3 ),false,24,0
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,1,WHITE,ophyperb,1,4,10,0,NOOP,false,0,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,1,BLACK,cheat,1,16,13,5604,(MOVE 4 5 4 4 ),false,90,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,2,BLACK,cheat,1,16,3,1867,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,2,WHITE,ophyperb,4,4,48,7379,(MOVE 1 1 1 2 ),false,108,8
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,3,WHITE,ophyperb,4,4,19,0,NOOP,false,0,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,3,BLACK,cheat,1,16,9,5550,(MOVE 4 4 4 3 ),false,105,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,4,BLACK,cheat,1,16,3,1753,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,4,WHITE,ophyperb,1,4,240,2169,(MOVE 2 2 2 3 ),false,28,53
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,5,WHITE,ophyperb,1,4,43,0,NOOP,false,0,11
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,5,BLACK,cheat,1,16,40,5124,(MOVE 4 3 3 2 ),false,120,6
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,6,BLACK,cheat,1,16,5,1150,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,6,WHITE,ophyperb,1,4,132,1643,(MOVE 4 1 3 2 ),false,32,23
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,7,WHITE,ophyperb,1,4,61,0,NOOP,false,0,19
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,7,BLACK,cheat,1,16,20,4159,(MOVE 6 5 6 4 ),false,90,2
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,8,BLACK,cheat,1,16,4,1546,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,8,WHITE,ophyperb,3,4,170,4350,(MOVE 2 3 2 4 ),false,84,44
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,9,WHITE,ophyperb,3,4,122,0,NOOP,false,0,35
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,9,BLACK,cheat,1,16,35,4726,(MOVE 1 5 1 4 ),false,120,5
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,10,BLACK,cheat,1,16,2,1305,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,10,WHITE,ophyperb,3,4,366,3198,(MOVE 2 4 3 5 ),false,72,80
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,11,WHITE,ophyperb,3,4,229,0,NOOP,false,0,71
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,11,BLACK,cheat,1,16,11,3167,(MOVE 2 6 3 5 ),false,120,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,12,BLACK,cheat,1,16,3,1353,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,12,WHITE,ophyperb,2,4,411,2037,(MOVE 5 2 5 3 ),false,40,107
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,13,WHITE,ophyperb,2,4,310,0,NOOP,false,0,84
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,13,BLACK,cheat,1,16,24,4416,(MOVE 1 6 1 5 ),false,120,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,14,BLACK,cheat,1,16,1,1245,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,14,WHITE,ophyperb,4,4,359,4188,(MOVE 2 1 2 2 ),false,112,90
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,15,WHITE,ophyperb,4,4,13,0,NOOP,false,0,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,15,BLACK,cheat,1,16,18,3367,(MOVE 2 5 2 4 ),false,105,6
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,16,BLACK,cheat,1,16,3,990,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,16,WHITE,ophyperb,4,4,110,4180,(MOVE 5 1 5 2 ),false,128,21
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,17,WHITE,ophyperb,4,4,10,0,NOOP,false,0,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,17,BLACK,cheat,1,16,21,3207,(MOVE 5 5 5 4 ),false,120,7
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,18,BLACK,cheat,1,16,5,1022,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,18,WHITE,ophyperb,4,4,29,3473,(MOVE 2 2 2 3 ),false,104,6
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,19,WHITE,ophyperb,4,4,12,0,NOOP,false,0,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,19,BLACK,cheat,1,16,16,3073,(MOVE 6 6 6 5 ),false,120,3
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,20,BLACK,cheat,1,16,5,1010,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,20,WHITE,ophyperb,3,4,4310,1833,(MOVE 2 3 1 4 ),false,72,1955
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,21,BLACK,cheat,1,16,36,5668,(MOVE 6 4 6 3 ),false,105,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,21,WHITE,ophyperb,3,4,6015,0,NOOP,false,0,1649
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,22,BLACK,cheat,1,16,2,722,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,22,WHITE,ophyperb,3,4,5269,954,(MOVE 5 2 6 3 ),false,48,2892
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,23,BLACK,cheat,1,16,18,5061,(MOVE 2 4 1 3 ),false,105,3
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,23,WHITE,ophyperb,3,4,7347,0,NOOP,false,0,2813
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,24,BLACK,cheat,1,16,6,680,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,24,WHITE,ophyperb,3,4,6613,880,(MOVE 4 2 4 3 ),false,48,3939
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,25,BLACK,cheat,1,16,27,3575,(MOVE 4 6 4 5 ),false,90,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,25,WHITE,ophyperb,3,4,7659,0,NOOP,false,0,3605
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,26,BLACK,cheat,1,16,1,674,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,26,WHITE,ophyperb,4,4,845,1364,(MOVE 6 3 5 4 ),false,80,283
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,27,WHITE,ophyperb,4,4,8,0,NOOP,false,0,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,27,BLACK,cheat,1,16,8,1335,(MOVE 4 5 4 4 ),false,90,2
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,28,BLACK,cheat,1,16,2,523,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,28,WHITE,ophyperb,1,4,11751,276,(MOVE 3 2 3 3 ),false,20,7387
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,29,BLACK,cheat,1,16,21,2733,(MOVE 6 5 5 4 ),false,90,5
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,29,WHITE,ophyperb,1,4,10579,0,NOOP,false,0,5860
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,30,BLACK,cheat,1,16,2,455,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,30,WHITE,ophyperb,1,4,11184,289,(MOVE 4 3 5 4 ),false,24,7150
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,31,BLACK,cheat,1,16,9,1632,(MOVE 4 4 4 3 ),false,75,2
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,31,WHITE,ophyperb,1,4,12135,0,NOOP,false,0,7286
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,32,BLACK,cheat,1,16,1,232,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,32,WHITE,ophyperb,1,4,13119,102,(MOVE 5 4 5 5 ),false,16,8576
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,33,BLACK,cheat,1,16,17,432,(MOVE 4 3 4 2 ),false,30,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,33,WHITE,ophyperb,1,4,12946,0,NOOP,false,0,8098
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,34,BLACK,cheat,1,16,3,172,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,34,WHITE,ophyperb,1,4,9521,76,(MOVE 3 1 4 2 ),false,20,6276
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,35,BLACK,cheat,1,16,13,278,(MOVE 3 5 3 4 ),false,15,4
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,35,WHITE,ophyperb,1,4,10066,0,NOOP,false,0,6524
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,36,BLACK,cheat,1,16,2,204,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,36,WHITE,ophyperb,1,4,10825,75,(MOVE 6 2 6 3 ),false,12,7186
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,37,BLACK,cheat,1,16,15,112,(MOVE 3 6 3 5 ),false,15,3
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,37,WHITE,ophyperb,1,4,11387,0,NOOP,false,0,7482
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,38,BLACK,cheat,1,16,2,108,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_4x4ophyperb_16cheat_linear_68,blind_breakthrough_6x6_CHEAT,38,WHITE,ophyperb,1,4,12195,45,(MOVE 6 1 6 2 ),false,16,8168

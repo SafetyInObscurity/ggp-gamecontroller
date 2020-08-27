@@ -751,13 +751,13 @@ public class OPAnytimeHyperPlayer<
 			prob = choiceFactorSum > 0.0 ? ( choiceFactor / choiceFactorSum ) : 1.0;
 			choiceProb = ( ( 1.0 / treecf ) / invChoiceFactorSum );
 //				System.out.println("Model " + model.getActionPathHash() + " has choiceFactor: " + choiceFactor);
-				System.out.println("Model " + model.getActionPathHash() + " has prob: " + prob);
+				System.out.println("Model " + model.getActionPathHash() + " has prob: " + (prob * choiceProb));
 //				System.out.println("Model " + model.getActionPathHash() + " has choiceProb: " + choiceProb);
 	//			if(prob != choiceProb) {
 	//				System.out.println("NO MATCH");
 	//				System.exit(0);
 	//			}
-			hyperProbs.put(model.getActionPathHash(), prob);
+			hyperProbs.put(model.getActionPathHash(), prob * choiceProb);
 			model.setLastProb(prob);
 			hyperProbsOrig.put(model.getActionPathHash(), choiceProb);
 		}
@@ -997,8 +997,7 @@ public class OPAnytimeHyperPlayer<
 			double totalValue = 0.0;
 			PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>> moveQueue = new PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>(possibleJointMoves.size(), new JointMoveTupleComparator());
 			ArrayList<Tuple<Double, JointMoveInterface<TermType>>> moveList = new ArrayList<Tuple<Double, JointMoveInterface<TermType>>>();
-			System.out.println("Moves: " + possibleJointMoves.size());
-			System.out.println("numTimesMovesSimulated BEFORE: " + numTimesMovesSimulated);
+//			System.out.println("State: " + model.getActionPathHash());
 			for (JointMoveInterface<TermType> jointMove : possibleJointMoves) {
 				// Use this move
 				move = jointMove.get(opponentRole);
@@ -1008,6 +1007,7 @@ public class OPAnytimeHyperPlayer<
 				}
 				expectedValue = expectedValue/numOPProbes;
 				totalValue += expectedValue;
+//				System.out.println("\t" + jointMove + " => " + expectedValue);
 
 				// Expand the node
 				model.getActionPath().push((JointMove<TermType>)jointMove);
@@ -1022,9 +1022,9 @@ public class OPAnytimeHyperPlayer<
 				moveList.add(tuple);
 			}
 			for(Node likelihoodChild : node.getChildren()) {
+//				System.out.println(likelihoodChild.getActionPathHash() + " => " + (likelihoodChild.getValue() > 0.0 ? ((double)likelihoodChild.getValue()) / totalValue : 0.0));
 				likelihoodChild.setRelLikelihood(likelihoodChild.getValue() > 0.0 ? ((double)likelihoodChild.getValue()) / totalValue : 0.0);
 			}
-			System.out.println("numTimesMovesSimulated AFTER: " + numTimesMovesSimulated);
 
 			// Add node to set of explored nodes AND add priority queue to map
 			likelihoodTreeExpansionTracker.add(model.getActionPathHash());

@@ -1,0 +1,17 @@
+match_id,game_name,step,role_name,player_name,count_hypergames,num_probes,time_to_update,time_to_select_move,move_chosen,last_move_illegal,num_sims,num_forward_calls
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,0,BLACK,cheat,1,16,31,3356,NOOP,false,15,0
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,0,WHITE,ophyperb,1,8,27,5342,(MOVE 3 2 3 3 ),false,48,0
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,1,WHITE,ophyperb,1,8,11,0,NOOP,false,0,1
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,1,BLACK,cheat,1,16,9,5365,(MOVE 2 5 2 4 ),false,90,1
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,2,BLACK,cheat,1,16,3,1779,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,2,WHITE,ophyperb,1,8,48,4550,(MOVE 5 2 5 3 ),false,64,9
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,3,WHITE,ophyperb,1,8,19,0,NOOP,false,0,5
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,3,BLACK,cheat,1,16,17,5841,(MOVE 2 4 3 3 ),false,120,2
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,4,BLACK,cheat,1,16,4,1564,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,4,WHITE,ophyperb,1,8,65,4192,(MOVE 1 2 1 3 ),false,72,16
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,5,WHITE,ophyperb,1,8,34,0,NOOP,false,0,11
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,5,BLACK,cheat,1,16,28,5781,(MOVE 3 3 4 2 ),false,135,5
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,6,BLACK,cheat,1,16,3,1310,NOOP,false,15,1
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,6,WHITE,ophyperb,1,8,94,2940,(MOVE 5 1 5 2 ),false,72,24
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,7,WHITE,ophyperb,1,8,81,0,NOOP,false,0,19
+blind_breakthrough_6x6_CHEAT_8x8ophyperb_16cheat_3_18,blind_breakthrough_6x6_CHEAT,7,BLACK,cheat,1,16,48,2965,(MOVE 4 2 3 1 ),false,105,8
