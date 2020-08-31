@@ -108,14 +108,22 @@
    (true (cell ?m2 ?n2 b))
    (not (true (tried oplayer ?m2 ?n2))))
 
+(<= (goal xplayer 50)
+   (line xplayer)
+   (line oplayer))
+
 (<= (goal xplayer 100)
    (line xplayer))
-  
+
 (<= (goal xplayer 50)
    (not (line xplayer))
    (not (line oplayer)))
-  
+
 (<= (goal xplayer 0)
+   (line oplayer))
+
+(<= (goal oplayer 50)
+   (line xplayer)
    (line oplayer))
 
 (<= (goal oplayer 100)
