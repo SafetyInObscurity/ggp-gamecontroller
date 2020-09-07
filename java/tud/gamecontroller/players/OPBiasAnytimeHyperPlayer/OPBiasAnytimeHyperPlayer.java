@@ -176,7 +176,7 @@ public class OPBiasAnytimeHyperPlayer<
 		stepNum = 0;
 		nextStepNum = 0;
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
-		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/10; // Can use 10% of the playclock to update the state
+		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/100; // Can use 10% of the playclock to update the state
 		moveSelectOrderMap = new HashMap<Integer, PriorityQueue<Tuple<Double, JointMoveInterface<TermType>>>>();
 		moveSelectMap = new HashMap<Integer, ArrayList<Tuple<Double, JointMoveInterface<TermType>>>>();
 
