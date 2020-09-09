@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source tests/testConfig/gdl2_stratego_CHEAT.txt
+source tests/testConfig/gdl2_blind_breakthrough_6x6_CHEAT.txt
 PARSERESULTS=true
 
 for ((i=$TESTSTARTNUM ; i < $TESTENDNUM ; i++));

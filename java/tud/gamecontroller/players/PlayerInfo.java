@@ -36,6 +36,7 @@ public abstract class PlayerInfo {
 	public static final String TYPE_CHEAT = "cheat";
 	public static final String TYPE_ANYTIMEHYPERPLAY_OP = "ophyper";
 	public static final String TYPE_ANYTIMEHYPERPLAY_OP_BIAS = "ophyperb";
+	public static final String TYPE_VARIANCE_HYPERPLAY = "varhyper";
 
 	private int roleindex;
 	private String name;
