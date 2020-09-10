@@ -42,6 +42,7 @@ import tud.gamecontroller.players.LegalPlayerInfo;
 import tud.gamecontroller.players.MCSPlayer.MCSPlayerInfo;
 import tud.gamecontroller.players.OPAnytimeHyperPlayer.OPAnytimeHyperPlayerInfo;
 import tud.gamecontroller.players.OPBiasAnytimeHyperPlayer.OPBiasAnytimeHyperPlayerInfo;
+import tud.gamecontroller.players.OPVarianceHyperPlayer.OPVarianceHyperPlayerInfo;
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
@@ -328,6 +329,19 @@ public abstract class AbstractGameControllerCLIRunner<
 					System.exit(-1);
 				}
 				player=new VarianceHyperPlayerInfo(roleindex-1, getGdlVersion());
+			}else{
+				missingArgumentsExit(argv[index-1]);
+			}
+		}else if(argv[index].equals("-varophyper")){
+			++index;
+			if(argv.length>=index+1){
+				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
+				if(roleindex<1){
+					System.err.println("roleindex out of bounds");
+					printUsage();
+					System.exit(-1);
+				}
+				player=new OPVarianceHyperPlayerInfo(roleindex-1, getGdlVersion());
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
