@@ -116,6 +116,7 @@ public class VarianceHyperPlayer<
 	private boolean shouldBranch = false;
 	private int numTimesMovesSimulated = 0;
 	private int numTimesHypergameForward = 0;
+	private int invPlaytimeFactor = 10;
 
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepBlacklist; // Any valid hypergame at this step must NOT allow the move contained here
 	private HashMap<Integer, MoveInterface<TermType>> moveForStepWhitelist; // Any valid hypergame at this step MUST allow the move contained here
@@ -142,6 +143,7 @@ public class VarianceHyperPlayer<
 				else if(data[0].equals("backtrackingDepth")) backtrackingDepth = Integer.parseInt(data[1]);
 				else if(data[0].equals("likelihoodPowerFactor")) likelihoodPowerFactor = Double.parseDouble(data[1]);
 				else if(data[0].equals("shouldBranch")) shouldBranch = Boolean.parseBoolean(data[1]);
+				else if(data[0].equals("invPlaytimeFactor")) invPlaytimeFactor = Integer.parseInt(data[1]);
 			}
 			csvReader.close();
 		}  catch (IOException e) {
@@ -171,7 +173,7 @@ public class VarianceHyperPlayer<
 		stepNum = 0;
 		nextStepNum = 0;
 		timeLimit = (this.match.getPlayclock()*1000 - PREFERRED_PLAY_BUFFER);
-		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/100; // Can use 10% of the playclock to update the state
+		stateUpdateTimeLimit = (this.match.getPlayclock()*1000)/invPlaytimeFactor; // Can use 10% of the playclock to update the state
 
 		moveForStepBlacklist = new HashMap<Integer, MoveInterface<TermType>>();
 		moveForStepWhitelist = new HashMap<Integer, MoveInterface<TermType>>();
