@@ -21,6 +21,8 @@
 package tud.gamecontroller.players;
 
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.players.StateVarianceHyperPlayer.StateVarianceHyperPlayer;
+import tud.gamecontroller.players.StateVarianceHyperPlayer.StateVarianceHyperPlayerInfo;
 import tud.gamecontroller.players.AnytimeHyperPlayer.AnytimeHyperPlayer;
 import tud.gamecontroller.players.AnytimeHyperPlayer.AnytimeHyperPlayerInfo;
 import tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree.AnytimeHyperPlayerLikelihoodTree;
@@ -125,6 +127,11 @@ public class PlayerFactory {
 	}
 
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createStateVarianceHyperPlayerInfo(StateVarianceHyperPlayerInfo info) {
+		return new StateVarianceHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createPlayer(PlayerInfo info, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
 			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, gameScrambler);
@@ -167,6 +174,9 @@ public class PlayerFactory {
 		}
 		else if(info instanceof OPVarianceHyperPlayerInfo){
 			return PlayerFactory. <TermType, StateType> createOPVarianceHyperPlayer((OPVarianceHyperPlayerInfo)info);
+		}
+		else if(info instanceof StateVarianceHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createStateVarianceHyperPlayerInfo((StateVarianceHyperPlayerInfo)info);
 		}
 		return null;
 	}

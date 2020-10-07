@@ -32,6 +32,7 @@ import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.impl.Game;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
+import tud.gamecontroller.players.StateVarianceHyperPlayer.StateVarianceHyperPlayerInfo;
 import tud.gamecontroller.logging.UnbufferedStreamHandler;
 import tud.gamecontroller.players.AnytimeHyperPlayer.AnytimeHyperPlayerInfo;
 import tud.gamecontroller.players.AnytimeHyperPlayerLikelihoodTree.AnytimeHyperPlayerLikelihoodTreeInfo;
@@ -46,7 +47,6 @@ import tud.gamecontroller.players.OPVarianceHyperPlayer.OPVarianceHyperPlayerInf
 import tud.gamecontroller.players.PlayerInfo;
 import tud.gamecontroller.players.RandomPlayerInfo;
 import tud.gamecontroller.players.RemotePlayerInfo;
-import tud.gamecontroller.players.VarianceHyperPlayer.VarianceHyperPlayer;
 import tud.gamecontroller.players.VarianceHyperPlayer.VarianceHyperPlayerInfo;
 import tud.gamecontroller.players.XXXXPlayer.XXXXPlayerInfo;
 import tud.gamecontroller.term.TermInterface;
@@ -342,6 +342,19 @@ public abstract class AbstractGameControllerCLIRunner<
 					System.exit(-1);
 				}
 				player=new OPVarianceHyperPlayerInfo(roleindex-1, getGdlVersion());
+			}else{
+				missingArgumentsExit(argv[index-1]);
+			}
+		}else if(argv[index].equals("-svarhyper")){
+			++index;
+			if(argv.length>=index+1){
+				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
+				if(roleindex<1){
+					System.err.println("roleindex out of bounds");
+					printUsage();
+					System.exit(-1);
+				}
+				player=new StateVarianceHyperPlayerInfo(roleindex-1, getGdlVersion());
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}

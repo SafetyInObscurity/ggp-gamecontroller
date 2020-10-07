@@ -1,10 +1,10 @@
 MATCH_ID="4x4_CHEAT_4x4ophyperb_16cheat_linear"
-GAMEFILE="testdata/games/games_gdl/kriegTTT4x4_CHEAT/kriegTTT_4x4_CHEAT.gdl"
+GAMEFILE="testdata/games/games_gdl/kriegTTT_4x4_CHEAT/kriegTTT_4x4_CHEAT.gdl"
 GAMENAME="kriegTTT_4x4_CHEAT"
 START_CLOCK=10
 PLAY_CLOCK=300
 GDL_VERSION=2
-PLAYER_NAME_1="ophyper"
+PLAYER_NAME_1="svarhyper"
 ROLE_ID_1=1
 ROLE_NAME_1="XPLAYER"
 PLAYER_NAME_2="cheat"
