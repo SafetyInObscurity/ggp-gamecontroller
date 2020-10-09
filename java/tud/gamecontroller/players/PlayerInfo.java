@@ -39,6 +39,7 @@ public abstract class PlayerInfo {
 	public static final String TYPE_VARIANCE_HYPERPLAY = "varhyper";
 	public static final String TYPE_STATE_VARIANCE_HYPERPLAY = "svarhyper";
 	public static final String TYPE_VARIANCE_HYPERPLAY_OP = "varophyper";
+	public static final String TYPE_STATE_VARIANCE_HYPERPLAY_OP = "svarophyper";
 
 	private int roleindex;
 	private String name;
