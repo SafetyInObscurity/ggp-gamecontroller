@@ -31,6 +31,9 @@ import tud.gamecontroller.AbstractGameControllerRunner;
 import tud.gamecontroller.GDLVersion;
 import tud.gamecontroller.ReasonerFactoryInterface;
 import tud.gamecontroller.game.impl.Game;
+import tud.gamecontroller.players.OPLikelihoodStateVarianceHyperPlayer.OPLikelihoodStateVarianceHyperPlayerInfo;
+import tud.gamecontroller.players.OPExpansionAnytimeHyperPlayer.OPExpansionAnytimeHyperPlayerInfo;
+import tud.gamecontroller.players.OPLikelihoodAnytimeHyperPlayer.OPLikelihoodAnytimeHyperPlayerInfo;
 import tud.gamecontroller.logging.PlainTextLogFormatter;
 import tud.gamecontroller.players.OPStateVarianceHyperPlayer.OPStateVarianceHyperPlayerInfo;
 import tud.gamecontroller.players.StateVarianceHyperPlayer.StateVarianceHyperPlayerInfo;
@@ -372,7 +375,47 @@ public abstract class AbstractGameControllerCLIRunner<
 			}else{
 				missingArgumentsExit(argv[index-1]);
 			}
-		}else{
+		}else if(argv[index].equals("-oplikehyper")){
+			++index;
+			if(argv.length>=index+1){
+				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
+				if(roleindex<1){
+					System.err.println("roleindex out of bounds");
+					printUsage();
+					System.exit(-1);
+				}
+				player=new OPLikelihoodAnytimeHyperPlayerInfo(roleindex-1, getGdlVersion());
+			}else{
+				missingArgumentsExit(argv[index-1]);
+			}
+		}else if(argv[index].equals("-opexpandhyper")){
+			++index;
+			if(argv.length>=index+1){
+				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
+				if(roleindex<1){
+					System.err.println("roleindex out of bounds");
+					printUsage();
+					System.exit(-1);
+				}
+				player=new OPExpansionAnytimeHyperPlayerInfo(roleindex-1, getGdlVersion());
+			}else{
+				missingArgumentsExit(argv[index-1]);
+			}
+		}else if(argv[index].equals("-svarlikeophyper")){
+			++index;
+			if(argv.length>=index+1){
+				int roleindex=getIntArg(argv[index], "roleindex"); ++index;
+				if(roleindex<1){
+					System.err.println("roleindex out of bounds");
+					printUsage();
+					System.exit(-1);
+				}
+				player=new OPLikelihoodStateVarianceHyperPlayerInfo(roleindex-1, getGdlVersion());
+			}else{
+				missingArgumentsExit(argv[index-1]);
+			}
+		}
+		else{
 			System.err.println("invalid argument: "+argv[index]);
 			printUsage();
 			System.exit(-1);

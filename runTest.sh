@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source tests/testConfig/gdl2_kriegTTT_4x4_CHEAT.txt
+source tests/testConfig/gdl2_kriegTTT_4x4_cheat.txt
 PARSERESULTS=true
 
 for ((i=$TESTSTARTNUM ; i < $TESTENDNUM ; i++));

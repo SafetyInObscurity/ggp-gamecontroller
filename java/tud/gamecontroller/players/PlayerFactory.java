@@ -21,6 +21,12 @@
 package tud.gamecontroller.players;
 
 import tud.gamecontroller.game.StateInterface;
+import tud.gamecontroller.players.OPLikelihoodStateVarianceHyperPlayer.OPLikelihoodStateVarianceHyperPlayer;
+import tud.gamecontroller.players.OPLikelihoodStateVarianceHyperPlayer.OPLikelihoodStateVarianceHyperPlayerInfo;
+import tud.gamecontroller.players.OPExpansionAnytimeHyperPlayer.OPExpansionAnytimeHyperPlayer;
+import tud.gamecontroller.players.OPExpansionAnytimeHyperPlayer.OPExpansionAnytimeHyperPlayerInfo;
+import tud.gamecontroller.players.OPLikelihoodAnytimeHyperPlayer.OPLikelihoodAnytimeHyperPlayer;
+import tud.gamecontroller.players.OPLikelihoodAnytimeHyperPlayer.OPLikelihoodAnytimeHyperPlayerInfo;
 import tud.gamecontroller.players.OPStateVarianceHyperPlayer.OPStateVarianceHyperPlayer;
 import tud.gamecontroller.players.OPStateVarianceHyperPlayer.OPStateVarianceHyperPlayerInfo;
 import tud.gamecontroller.players.StateVarianceHyperPlayer.StateVarianceHyperPlayer;
@@ -139,6 +145,21 @@ public class PlayerFactory {
 	}
 
 	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createOPLikelihoodAnytimeHyperPlayerInfo(OPLikelihoodAnytimeHyperPlayerInfo info) {
+		return new OPLikelihoodAnytimeHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createOPExpansionAnytimeHyperPlayerInfo(OPExpansionAnytimeHyperPlayerInfo info) {
+		return new OPExpansionAnytimeHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
+	Player<TermType, StateType> createOPLikelihoodStateVarianceHyperPlayerInfo(OPLikelihoodStateVarianceHyperPlayerInfo info) {
+		return new OPLikelihoodStateVarianceHyperPlayer<TermType, StateType>(info.getName(), info.getGdlVersion());
+	}
+
+	public static <TermType extends TermInterface, StateType extends StateInterface<TermType, ? extends StateType>>
 		Player<TermType, StateType> createPlayer(PlayerInfo info, GameScramblerInterface gameScrambler) {
 		if(info instanceof RemotePlayerInfo){
 			return PlayerFactory. <TermType, StateType> createRemotePlayer((RemotePlayerInfo)info, gameScrambler);
@@ -186,6 +207,12 @@ public class PlayerFactory {
 			return PlayerFactory. <TermType, StateType> createStateVarianceHyperPlayerInfo((StateVarianceHyperPlayerInfo)info);
 		}else if(info instanceof OPStateVarianceHyperPlayerInfo){
 			return PlayerFactory. <TermType, StateType> createOPStateVarianceHyperPlayerInfo((OPStateVarianceHyperPlayerInfo)info);
+		}else if(info instanceof OPLikelihoodAnytimeHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createOPLikelihoodAnytimeHyperPlayerInfo((OPLikelihoodAnytimeHyperPlayerInfo)info);
+		}else if(info instanceof OPExpansionAnytimeHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createOPExpansionAnytimeHyperPlayerInfo((OPExpansionAnytimeHyperPlayerInfo)info);
+		}else if(info instanceof OPLikelihoodStateVarianceHyperPlayerInfo){
+			return PlayerFactory. <TermType, StateType> createOPLikelihoodStateVarianceHyperPlayerInfo((OPLikelihoodStateVarianceHyperPlayerInfo)info);
 		}
 		return null;
 	}
