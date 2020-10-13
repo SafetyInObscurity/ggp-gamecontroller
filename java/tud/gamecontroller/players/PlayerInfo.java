@@ -43,6 +43,7 @@ public abstract class PlayerInfo {
 	public static final String TYPE_LIKELIHOOD_ANYTIMEHYPERPLAY_OP = "oplikehyper";
 	public static final String TYPE_EXPAND_ANYTIMEHYPERPLAY_OP = "opexpandhyper";
 	public static final String TYPE_STATE_VARIANCE_LIKELIHOOD_HYPERPLAY_OP = "svarlikeophyper";
+	public static final String TYPE_STATE_VARIANCE_NOBIAS_HYPERPLAY = "svarnobiashyper";
 
 	private int roleindex;
 	private String name;
