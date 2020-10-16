@@ -495,9 +495,9 @@ public class StateVarianceHyperPlayer<
 
 			// Filter to ensure the hypergames have the correct variance
 			if(hypergames.size() > numHyperGames) {
-				hypergames = filterByVariance(hypergames);
+				hypergames = filterByVarianceOptimized(hypergames);
+				System.out.println(this.getName() + ": Number of hypergames after reducing variance: " + hypergames.size());
 			}
-			System.out.println(this.getName() + ": Number of hypergames after reducing variance: " + hypergames.size());
 		}
 
 		currentlyInUseMoves.clear();
@@ -559,18 +559,147 @@ public class StateVarianceHyperPlayer<
 		return bestMove;
 	}
 
+	public ArrayList<Model<TermType>> filterByVarianceOptimized(ArrayList<Model<TermType>> hypergameList) {
+			// Calculate probabilities of each model contained
+		HashMap<Integer, Double> choiceFactors = new HashMap<Integer, Double>();
+		HashMap<Integer, Double> hyperProbs = new HashMap<Integer, Double>();
+		double prob;
+			// Find the most likely model
+		Model<TermType> mostLikelyModel = hypergameList.get(0);
+		double mostLikelyProb = -(Double.MAX_VALUE);
+			// Calculate the state as a bitstring
+		HashMap<Integer, BitSet> bitStates = new HashMap<Integer, BitSet>();
+		BitSet bitState;
+		int bitSetLength = 1;
+		HashMap<TermType, Integer> stateToIntMap = new HashMap<TermType, Integer>();
+		Integer stateInt;
+
+		// Note: This does not normalize the prob
+		for(Model<TermType> model : hypergameList) {
+			// Calculate the prob of each model and add to the map
+			prob = (1.0/likelihoodTree.getChoiceFactor(model.getActionPathHashPath()));
+			hyperProbs.put(model.getActionPathHash(), prob);
+			if(prob > mostLikelyProb) {
+				mostLikelyProb = prob;
+				mostLikelyModel = model;
+			}
+
+			// Calculate the state as a bit string
+			bitState = new BitSet(bitSetLength);
+			Iterator<TermType> it = (Iterator<TermType>) model.getCurrentState(match).getFluents().iterator();
+			while (it.hasNext())
+			{
+				// Put in map if not contained and get value
+				stateInt = stateToIntMap.putIfAbsent(it.next(), bitSetLength);
+				if(stateInt == null) {
+					stateInt = bitSetLength;
+					bitSetLength++;
+				}
+
+				bitState.set(stateInt);
+			}
+			bitStates.put(model.getActionPathHash(), bitState);
+		}
+
+		// Print to check
+//		System.out.println("Model Probabilities");
+//		for(Model<TermType> model : hypergameList) {
+//			System.out.println("\tModel: " + model.getActionPathHash() + " has prob " + hyperProbs.get(model.getActionPathHash()));
+//		}
+//		System.out.println("Model actual states");
+//		for(Model<TermType> model : hypergameList) {
+//			System.out.println("\tModel: " + model.getActionPathHash() + " has state " + model.getCurrentState(match).toString());
+//		}
+//		System.out.println("Model actual states");
+//		for(Model<TermType> model : hypergameList) {
+//			System.out.println("\tModel: " + model.getActionPathHash() + " has state bitmap " + bitStates.get(model.getActionPathHash()));
+//		}
+//		System.exit(0);
+
+		// Add most likely model to start sample
+		ArrayList<Model<TermType>> hypergameListClone = new ArrayList<Model<TermType>>(hypergameList);
+		ArrayList<Model<TermType>> filteredHypergameList = new ArrayList<Model<TermType>>();
+		filteredHypergameList.add(mostLikelyModel);
+		hypergameListClone.remove(mostLikelyModel);
+
+		// Select based on variance
+			// Get the variance for each model
+		int variance;
+		BitSet modelBitState;
+		BitSet temp;
+
+		while(filteredHypergameList.size() < numHyperGames) {
+			// Calc variance
+			ArrayList<Model<TermType>> mostVariedModels = new ArrayList<Model<TermType>>();
+			int mostVariedVariance = -1;
+			for (Model<TermType> model : hypergameListClone) {
+				variance = 0;
+				modelBitState = bitStates.get(model.getActionPathHash());
+				for (Model<TermType> sampledModel : filteredHypergameList) {
+					temp = (BitSet) modelBitState.clone();
+					temp.xor(bitStates.get(sampledModel.getActionPathHash()));
+					variance += temp.cardinality();
+				}
+//				System.out.println("\tModel: " + model.getActionPathHash() + " has variance: " + variance);
+
+				// If variance is greater, then add to list
+				if (variance > mostVariedVariance) {
+					mostVariedModels.clear();
+					mostVariedModels.add(model);
+					mostVariedVariance = variance;
+				} else if (variance == mostVariedVariance) {
+					mostVariedModels.add(model);
+				}
+			}
+
+			// If multiple, select based on probability
+			Model<TermType> chosenModel = null;
+			if (mostVariedModels.size() > 1) {
+				// Get one with highest probability
+				chosenModel = mostVariedModels.get(0);
+				mostLikelyProb = hyperProbs.get(chosenModel.getActionPathHash());
+//				System.out.println();
+				for (Model<TermType> model : mostVariedModels) {
+//					System.out.println("TOP RUNNER: Hypergame " + model.getActionPathHash() + " has a probability of " + hyperProbs.get(model.getActionPathHash()));
+					if (hyperProbs.get(model.getActionPathHash()) > mostLikelyProb) {
+						mostLikelyProb = hyperProbs.get(model.getActionPathHash());
+						chosenModel = model;
+					}
+				}
+				System.out.println();
+			} else {
+				chosenModel = mostVariedModels.get(0);
+			}
+//
+//			System.out.println();
+//			System.out.println("Chose model " + chosenModel.getActionPathHash() + " as the model with greatest variance/probability");
+//			System.out.println();
+
+			filteredHypergameList.add(chosenModel);
+			hypergameListClone.remove(chosenModel);
+		}
+
+		// Print chosen models
+//		int count = 0;
+//		for(Model<TermType> model : filteredHypergameList) {
+//			System.out.println(count + ": Model " + model.getActionPathHash());
+//			count++;
+//		}
+
+
+		return filteredHypergameList;
+	}
+
 	public ArrayList<Model<TermType>> filterByVariance(ArrayList<Model<TermType>> hypergameList) {
 		ArrayList<Model<TermType>> filteredHypergameList = new ArrayList<Model<TermType>>();
 
 		// Find the most likely model
-		// @todo: Reduce all of this looping to a single loop
 			// Calculate relative probabilities of each hypergame
 		HashMap<Integer, Double> choiceFactors = new HashMap<Integer, Double>();
 		double choiceFactor;
 		double invChoiceFactorSum = 0;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = likelihoodTree.getChoiceFactor(model.getActionPathHashPath());
-			double treecf = model.getNumberOfPossibleActions();
 			choiceFactors.put(model.getActionPathHash(), choiceFactor);
 			invChoiceFactorSum += (1.0/choiceFactor);
 		}
@@ -578,7 +707,7 @@ public class StateVarianceHyperPlayer<
 		double prob;
 		for(Model<TermType> model : hypergames) {
 			choiceFactor = choiceFactors.get(model.getActionPathHash());
-			prob = ((1.0/(Double)choiceFactor)/invChoiceFactorSum);
+			prob = ((1.0/choiceFactor)/invChoiceFactorSum);
 			hyperProbs.put(model.getActionPathHash(), prob);
 		}
 		// Find the most likely model
