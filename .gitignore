@@ -6,3 +6,4 @@ gamecontroller.jar
 gamecontroller-cli.jar
 gamecontroller-gui.jar
 gamecontroller-retracer.jar
+*.class

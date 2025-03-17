@@ -3,8 +3,7 @@
     <property environment="env"/>
     <property name="ggpserver.location" value="../ggpserver"/>
     <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+    <property name="release" value="8"/>
     <path id="gamecontroller.classpath">
         <pathelement location="bin"/>
         <pathelement location="lib/BenderNG/lib/antlr.jar"/>
@@ -86,37 +85,37 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="lib/BenderNG/source"/>
             <classpath refid="gamecontroller.classpath"/>
             <!--<compilerarg value="-Xlint:unchecked"/>-->
         </javac>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="lib/BenderNG/tests"/>
             <classpath refid="gamecontroller.classpath"/>
             <!--<compilerarg value="-Xlint:unchecked"/>-->
         </javac>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="lib/JavaProver"/>
             <classpath refid="gamecontroller.classpath"/>
             <!--<compilerarg value="-Xlint:unchecked"/>-->
         </javac>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="lib/jocular-0.2/Common/src/java"/>
             <classpath refid="gamecontroller.classpath"/>
             <!--<compilerarg value="-Xlint:unchecked"/>-->
         </javac>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="lib/jocular-0.2/Jocular/src/java"/>
             <classpath refid="gamecontroller.classpath"/>
             <!--<compilerarg value="-Xlint:unchecked"/>-->
         </javac>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="java"/>
             <classpath refid="gamecontroller.classpath"/>
             <compilerarg value="-Xlint:unchecked"/>
         </javac>
-        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+        <javac includeantruntime="false" debug="true" debuglevel="${debuglevel}" destdir="bin" release="${release}">
             <src path="."/>
             <exclude name="java/"/>
             <exclude name="lib/BenderNG/source/"/>
