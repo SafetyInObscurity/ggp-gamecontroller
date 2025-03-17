@@ -47,7 +47,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
-public abstract class RemotePlayer<TermType extends TermInterface,
+public class RemotePlayer<TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends AbstractPlayer<TermType, StateType>  {
 	
 	private String host;
@@ -272,4 +272,9 @@ public abstract class RemotePlayer<TermType extends TermInterface,
 		}
 		return hostAddress;
 	}
+
+    @Override
+    public MoveInterface<TermType> gamePlay(Object seesFluents, Object priorMove, ConnectionEstablishedNotifier notifier) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
