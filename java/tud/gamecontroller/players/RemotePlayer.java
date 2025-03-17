@@ -47,7 +47,7 @@ import tud.gamecontroller.logging.GameControllerErrorMessage;
 import tud.gamecontroller.scrambling.GameScramblerInterface;
 import tud.gamecontroller.term.TermInterface;
 
-public class RemotePlayer<TermType extends TermInterface,
+public abstract class RemotePlayer<TermType extends TermInterface,
 	StateType extends StateInterface<TermType, ? extends StateType>> extends AbstractPlayer<TermType, StateType>  {
 	
 	private String host;
@@ -136,7 +136,6 @@ public class RemotePlayer<TermType extends TermInterface,
 		return move;
 	}
 
-	@Override
 	public void gameStop(Object seesTerms, ConnectionEstablishedNotifier notifier) {
 		String msg = constructPlayOrStopMessage("STOP", seesTerms);
 		//notifyStartRunning(); // don't count time for the stop message
